@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 5: Bayesian Learning, PGMs & EM Algorithm — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #fb7185;
+      --accent-glow: rgba(251, 113, 133, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --cyan: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--cyan); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(52, 211, 153, 0.08);
+      border-left: 4px solid var(--success);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--success); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">ML<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="module1_interview_guide.html" class="mod-link">M1: Foundations</a>
+      <a href="module2_interview_guide.html" class="mod-link">M2: Pipelines</a>
+      <a href="module3_interview_guide.html" class="mod-link">M3: Regression</a>
+      <a href="module4_interview_guide.html" class="mod-link">M4: Trees/Ensembles</a>
+      <a href="module5_interview_guide.html" class="mod-link active">M5: Bayesian</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">Module 5 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-bayes')"><span>🔮</span> 1. Bayes' Theorem & Foundations</li>
+        <li class="nav-item" onclick="switchTab('tab-mle-map')"><span>⚖️</span> 2. MLE vs. MAP vs. Bayesian</li>
+        <li class="nav-item" onclick="switchTab('tab-proofs')"><span>📐</span> 3. MSE & Cross-Entropy Proofs</li>
+        <li class="nav-item" onclick="switchTab('tab-mdl')"><span>💾</span> 4. Minimum Description Length (MDL)</li>
+        <li class="nav-item" onclick="switchTab('tab-optimal')"><span>👑</span> 5. Bayes Optimal & Gibbs Algo</li>
+        <li class="nav-item" onclick="switchTab('tab-naive')"><span>📨</span> 6. Naïve Bayes & Text Classif.</li>
+        <li class="nav-item" onclick="switchTab('tab-bbn')"><span>🕸️</span> 7. Belief Networks & d-Separation</li>
+        <li class="nav-item" onclick="switchTab('tab-em')"><span>🔄</span> 8. EM Algorithm & ELBO Math</li>
+        <li class="nav-item" onclick="switchTab('tab-gmm')"><span>👥</span> 9. GMM & K-Means Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-modern')"><span>🎲</span> 10. MCMC & Thompson Sampling</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: BAYES THEOREM & FOUNDATIONS -->
+      <section id="tab-bayes" class="tab-section active">
+        <h1>Bayes' Theorem & Probabilistic Reasoning</h1>
+        <p class="section-subtitle">Belief updating under evidence, mathematical anatomy, and the base rate fallacy.</p>
+
+        <div class="first-principles">
+          <h4>🔮 What is Bayesian Thinking? (From First Principles)</h4>
+          <p>Imagine you look out the window in the morning and see wet pavement. Why is it wet?</p>
+          <ol>
+            <li><strong>Frequentist perspective:</strong> Pavement is either wet or dry. If we repeat this exact morning 1,000 times under identical atmospheric conditions, what proportion of mornings did rain cause the wet pavement?</li>
+            <li><strong>Bayesian perspective:</strong> You have an initial degree of belief about whether it rained overnight based on season and climate (<strong>Prior</strong>). Seeing wet pavement is an observation (<strong>Evidence</strong>). You update your degree of belief about rain in light of this observation (<strong>Posterior</strong>).</li>
+          </ol>
+          <p>In machine learning, <em>learning</em> is the process of updating probability distributions over model parameters or hypotheses as new data arrives: <strong>Today's posterior becomes tomorrow's prior.</strong></p>
+        </div>
+
+        <h2>1. Mathematical Anatomy of Bayes' Theorem</h2>
+        <div class="math-box">
+          <h4>The Core Formula:</h4>
+          $$P(h \mid \mathcal{D}) = \frac{P(\mathcal{D} \mid h) \cdot P(h)}{P(\mathcal{D})}$$
+          <ul>
+            <li>$P(h)$ &mdash; <strong>Prior Probability:</strong> Your initial belief in hypothesis $h$ before seeing training data $\mathcal{D}$. Encodes domain knowledge, physical constraints, or inductive biases.</li>
+            <li>$P(\mathcal{D} \mid h)$ &mdash; <strong>Likelihood:</strong> The probability that data $\mathcal{D}$ would be observed if hypothesis $h$ were strictly true. Evaluated as a function of $h$.</li>
+            <li>$P(\mathcal{D})$ &mdash; <strong>Marginal Evidence (Normalizing Constant):</strong> The total probability of observing data $\mathcal{D}$ across all possible hypotheses in hypothesis space $\mathcal{H}$:
+              $$P(\mathcal{D}) = \sum_{h' \in \mathcal{H}} P(\mathcal{D} \mid h') P(h') \quad \text{or} \quad \int_{\mathcal{H}} P(\mathcal{D} \mid \theta) P(\theta) d\theta$$
+            </li>
+            <li>$P(h \mid \mathcal{D})$ &mdash; <strong>Posterior Probability:</strong> Your updated belief in hypothesis $h$ after observing evidence $\mathcal{D}$.</li>
+          </ul>
+        </div>
+
+        <h2>2. Worked Numerical Walkthrough: The Classic Medical Test Paradox</h2>
+        <p>This is one of the most famous screening interview questions at Google, Meta, and quantitative hedge funds. It tests whether an engineer understands <strong>Base Rates</strong>.</p>
+
+        <div class="example-box">
+          <h4>🏥 The Rare Disease Screening Problem</h4>
+          <p><strong>Clinical Setup:</strong></p>
+          <ul>
+            <li>A rare disease affects <strong>0.5%</strong> of the population: $P(\text{Disease}) = 0.005$, hence $P(\neg\text{Disease}) = 0.995$.</li>
+            <li>A laboratory test has a <strong>99% Sensitivity (True Positive Rate)</strong>: $P(+ \mid \text{Disease}) = 0.99$.</li>
+            <li>The test has a <strong>2% False Positive Rate</strong> (98% Specificity): $P(+ \mid \neg\text{Disease}) = 0.02$.</li>
+          </ul>
+          <p><strong>Interview Question:</strong> <em>A patient randomly selected from the general population tests positive ($+$). What is the exact probability that this patient actually has the disease?</em></p>
+
+          <p><strong>Step 1: Compute the Marginal Evidence $P(+)$ using the Law of Total Probability:</strong></p>
+          $$P(+) = P(+ \mid \text{Disease})P(\text{Disease}) + P(+ \mid \neg\text{Disease})P(\neg\text{Disease})$$
+          $$P(+) = (0.99 \times 0.005) + (0.02 \times 0.995) = 0.00495 + 0.01990 = \mathbf{0.02485}$$
+
+          <p><strong>Step 2: Apply Bayes' Rule to Find the Posterior $P(\text{Disease} \mid +)$:</strong></p>
+          $$P(\text{Disease} \mid +) = \frac{P(+ \mid \text{Disease}) P(\text{Disease})}{P(+)} = \frac{0.00495}{0.02485} \approx \mathbf{0.1992 \approx 19.92\%}$$
+
+          <div class="interview-alert">
+            <h4>💡 The Intuitive Key (Natural Frequencies):</h4>
+            <p>Imagine <strong>10,000 people</strong>:</p>
+            <ul>
+              <li><strong>50 people</strong> actually have the disease. Of these, 99% test positive &rarr; $\approx 49.5 \approx 50$ true positives.</li>
+              <li><strong>9,950 people</strong> are healthy. Of these, 2% falsely test positive &rarr; $0.02 \times 9,950 = 199$ false positives!</li>
+              <li>Total positive tests = $50 + 199 = 249$.</li>
+              <li>Fraction of positive tests that are actually sick = $\frac{50}{249} \approx \mathbf{20.08\%}$!</li>
+            </ul>
+            <p><strong>Interview Takeaway:</strong> Even with a 99% accurate test, an individual who tests positive has an <strong>80% chance of being completely healthy</strong>. Why? Because the prior probability of being healthy is so overwhelmingly high ($99.5\%$) that the 2% false positives from the healthy population heavily outnumber the true positives from the infected population. This phenomenon is called the <strong>Base Rate Fallacy</strong>.</p>
+          </div>
+        </div>
+
+        <h2>3. Three Fundamental Rules of Probability</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Rule Name</th>
+                <th>Mathematical Formula</th>
+                <th>Machine Learning Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Product Rule</strong></td>
+                <td>$P(A, B) = P(A \mid B)P(B) = P(B \mid A)P(A)$</td>
+                <td>Joint distribution decomposition (foundation of Bayesian Networks and autoregressive models).</td>
+              </tr>
+              <tr>
+                <td><strong>Sum Rule (Marginalization)</strong></td>
+                <td>$P(A) = \sum_B P(A, B) = \sum_B P(A \mid B)P(B)$</td>
+                <td>Integrating out nuisance parameters or unobserved latent variables (foundation of EM and GMM).</td>
+              </tr>
+              <tr>
+                <td><strong>Conditional Independence</strong></td>
+                <td>$P(A, B \mid C) = P(A \mid C)P(B \mid C)$</td>
+                <td>Given $C$, knowing $A$ gives zero additional information about $B$. Foundation of Na&iuml;ve Bayes and Markov blankets.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 2: MLE VS MAP VS FULL BAYESIAN -->
+      <section id="tab-mle-map" class="tab-section">
+        <h1>MLE vs. MAP vs. Full Bayesian Inference</h1>
+        <p class="section-subtitle">Point estimation vs. distributions over parameters, and why regularization is simply a Bayesian prior.</p>
+
+        <div class="first-principles">
+          <h4>🎯 The Spectrum of Parameter Estimation</h4>
+          <p>Suppose we observe data $\mathcal{D}$ and want to estimate parameters $\theta$ (e.g. regression weights $w$):</p>
+          <ul>
+            <li><strong>Maximum Likelihood Estimation (MLE):</strong> <em>"Find the single parameter vector $\theta$ that makes the observed data as likely as possible."</em> (Ignores priors; can severely overfit on small datasets).</li>
+            <li><strong>Maximum A Posteriori (MAP):</strong> <em>"Find the single parameter vector $\theta$ that has the highest posterior probability given data and prior belief."</em> (Point estimate; equivalent to regularized MLE).</li>
+            <li><strong>Full Bayesian Inference:</strong> <em>"Do not pick a single $\theta$! Maintain the full posterior distribution $P(\theta \mid \mathcal{D})$ over all possible parameters, and integrate across all of them when predicting."</em> (Gold standard for uncertainty quantification; computationally expensive).</li>
+          </ul>
+        </div>
+
+        <h2>1. Comparison Table: MLE vs. MAP vs. Full Bayesian</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Maximum Likelihood (MLE)</th>
+                <th>Maximum A Posteriori (MAP)</th>
+                <th>Full Bayesian Inference</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Objective Formula</strong></td>
+                <td>$$\hat{\theta}_{\text{MLE}} = \arg\max_\theta P(\mathcal{D} \mid \theta)$$</td>
+                <td>$$\hat{\theta}_{\text{MAP}} = \arg\max_\theta P(\mathcal{D} \mid \theta)P(\theta)$$</td>
+                <td>$$P(\theta \mid \mathcal{D}) = \frac{P(\mathcal{D} \mid \theta)P(\theta)}{\int P(\mathcal{D} \mid \theta')P(\theta')d\theta'}$$</td>
+              </tr>
+              <tr>
+                <td><strong>Prediction Formula for new $x^*$</strong></td>
+                <td>$$P(y^* \mid x^*, \hat{\theta}_{\text{MLE}})$$</td>
+                <td>$$P(y^* \mid x^*, \hat{\theta}_{\text{MAP}})$$</td>
+                <td>$$P(y^* \mid x^*, \mathcal{D}) = \int P(y^* \mid x^*, \theta) P(\theta \mid \mathcal{D}) d\theta$$</td>
+              </tr>
+              <tr>
+                <td><strong>Output Type</strong></td>
+                <td>Single point estimate $\hat{\theta}$</td>
+                <td>Single point estimate $\hat{\theta}$</td>
+                <td>Complete probability distribution over predictions</td>
+              </tr>
+              <tr>
+                <td><strong>Prior Required?</strong></td>
+                <td>No (implicit uniform flat prior)</td>
+                <td>Yes ($P(\theta)$ acts as regularizer)</td>
+                <td>Yes ($P(\theta)$ shapes entire posterior)</td>
+              </tr>
+              <tr>
+                <td><strong>Overfitting Risk</strong></td>
+                <td>High on small sample size $N$</td>
+                <td>Controlled by prior variance $\sigma_0^2$</td>
+                <td>Very low (marginalizes over parameters)</td>
+              </tr>
+              <tr>
+                <td><strong>Computational Cost</strong></td>
+                <td>Optimization (gradient descent / convex)</td>
+                <td>Optimization (gradient descent / convex)</td>
+                <td>Intractable integration &rarr; requires MCMC / Variational Inference</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Concrete Derivation: The Biased Coin Flip (Beta-Binomial Conjugacy)</h2>
+        <p>Let's flip a coin with unknown probability of heads $\theta \in [0, 1]$. We flip it $N$ times and observe $k$ heads and $N - k$ tails.</p>
+
+        <div class="deep-dive">
+          <h4>A. MLE for Coin Toss:</h4>
+          <p>Likelihood follows the Binomial distribution: $P(\mathcal{D} \mid \theta) = \binom{N}{k} \theta^k (1 - \theta)^{N - k}$.</p>
+          <p>Taking the log-likelihood:</p>
+          $$\ln P(\mathcal{D} \mid \theta) = \ln \binom{N}{k} + k \ln \theta + (N - k) \ln (1 - \theta)$$
+          <p>Differentiating with respect to $\theta$ and setting to 0:</p>
+          $$\frac{\partial \ln P}{\partial \theta} = \frac{k}{\theta} - \frac{N - k}{1 - \theta} = 0 \implies k(1 - \theta) = \theta(N - k) \implies \mathbf{\hat{\theta}_{\text{MLE}} = \frac{k}{N}}$$
+          <p><strong>The Catastrophe of Small Data:</strong> If you flip the coin <strong>3 times and get 3 heads</strong> ($N=3, k=3$), MLE says $\hat{\theta}_{\text{MLE}} = 1.0$ &mdash; meaning it is 100% impossible for this coin to ever land on tails! This is disastrous in production.</p>
+        </div>
+
+        <div class="deep-dive">
+          <h4>B. MAP with Beta Conjugate Prior:</h4>
+          <p>We place a <strong>Beta prior</strong> on $\theta$: $P(\theta) \propto \theta^{\alpha - 1}(1 - \theta)^{\beta - 1}$, where $\alpha, \beta$ are hyper-parameters representing <em>pseudo-counts</em> of previous heads and tails.</p>
+          <p>For example, $\text{Beta}(2, 2)$ represents a weak prior belief that the coin is fair (centered at $0.5$).</p>
+          <p>The posterior distribution is:</p>
+          $$P(\theta \mid \mathcal{D}) \propto P(\mathcal{D} \mid \theta) P(\theta) \propto [\theta^k (1 - \theta)^{N - k}] \cdot [\theta^{\alpha - 1} (1 - \theta)^{\beta - 1}] = \theta^{k + \alpha - 1} (1 - \theta)^{N - k + \beta - 1}$$
+          <p>Notice that the posterior is <strong>another Beta distribution</strong>: $\text{Beta}(k + \alpha, N - k + \beta)$! This property is called <strong>Conjugacy</strong>.</p>
+          <p>Taking the logarithm of the posterior and differentiating yields the MAP estimate:</p>
+          $$\mathbf{\hat{\theta}_{\text{MAP}} = \frac{k + \alpha - 1}{N + \alpha + \beta - 2}}$$
+          <p>With prior $\alpha = 2, \beta = 2$, after 3 heads in 3 flips:</p>
+          $$\hat{\theta}_{\text{MAP}} = \frac{3 + 2 - 1}{3 + 2 + 2 - 2} = \frac{4}{5} = \mathbf{0.80}$$
+          <p>The prior gracefully prevented the model from claiming 100% certainty!</p>
+        </div>
+
+        <h2>3. Why Regularization IS a Bayesian Prior (The Fundamental Equivalence)</h2>
+        <div class="math-box">
+          <h4>Mathematical Proof: Ridge & Lasso as MAP</h4>
+          <p>Recall the MAP objective in log-space:</p>
+          $$\hat{w}_{\text{MAP}} = \arg\max_w [\ln P(\mathcal{D} \mid w) + \ln P(w)] = \arg\min_w [-\ln P(\mathcal{D} \mid w) - \ln P(w)]$$
+          <ul>
+            <li><strong>Gaussian Prior $\implies$ Ridge ($L_2$) Regularization:</strong>
+              <br>Assume prior weights follow zero-mean independent Gaussian distributions: $w_j \sim \mathcal{N}(0, \sigma_0^2)$.
+              $$P(w) = \prod_{j=1}^D \frac{1}{\sqrt{2\pi\sigma_0^2}} \exp\left(-\frac{w_j^2}{2\sigma_0^2}\right) \implies -\ln P(w) = \frac{1}{2\sigma_0^2} \|w\|_2^2 + \text{const}$$
+              $$-\ln P(\mathcal{D} \mid w) - \ln P(w) = \text{Loss}(w) + \lambda \|w\|_2^2 \quad \text{where } \lambda = \frac{\sigma^2}{\sigma_0^2}$$
+              <strong>Conclusion:</strong> Ridge regression is mathematically identical to MAP estimation under an independent Gaussian prior!
+            </li>
+            <br>
+            <li><strong>Laplace Prior $\implies$ Lasso ($L_1$) Regularization:</strong>
+              <br>Assume prior weights follow zero-mean Laplace distribution: $P(w_j) = \frac{1}{2b} \exp\left(-\frac{|w_j|}{b}\right)$.
+              $$-\ln P(w) = \frac{1}{b} \sum_{j=1}^D |w_j| + \text{const} = \frac{1}{b} \|w\|_1 + \text{const}$$
+              $$-\ln P(\mathcal{D} \mid w) - \ln P(w) = \text{Loss}(w) + \lambda \|w\|_1 \quad \text{where } \lambda = \frac{\sigma^2}{b}$$
+              <strong>Conclusion:</strong> Lasso regression is mathematically identical to MAP estimation under a sharp Laplacian prior centered at zero!
+            </li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 3: LEAST SQUARES & CROSS-ENTROPY PROOFS -->
+      <section id="tab-proofs" class="tab-section">
+        <h1>First-Principles Proofs: MSE and Cross-Entropy from MLE</h1>
+        <p class="section-subtitle">Deriving the two most ubiquitous machine learning loss functions directly from probability theory.</p>
+
+        <div class="first-principles">
+          <h4>📐 Why Do We Minimize Squared Errors and Log-Loss?</h4>
+          <p>Beginners often treat $\sum (y - \hat{y})^2$ and $-\sum [y\ln p + (1-y)\ln(1-p)]$ as arbitrary loss formulas picked by computer scientists. <strong>They are not arbitrary.</strong></p>
+          <p>Both loss functions are the direct, unavoidable mathematical consequences of maximizing likelihood under specific, natural noise distributions:</p>
+          <ul>
+            <li>If measurement errors are additive <strong>Gaussian (Normal) noise</strong> &rarr; MLE forces you to minimize <strong>Mean Squared Error (MSE)</strong>.</li>
+            <li>If binary outcomes follow a <strong>Bernoulli distribution</strong> &rarr; MLE forces you to minimize <strong>Binary Cross-Entropy (Log-Loss)</strong>.</li>
+            <li>If discrete counts follow a <strong>Poisson distribution</strong> &rarr; MLE forces you to minimize <strong>Poisson Deviance</strong>.</li>
+          </ul>
+        </div>
+
+        <h2>1. Complete Derivation: Gaussian Noise $\implies$ Ordinary Least Squares</h2>
+        <div class="deep-dive">
+          <h4>Theorem: Maximum Likelihood under i.i.d. Gaussian error is equivalent to Mean Squared Error minimization.</h4>
+          <p><strong>Assumptions:</strong></p>
+          <ol>
+            <li>True relationship: $y_i = h_w(x_i) + \epsilon_i$.</li>
+            <li>Errors $\epsilon_i$ are independent and identically distributed (i.i.d.) normal random variables with zero mean and constant variance $\sigma^2$: $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$.</li>
+          </ol>
+          <p><strong>Step 1: Write the Conditional Likelihood of a Single Data Point:</strong></p>
+          $$P(y_i \mid x_i, w) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y_i - h_w(x_i))^2}{2\sigma^2} \right)$$
+
+          <p><strong>Step 2: Joint Likelihood of the Entire Dataset $\mathcal{D} = \{(x_1, y_1), \dots, (x_N, y_N)\}$:</strong></p>
+          <p>Because observations are mutually independent, the joint probability is the product of individual probabilities:</p>
+          $$L(w) = P(\mathcal{D} \mid w) = \prod_{i=1}^N \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left( -\frac{(y_i - h_w(x_i))^2}{2\sigma^2} \right)$$
+
+          <p><strong>Step 3: Convert to Log-Likelihood $\ell(w) = \ln L(w)$:</strong></p>
+          $$\ell(w) = \sum_{i=1}^N \left[ \ln\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right) - \frac{(y_i - h_w(x_i))^2}{2\sigma^2} \right]$$
+          $$\ell(w) = N \ln\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right) - \frac{1}{2\sigma^2} \sum_{i=1}^N (y_i - h_w(x_i))^2$$
+
+          <p><strong>Step 4: Maximize with Respect to Parameters $w$:</strong></p>
+          <p>The first term $N \ln\left(\frac{1}{\sqrt{2\pi\sigma^2}}\right)$ does not depend on $w$ and drops out. The factor $\frac{1}{2\sigma^2}$ is a positive constant scalar. Therefore:</p>
+          $$\arg\max_w \ell(w) = \arg\max_w \left[ -\frac{1}{2\sigma^2} \sum_{i=1}^N (y_i - h_w(x_i))^2 \right] = \arg\min_w \sum_{i=1}^N (y_i - h_w(x_i))^2$$
+          $$\mathbf{\hat{w}_{\text{MLE}} = \arg\min_w \sum_{i=1}^N (y_i - h_w(x_i))^2 = \arg\min_w \text{SSE}(w)} \quad \blacksquare$$
+        </div>
+
+        <h2>2. Complete Derivation: Bernoulli Trials $\implies$ Binary Cross-Entropy</h2>
+        <div class="deep-dive">
+          <h4>Theorem: Maximum Likelihood for binary classification yields Binary Cross-Entropy (Log-Loss).</h4>
+          <p><strong>Assumptions:</strong></p>
+          <ol>
+            <li>Target labels $y_i \in \{0, 1\}$.</li>
+            <li>Model outputs conditional probability $p_i = P(y_i = 1 \mid x_i; w) = \sigma(w^T x_i)$, and $P(y_i = 0 \mid x_i; w) = 1 - p_i$.</li>
+          </ol>
+          <p><strong>Step 1: Express the Bernoulli Likelihood in Compact Exponent Form:</strong></p>
+          $$P(y_i \mid x_i; w) = p_i^{y_i} (1 - p_i)^{1 - y_i}$$
+          <p><em>(Notice: When $y_i = 1$, this equals $p_i^1 (1-p_i)^0 = p_i$. When $y_i = 0$, this equals $p_i^0 (1-p_i)^1 = 1 - p_i$.)</em></p>
+
+          <p><strong>Step 2: Joint Likelihood over $N$ Independent Observations:</strong></p>
+          $$L(w) = \prod_{i=1}^N p_i^{y_i} (1 - p_i)^{1 - y_i}$$
+
+          <p><strong>Step 3: Log-Likelihood $\ell(w)$:</strong></p>
+          $$\ell(w) = \ln L(w) = \sum_{i=1}^N \left[ y_i \ln p_i + (1 - y_i) \ln (1 - p_i) \right]$$
+
+          <p><strong>Step 4: Objective Inversion (Maximizing Likelihood = Minimizing Negative Log-Likelihood):</strong></p>
+          $$\mathbf{J(w) = -\ell(w) = -\sum_{i=1}^N \left[ y_i \ln p_i + (1 - y_i) \ln (1 - p_i) \right] = \text{BCE Loss}} \quad \blacksquare$$
+        </div>
+
+        <div class="interview-alert">
+          <h4>🔥 FAANG Interview Punchline:</h4>
+          <p><em>"Whenever you minimize Mean Squared Error, you are implicitly asserting that error deviations follow a Gaussian distribution. If your errors have heavy tails or outliers (e.g. financial returns or click-through delays), Gaussian MLE is vulnerable to extreme values. Switching to Laplace noise yields Mean Absolute Error ($L_1$), which is robust to outliers!"</em></p>
+        </div>
+      </section>
+    
+      <!-- TAB 4: MINIMUM DESCRIPTION LENGTH (MDL) -->
+      <section id="tab-mdl" class="tab-section">
+        <h1>Minimum Description Length (MDL) Principle</h1>
+        <p class="section-subtitle">Information-theoretic Occam's Razor: Learning is data compression.</p>
+
+        <div class="first-principles">
+          <h4>💾 The Philosophy of MDL (Jorma Rissanen, 1978)</h4>
+          <p>Suppose Alice wants to transmit a dataset $\mathcal{D}$ across a network to Bob using the fewest possible bits:</p>
+          <ul>
+            <li><strong>Strategy 1 (Raw Data):</strong> Send all raw numbers directly. No model needed ($L(h) = 0$), but data size $L(\mathcal{D})$ is enormous.</li>
+            <li><strong>Strategy 2 (Giant Memorizing Model):</strong> Send a massive model that perfectly memorizes every data point ($L(\mathcal{D} \mid h) = 0$). But the model description $L(h)$ requires trillions of bits!</li>
+            <li><strong>Strategy 3 (Optimal Compact Model):</strong> Alice discovers the true underlying law of the data, sends a concise model $h$ in a few bits, and sends only the small residual error discrepancies $L(\mathcal{D} \mid h)$.</li>
+          </ul>
+          <p>The MDL Principle states: <strong>The model that produces the shortest total code length (model + residuals) is the best hypothesis for generalizing to unseen data.</strong></p>
+        </div>
+
+        <h2>1. Mathematical Derivation of MDL from MAP</h2>
+        <div class="deep-dive">
+          <h4>Connecting Bayesian MAP to Information Theory:</h4>
+          <p>Recall the MAP hypothesis definition:</p>
+          $$h_{\text{MAP}} = \arg\max_{h \in \mathcal{H}} P(\mathcal{D} \mid h) P(h)$$
+          <p>Taking base-2 logarithm (which does not change the argmax):</p>
+          $$h_{\text{MAP}} = \arg\max_{h \in \mathcal{H}} [\log_2 P(\mathcal{D} \mid h) + \log_2 P(h)]$$
+          <p>Negating to turn maximization into minimization:</p>
+          $$h_{\text{MAP}} = \arg\min_{h \in \mathcal{H}} [-\log_2 P(h) - \log_2 P(\mathcal{D} \mid h)]$$
+          
+          <p>Now apply <strong>Shannon's Source Coding Theorem</strong>: The minimum number of bits required to encode an event $x$ drawn from probability distribution $P(x)$ using an optimal prefix-free code is:</p>
+          $$L(x) = -\log_2 P(x) \text{ bits}$$
+          <p>Substituting Shannon's code lengths:</p>
+          <ul>
+            <li>$L(h) = -\log_2 P(h)$: The number of bits needed to encode and describe hypothesis $h$.</li>
+            <li>$L(\mathcal{D} \mid h) = -\log_2 P(\mathcal{D} \mid h)$: The number of bits needed to encode data discrepancies (residuals/exceptions) given model $h$.</li>
+          </ul>
+          $$\mathbf{h_{\text{MDL}} = \arg\min_{h \in \mathcal{H}} \Big[ \underbrace{L(h)}_{\text{Model Complexity}} + \underbrace{L(\mathcal{D} \mid h)}_{\text{Residual Error}} \Big]}$$
+        </div>
+
+        <h2>2. Visual Trade-off in Model Selection</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Model Choice</th>
+                <th>Model Bits $L(h)$</th>
+                <th>Error Bits $L(\mathcal{D} \mid h)$</th>
+                <th>Total Length $L(h) + L(\mathcal{D} \mid h)$</th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Underfit (Constant / Horizontal Line)</strong></td>
+                <td>Very Small (e.g. 5 bits)</td>
+                <td>Huge (huge residuals everywhere)</td>
+                <td>Large</td>
+                <td>High Bias</td>
+              </tr>
+              <tr>
+                <td><strong>Optimal Fit (Quadratic Curve)</strong></td>
+                <td>Moderate (e.g. 40 bits)</td>
+                <td>Small (Gaussian noise only)</td>
+                <td><strong>Minimum (MDL Optimal)</strong></td>
+                <td><strong>Best Generalization</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Overfit (Degree-20 Polynomial)</strong></td>
+                <td>Gigantic (1000s of bits for 20 coefficients)</td>
+                <td>Zero (interpolates every point)</td>
+                <td>Large</td>
+                <td>High Variance</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. Connection to Modern Information Criteria: AIC and BIC</h2>
+        <div class="math-box">
+          <h4>Akaike Information Criterion (AIC) vs. Bayesian Information Criterion (BIC):</h4>
+          <p>In classical statistics and econometrics, MDL is directly materialized in <strong>BIC</strong> (Schwarz, 1978):</p>
+          $$\text{BIC} = -2\ln L(\hat{\theta}) + k \ln N$$
+          $$\text{AIC} = -2\ln L(\hat{\theta}) + 2k$$
+          <ul>
+            <li>$-2\ln L(\hat{\theta})$ corresponds to the residual error description length $2\ln(2) \cdot L(\mathcal{D} \mid h)$.</li>
+            <li>$k \ln N$ penalizes the $k$ model parameters with sample size $N$ (the model description length $L(h)$).</li>
+          </ul>
+          <p><strong>Interview Rule of Thumb:</strong> As sample size $N \to \infty$, BIC penalizes complexity much more severely than AIC ($k \ln N \gg 2k$), making BIC <em>dimension consistent</em> (it asymptotically selects the true model if it is in the candidate set).</p>
+        </div>
+      </section>
+    
+      <!-- TAB 5: BAYES OPTIMAL CLASSIFIER & GIBBS ALGORITHM -->
+      <section id="tab-optimal" class="tab-section">
+        <h1>Bayes Optimal Classifier & The Gibbs Algorithm</h1>
+        <p class="section-subtitle">The theoretical upper bound of machine learning and its stochastic approximation.</p>
+
+        <div class="first-principles">
+          <h4>👑 Why the Single Best Hypothesis (MAP) Can Fail</h4>
+          <p>Imagine 3 medical experts reviewing an MRI scan for a tumor ($+$) vs benign ($-$) diagnosis:</p>
+          <ul>
+            <li>Doctor A (Posterior probability $P(h_A \mid \mathcal{D}) = 0.40$) predicts: <strong>Tumor ($+$)</strong></li>
+            <li>Doctor B (Posterior probability $P(h_B \mid \mathcal{D}) = 0.30$) predicts: <strong>Benign ($-$)</strong></li>
+            <li>Doctor C (Posterior probability $P(h_C \mid \mathcal{D}) = 0.30$) predicts: <strong>Benign ($-$)</strong></li>
+          </ul>
+          <p>If you use the <strong>MAP hypothesis</strong>, you choose the single most probable doctor: Doctor A ($P=0.40$), so you predict <strong>Tumor ($+$)</strong>.</p>
+          <p><strong>The Flaw:</strong> Combining Doctors B and C gives a combined posterior probability of $0.30 + 0.30 = \mathbf{0.60}$ for <strong>Benign ($-$)</strong>! The majority of probability mass votes against Doctor A!</p>
+          <p>The <strong>Bayes Optimal Classifier</strong> solves this by taking a weighted ensemble vote across <em>every possible hypothesis in the entire hypothesis space</em>.</p>
+        </div>
+
+        <h2>1. Mathematical Formulation of Bayes Optimal Classifier</h2>
+        <div class="math-box">
+          <h4>The Bayes Optimal Decision Rule:</h4>
+          $$v_{\text{BOC}} = \arg\max_{v_j \in V} \sum_{h_i \in \mathcal{H}} P(v_j \mid h_i) P(h_i \mid \mathcal{D})$$
+          <ul>
+            <li>$V$: Set of all possible class labels (e.g. $\{+, -\}$).</li>
+            <li>$P(v_j \mid h_i) = 1$ if hypothesis $h_i$ predicts class $v_j$, else $0$.</li>
+            <li>$P(h_i \mid \mathcal{D})$: Posterior probability of hypothesis $h_i$ given training data.</li>
+          </ul>
+        </div>
+
+        <div class="interview-alert">
+          <h4>🔥 The Fundamental Theorem of Bayes Optimality:</h4>
+          <p><em>No classification method using the same hypothesis space $\mathcal{H}$ and identical prior knowledge $P(h)$ can outperform the Bayes Optimal Classifier on average!</em></p>
+          <p>Its error rate is defined as the <strong>Bayes Error Rate</strong> &mdash; the unavoidable irreducible noise inherent in the problem domain.</p>
+          <p><strong>Why isn't it implemented in standard libraries?</strong> In real-world machine learning (e.g. neural networks or random forests), the hypothesis space $\mathcal{H}$ contains uncountably infinite hypotheses. Computing the sum or integral $\int_{\mathcal{H}} P(y \mid x, h) P(h \mid \mathcal{D}) dh$ is computationally intractable.</p>
+        </div>
+
+        <h2>2. The Gibbs Algorithm: A Tractable $O(1)$ Approximation</h2>
+        <p>Because enumerating all hypotheses in $\mathcal{H}$ is impossible, how can we approximate the Bayes Optimal Classifier?</p>
+
+        <div class="deep-dive">
+          <h4>The Gibbs Procedure:</h4>
+          <ol>
+            <li>Sample a single hypothesis $h \in \mathcal{H}$ at random according to the posterior probability distribution:
+              $$h \sim P(h \mid \mathcal{D})$$
+            </li>
+            <li>Use this single sampled hypothesis $h$ to predict the label for new query instance $x$.</li>
+          </ol>
+          <h4>The Famous Theoretical Performance Guarantee:</h4>
+          <p>Under the assumption that the target concept is drawn from prior $P(h)$, the expected error rate of the Gibbs algorithm is <strong>at most twice</strong> the expected error rate of the theoretical Bayes Optimal Classifier:</p>
+          $$\mathbf{\mathbb{E}[\text{Error}_{\text{Gibbs}}] \le 2 \times \mathbb{E}[\text{Error}_{\text{BayesOptimal}}]}$$
+          <p><em>Proof intuition:</em> If the Bayes Optimal Classifier has an error rate of 10%, the fast single-sample Gibbs algorithm is mathematically guaranteed to have an expected error of no more than 20%.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 6: NAIVE BAYES DEEP DIVE & TEXT CLASSIFICATION -->
+      <section id="tab-naive" class="tab-section">
+        <h1>Na&iuml;ve Bayes: Math, Smoothing & Worked Text Example</h1>
+        <p class="section-subtitle">Conditional independence assumption, zero-frequency catastrophe, Laplace vs. m-estimate, and Log-Sum-Exp.</p>
+
+        <div class="first-principles">
+          <h4>📨 What is Na&iuml;ve Bayes? (From First Principles)</h4>
+          <p>Suppose you want to classify an email as <strong>Spam ($y=1$)</strong> or <strong>Ham ($y=0$)</strong> based on $D = 100$ vocabulary words.</p>
+          <p>By Bayes' Theorem, the exact posterior is:</p>
+          $$P(y \mid x_1, x_2, \dots, x_D) = \frac{P(x_1, x_2, \dots, x_D \mid y) P(y)}{P(x_1, x_2, \dots, x_D)}$$
+          <p><strong>The Curse of Dimensionality:</strong> If each word is binary (present/absent), the joint likelihood $P(x_1, \dots, x_D \mid y)$ requires a lookup table of $2^{100} \approx 1.26 \times 10^{30}$ parameters! You would need more training emails than the number of atoms on Earth to estimate this table.</p>
+          <p><strong>The "Na&iuml;ve" Assumption:</strong> Assume all words are <em>conditionally independent</em> given the class label $y$:</p>
+          $$P(x_1, x_2, \dots, x_D \mid y) = \prod_{d=1}^D P(x_d \mid y)$$
+          <p>Now you only need to estimate $2 \times 100 = 200$ parameters &mdash; trivial to compute from a few hundred emails!</p>
+        </div>
+
+        <h2>1. Why Does Na&iuml;ve Bayes Work When Independence Is Blatantly False?</h2>
+        <div class="interview-alert">
+          <h4>💡 The Domingos & Pazzani (1997) Theorem:</h4>
+          <p>In real English, words like <em>"Rolex"</em> and <em>"Discount"</em> strongly co-occur; they are clearly NOT independent. Why does Na&iuml;ve Bayes still classify spam accurately?</p>
+          <ul>
+            <li><strong>Classification $\ne$ Calibration:</strong> To make a correct classification decision under 0-1 loss, you do NOT need the predicted probability $\hat{P}(y=1 \mid x)$ to be calibrated. You only need:
+              $$\hat{P}(y = \text{Spam} \mid x) > \hat{P}(y = \text{Ham} \mid x)$$
+            </li>
+            <li>Correlated features push probability estimates toward extremes ($0.9999$ or $0.0001$), but as long as the <strong>relative odds ratio</strong> between classes remains on the correct side of the threshold, the classification accuracy remains optimal.</li>
+          </ul>
+        </div>
+
+        <h2>2. Worked Numerical Walkthrough: Spam Email Classification</h2>
+        <p>Let's walk through an exact, step-by-step numerical calculation with real numbers.</p>
+
+        <div class="example-box">
+          <h4>📊 Training Dataset (4 Emails, Vocabulary size $|V| = 6$):</h4>
+          <p>Vocabulary: <code>['lottery', 'winner', 'cash', 'meeting', 'project', 'schedule']</code></p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Email ID</th><th>Class ($y$)</th><th>Words Contained</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><strong>Spam</strong></td><td><code>lottery, winner, cash</code></td></tr>
+                <tr><td>2</td><td><strong>Spam</strong></td><td><code>winner, cash</code></td></tr>
+                <tr><td>3</td><td><strong>Ham</strong></td><td><code>meeting, project, schedule</code></td></tr>
+                <tr><td>4</td><td><strong>Ham</strong></td><td><code>project, schedule</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Test Email:</strong> $E_{\text{test}} =$ <code>["winner", "cash", "project"]</code>. <em>Classify this email!</em></p>
+
+          <p><strong>Step 1: Compute Prior Class Probabilities $P(y)$:</strong></p>
+          $$P(\text{Spam}) = \frac{2}{4} = 0.50, \quad P(\text{Ham}) = \frac{2}{4} = 0.50$$
+
+          <p><strong>Step 2: The Zero-Frequency Disaster without Smoothing:</strong></p>
+          <p>Look at the word <code>project</code> in Spam. It appeared <strong>0 times</strong> in the Spam training emails!</p>
+          $$P(\text{project} \mid \text{Spam}) = \frac{0}{5} = 0$$
+          $$P(E_{\text{test}} \mid \text{Spam}) = P(\text{winner} \mid \text{Spam}) \cdot P(\text{cash} \mid \text{Spam}) \cdot \underbrace{P(\text{project} \mid \text{Spam})}_{0} = \mathbf{0}$$
+          <p>A single unseen word completely eliminated the possibility of Spam, even though the email screams "winner cash"!</p>
+
+          <p><strong>Step 3: Apply Laplace (Add-1) Smoothing:</strong></p>
+          $$P(w_k \mid y) = \frac{N_{w_k, y} + 1}{N_y + |V|}$$
+          <ul>
+            <li>Total word tokens in Spam $N_{\text{Spam}} = 3 + 2 = 5$. Vocabulary size $|V| = 6$. Denominator $= 5 + 6 = 11$.</li>
+            <li>Total word tokens in Ham $N_{\text{Ham}} = 3 + 2 = 5$. Vocabulary size $|V| = 6$. Denominator $= 5 + 6 = 11$.</li>
+          </ul>
+
+          <p><strong>Compute Conditional Likelihoods for Test Words:</strong></p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Word</th><th>Count in Spam</th><th>$P(w \mid 	ext{Spam}) = rac{N+1}{11}$</th><th>Count in Ham</th><th>$P(w \mid 	ext{Ham}) = rac{N+1}{11}$</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>winner</code></td><td>2</td><td>$\frac{2+1}{11} = \frac{3}{11} \approx 0.2727$</td><td>0</td><td>$\frac{0+1}{11} = \frac{1}{11} \approx 0.0909$</td></tr>
+                <tr><td><code>cash</code></td><td>2</td><td>$\frac{2+1}{11} = \frac{3}{11} \approx 0.2727$</td><td>0</td><td>$\frac{0+1}{11} = \frac{1}{11} \approx 0.0909$</td></tr>
+                <tr><td><code>project</code></td><td>0</td><td>$\frac{0+1}{11} = \frac{1}{11} \approx 0.0909$</td><td>2</td><td>$\frac{2+1}{11} = \frac{3}{11} \approx 0.2727$</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Step 4: Compute Posterior Scores:</strong></p>
+          $$\text{Score}(\text{Spam}) = P(\text{Spam}) \times \prod_{w} P(w \mid \text{Spam}) = 0.50 \times \frac{3}{11} \times \frac{3}{11} \times \frac{1}{11} = 0.50 \times \frac{9}{1331} \approx \mathbf{0.00338}$$
+          $$\text{Score}(\text{Ham}) = P(\text{Ham}) \times \prod_{w} P(w \mid \text{Ham}) = 0.50 \times \frac{1}{11} \times \frac{1}{11} \times \frac{3}{11} = 0.50 \times \frac{3}{1331} \approx \mathbf{0.00113}$$
+
+          <p><strong>Step 5: Normalize and Predict:</strong></p>
+          $$P(\text{Spam} \mid E_{\text{test}}) = \frac{0.00338}{0.00338 + 0.00113} = \frac{0.00338}{0.00451} = \mathbf{74.94\%}$$
+          $$P(\text{Ham} \mid E_{\text{test}}) = \mathbf{25.06\%}$$
+          <p><strong>Decision:</strong> Predict <strong>Spam</strong> with 75% confidence!</p>
+        </div>
+
+        <h2>3. Laplace Smoothing vs. The $m$-Estimate</h2>
+        <div class="math-box">
+          <h4>The Generalized $m$-Estimate Formulation:</h4>
+          $$P(x_i \mid y) = \frac{n_c + m p}{n + m}$$
+          <ul>
+            <li>$n_c$: Number of training instances of class $y$ possessing feature $x_i$.</li>
+            <li>$n$: Total number of training instances of class $y$.</li>
+            <li>$p$: Prior estimate of feature probability (typically uniform $p = 1/K$ where $K$ is number of possible values).</li>
+            <li>$m$: Equivalent sample size (weight parameter controlling how heavily the prior is trusted).</li>
+          </ul>
+          <p><strong>Special Case:</strong> When $p = 1/K$ and $m = K$, the $m$-estimate becomes $\frac{n_c + 1}{n + K}$ &mdash; which is precisely <strong>Laplace (Add-1) smoothing</strong>!</p>
+        </div>
+
+        <h2>4. Production Engineering: Numerical Underflow & The Log-Sum-Exp Trick</h2>
+        <div class="deep-dive">
+          <h4>🚨 The Floating-Point Underflow Hazard:</h4>
+          <p>In real NLP pipelines, an email contains hundreds of words. Multiplying hundreds of small numbers ($0.01 \times 0.005 \times \dots$) causes standard 64-bit floating-point numbers to underflow to zero ($0.0$ in IEEE 754), crashing production.</p>
+          
+          <h4>The Solution: Log-Space Computation</h4>
+          $$\ln P(y \mid x_1, \dots, x_D) \propto \ln P(y) + \sum_{d=1}^D \ln P(x_d \mid y)$$
+          <p>To convert unnormalized log-scores $s_k$ back to probabilities without numerical overflow/underflow, use the <strong>Log-Sum-Exp trick</strong>:</p>
+          $$\ln \sum_{k=1}^K \exp(s_k) = M + \ln \sum_{k=1}^K \exp(s_k - M) \quad \text{where } M = \max(s_1, \dots, s_K)$$
+          <p>Subtracting the maximum value $M$ guarantees that the largest exponent is $e^0 = 1$, preventing float overflow!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 7: BAYESIAN BELIEF NETWORKS & D-SEPARATION -->
+      <section id="tab-bbn" class="tab-section">
+        <h1>Bayesian Belief Networks & d-Separation</h1>
+        <p class="section-subtitle">Probabilistic Directed Acyclic Graphs (DAGs), conditional independence, and the explaining away phenomenon.</p>
+
+        <div class="first-principles">
+          <h4>🕸️ Beyond Na&iuml;ve Bayes: Structured Dependence</h4>
+          <p>Na&iuml;ve Bayes assumes all features are mutually independent given the class &mdash; which is too restrictive. Full joint distributions require $2^D$ parameters &mdash; which is intractable.</p>
+          <p><strong>Bayesian Belief Networks (BBN)</strong> represent the perfect middle ground: A Directed Acyclic Graph (DAG) that explicitly encodes <em>which variables depend on which</em>, and which variables are conditionally independent.</p>
+        </div>
+
+        <h2>1. The Markov Condition & Joint Factorization</h2>
+        <div class="math-box">
+          <h4>The Local Markov Property:</h4>
+          <p>Each variable $X_i$ in a Bayesian Network is conditionally independent of all its non-descendants given its direct parent nodes $\text{Parents}(X_i)$.</p>
+          <h4>The Joint Factorization Rule:</h4>
+          $$P(X_1, X_2, \dots, X_N) = \prod_{i=1}^N P(X_i \mid \text{Parents}(X_i))$$
+          <p>If a network has 20 binary variables, an unrestricted joint table requires $2^{20} = 1,048,576$ values. If each node has at most 2 parents, BBN requires only $20 \times 2^2 = 80$ parameters!</p>
+        </div>
+
+        <h2>2. The Three Canonical Motifs of d-Separation</h2>
+        <p>In an interview, you will often be asked whether variable $X$ is independent of $Z$ given $Y$. The concept of <strong>d-separation</strong> (directional separation, Judea Pearl) governs this via 3 basic graph structures:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Structure Motif</th>
+                <th>Graph Layout</th>
+                <th>When $Y$ is NOT Observed</th>
+                <th>When $Y$ IS Observed</th>
+                <th>Real-World Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Chain (Causal)</strong></td>
+                <td>$X \to Y \to Z$</td>
+                <td><strong>Active</strong> ($X$ and $Z$ are dependent)</td>
+                <td><strong>Blocked</strong> ($X \perp Z \mid Y$)</td>
+                <td>Rain ($X$) &rarr; Muddy Road ($Y$) &rarr; Car Slip ($Z$). If you know the road is muddy, knowing about rain provides no extra prediction about car slip.</td>
+              </tr>
+              <tr>
+                <td><strong>2. Fork (Common Cause)</strong></td>
+                <td>$X \leftarrow Y \to Z$</td>
+                <td><strong>Active</strong> ($X$ and $Z$ are dependent)</td>
+                <td><strong>Blocked</strong> ($X \perp Z \mid Y$)</td>
+                <td>Flu ($Y$) causes Fever ($X$) and Cough ($Z$). If you know the patient has the Flu, knowing about Fever tells you nothing new about Cough.</td>
+              </tr>
+              <tr>
+                <td><strong>3. Collider (V-Structure)</strong></td>
+                <td>$X \to Y \leftarrow Z$</td>
+                <td><strong>Blocked</strong> ($X \perp Z$) &mdash; marginally independent!</td>
+                <td><strong>ACTIVE!</strong> ($X$ and $Z$ become dependent!)</td>
+                <td>Burglary ($X$) and Earthquake ($Z$) both trigger Alarm ($Y$). <strong>"Explaining Away"</strong>!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="deep-dive">
+          <h4>🔥 The Counter-Intuitive Magic: The Collider & "Explaining Away"</h4>
+          <p>In a Collider ($X \to Y \leftarrow Z$), two completely independent causes converge onto a common effect:</p>
+          <ul>
+            <li>Is an Earthquake ($Z$) independent of a Burglary ($X$)? <strong>Yes.</strong> Earthquakes don't cause burglaries, nor vice versa.</li>
+            <li>Now suppose the Alarm ($Y$) rings. You run downstairs and hear on the radio that a massive <strong>Earthquake ($Z$) just hit your neighborhood</strong>!</li>
+            <li>What happens to your belief in a Burglary ($X$)? <strong>It plummets immediately!</strong> The earthquake already "explained away" why the alarm sounded!</li>
+            <li><em>Mathematical takeaway:</em> <strong>Conditioning on a collider (or any of its descendants) opens the path and creates conditional dependence between previously independent variables!</strong></li>
+          </ul>
+        </div>
+
+        <h2>3. Worked Exam Example: The Burglary-Alarm Network</h2>
+        <div class="example-box">
+          <h4>🚨 The Famous Judea Pearl Alarm Network:</h4>
+          <ul>
+            <li>Nodes: <strong>Burglary ($B$)</strong>, <strong>Earthquake ($E$)</strong>, <strong>Alarm ($A$)</strong>, <strong>DavidCalls ($D$)</strong>, <strong>SophiaCalls ($S$)</strong>.</li>
+            <li>Edges: $B \to A$, $E \to A$, $A \to D$, $A \to S$.</li>
+          </ul>
+          <p><strong>Conditional Probability Tables (CPTs):</strong></p>
+          <ul>
+            <li>$P(B=T) = 0.002, \quad P(E=T) = 0.001$</li>
+            <li>$P(A=T \mid B=T, E=T) = 0.95$</li>
+            <li>$P(A=T \mid B=T, E=F) = 0.94$</li>
+            <li>$P(A=T \mid B=F, E=T) = 0.29$</li>
+            <li>$P(A=T \mid B=F, E=F) = 0.001$</li>
+            <li>$P(D=T \mid A=T) = 0.91, \quad P(D=T \mid A=F) = 0.05$</li>
+            <li>$P(S=T \mid A=T) = 0.75, \quad P(S=T \mid A=F) = 0.01$</li>
+          </ul>
+
+          <p><strong>Query:</strong> Calculate $P(S=T, D=T, A=T, B=F, E=F)$:</p>
+          $$P(S, D, A, \neg B, \neg E) = P(S \mid A) \cdot P(D \mid A) \cdot P(A \mid \neg B, \neg E) \cdot P(\neg B) \cdot P(\neg E)$$
+          $$= 0.75 \times 0.91 \times 0.001 \times (1 - 0.002) \times (1 - 0.001)$$
+          $$= 0.75 \times 0.91 \times 0.001 \times 0.998 \times 0.999 = \mathbf{0.00068045}$$
+        </div>
+      </section>
+    
+      <!-- TAB 8: THE EM ALGORITHM & ELBO DERIVATION -->
+      <section id="tab-em" class="tab-section">
+        <h1>The Expectation-Maximization (EM) Algorithm & ELBO</h1>
+        <p class="section-subtitle">Maximum Likelihood with latent variables, Jensen's inequality, Evidence Lower Bound (ELBO), and convergence proof.</p>
+
+        <div class="first-principles">
+          <h4>🔄 The Chicken-and-Egg Problem with Latent Variables</h4>
+          <p>Suppose you record the heights of 1,000 university students. You know the population is a mixture of two biological groups (Men and Women), each normally distributed with unknown parameters $(\mu_1, \sigma_1^2)$ and $(\mu_2, \sigma_2^2)$.</p>
+          <ul>
+            <li><strong>If you knew the gender of every student ($Z$):</strong> Computing means $\mu_1, \mu_2$ would be simple arithmetic averages.</li>
+            <li><strong>If you knew the true parameters $\mu_1, \mu_2, \sigma_1^2, \sigma_2^2$:</strong> Assigning each student to their most likely gender would be simple Bayes' rule.</li>
+            <li><strong>The Deadlock: You know NEITHER!</strong> Gender $Z$ is a <em>latent (hidden / unobserved) variable</em>.</li>
+          </ul>
+          <p>Why not just use standard calculus to maximize the log-likelihood? Because the marginal log-likelihood has a <strong>sum inside the logarithm</strong>:</p>
+          $$\ln P(X \mid \theta) = \sum_{i=1}^N \ln \left( \sum_{z} P(x_i, z \mid \theta) \right)$$
+          <p>Taking the derivative of the log of a sum results in an intractable non-linear system with no closed-form solution!</p>
+        </div>
+
+        <h2>1. Complete Derivation of the Evidence Lower Bound (ELBO)</h2>
+        <div class="deep-dive">
+          <h4>Derivation via Jensen's Inequality:</h4>
+          <p>Let $X$ denote observed data, $Z$ denote latent variables, and $\theta$ denote model parameters. Introduce any arbitrary probability distribution $q(Z)$ over the latent variables ($\sum_Z q(Z) = 1, q(Z) \ge 0$).</p>
+          
+          <p><strong>Step 1: Multiply and divide by $q(Z)$ inside the sum:</strong></p>
+          $$\ln P(X \mid \theta) = \ln \sum_Z P(X, Z \mid \theta) = \ln \sum_Z q(Z) \left( \frac{P(X, Z \mid \theta)}{q(Z)} \right)$$
+          
+          <p><strong>Step 2: Recognize the Expectation:</strong></p>
+          $$\ln P(X \mid \theta) = \ln \mathbb{E}_{q(Z)} \left[ \frac{P(X, Z \mid \theta)}{q(Z)} \right]$$
+
+          <p><strong>Step 3: Apply Jensen's Inequality:</strong></p>
+          <p>Because the logarithm function is strictly concave ($rac{d^2 \ln u}{du^2} = -\frac{1}{u^2} < 0$), by Jensen's inequality: $\ln \mathbb{E}[u] \ge \mathbb{E}[\ln u]$. Therefore:</p>
+          $$\ln \mathbb{E}_{q(Z)} \left[ \frac{P(X, Z \mid \theta)}{q(Z)} \right] \ge \mathbb{E}_{q(Z)} \left[ \ln \frac{P(X, Z \mid \theta)}{q(Z)} \right]$$
+          $$\mathbf{\ln P(X \mid \theta) \ge \mathcal{L}(q, \theta) \equiv \sum_Z q(Z) \ln \left( \frac{P(X, Z \mid \theta)}{q(Z)} \right) \quad \text{(The ELBO)}}$$
+        </div>
+
+        <h2>2. Exact Decomposition: ELBO and KL Divergence</h2>
+        <div class="math-box">
+          <h4>The Fundamental EM Identity:</h4>
+          $$\ln P(X \mid \theta) = \mathcal{L}(q, \theta) + \text{KL}(q(Z) \parallel P(Z \mid X, \theta))$$
+          <p>Where $\text{KL}(q \parallel p) = \sum_Z q(Z) \ln \frac{q(Z)}{p(Z)} \ge 0$ is the <strong>Kullback-Leibler (KL) Divergence</strong>.</p>
+          <p>Because $\text{KL} \ge 0$ always, $\mathcal{L}(q, \theta) \le \ln P(X \mid \theta)$ forms a strict mathematical <strong>lower bound</strong> on the true log-likelihood.</p>
+        </div>
+
+        <h2>3. The Two-Step Iteration (E-Step and M-Step)</h2>
+        <div class="deep-dive">
+          <h4>The EM Algorithm in Geometric Action:</h4>
+          <ol>
+            <li><strong>Expectation Step (E-step): Maximize ELBO with respect to $q(Z)$ while holding parameters $\theta^{(t)}$ fixed.</strong>
+              <br>To make the lower bound $\mathcal{L}(q, \theta^{(t)})$ touch the true log-likelihood, we must drive $\text{KL}(q \parallel P(Z \mid X, \theta^{(t)}))$ to <strong>zero</strong>!
+              <br>KL divergence is zero if and only if the two distributions are identical. Therefore, the optimal choice is:
+              $$\mathbf{q^*(Z) = P(Z \mid X, \theta^{(t)})}$$
+              <em>The E-step computes the exact posterior responsibilities of the hidden variables under current parameters!</em>
+            </li>
+            <br>
+            <li><strong>Maximization Step (M-step): Maximize ELBO with respect to $\theta$ while holding $q(Z)$ fixed.</strong>
+              $$\mathbf{\theta^{(t+1)} = \arg\max_\theta \mathcal{L}(q^*, \theta) = \arg\max_\theta \mathbb{E}_{Z \mid X, \theta^{(t)}} [\ln P(X, Z \mid \theta)]}$$
+              <em>The M-step updates the parameters by maximizing the expected complete-data log-likelihood!</em>
+            </li>
+          </ol>
+          <h4>Monotonic Convergence Guarantee:</h4>
+          $$\ln P(X \mid \theta^{(t+1)}) \ge \mathcal{L}(q^*, \theta^{(t+1)}) \ge \mathcal{L}(q^*, \theta^{(t)}) = \ln P(X \mid \theta^{(t)})$$
+          <p><strong>Every iteration of the EM algorithm is mathematically guaranteed to increase or maintain the true marginal log-likelihood!</strong> It converges to a local maximum or saddle point.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 9: GAUSSIAN MIXTURE MODELS & K-MEANS -->
+      <section id="tab-gmm" class="tab-section">
+        <h1>Gaussian Mixture Models (GMM) & The $K$-Means Proof</h1>
+        <p class="section-subtitle">Soft clustering mathematics, numerical walkthrough, and the rigorous zero-variance proof connecting GMM to K-Means.</p>
+
+        <div class="first-principles">
+          <h4>👥 Soft Clustering with Probability Distributions</h4>
+          <p>Standard $K$-Means assumes clusters are rigid, spherical balls with equal radii. It forces every data point to belong 100% to a single cluster.</p>
+          <p>A <strong>Gaussian Mixture Model (GMM)</strong> represents data as a linear combination of $K$ different multivariate normal distributions, allowing clusters to have arbitrary ellipsoidal shapes, orientations, and soft probabilistic memberships:</p>
+          $$P(x) = \sum_{k=1}^K \pi_k \mathcal{N}(x \mid \mu_k, \Sigma_k) \quad \text{where } \sum_{k=1}^K \pi_k = 1, \; \pi_k \ge 0$$
+          <ul>
+            <li>$\pi_k$: Mixing coefficient (prior probability that a randomly drawn point belongs to cluster $k$).</li>
+            <li>$\mu_k$: Mean vector (center) of cluster $k$.</li>
+            <li>$\Sigma_k$: Covariance matrix (shape, spread, and orientation) of cluster $k$.</li>
+          </ul>
+        </div>
+
+        <h2>1. The EM Equations for GMM</h2>
+        <div class="math-box">
+          <h4>A. Expectation Step (E-Step) &mdash; Compute Responsibilities:</h4>
+          <p>Compute the posterior probability $\gamma_{ik}$ that data point $x_i$ was generated by cluster component $k$:</p>
+          $$\mathbf{\gamma_{ik} = P(z_i = k \mid x_i) = \frac{\pi_k \mathcal{N}(x_i \mid \mu_k, \Sigma_k)}{\sum_{j=1}^K \pi_j \mathcal{N}(x_i \mid \mu_j, \Sigma_j)}}$$
+
+          <h4>B. Maximization Step (M-Step) &mdash; Parameter Updates:</h4>
+          <p>Let $N_k = \sum_{i=1}^N \gamma_{ik}$ denote the effective number of data points assigned to cluster $k$:</p>
+          $$\mathbf{\mu_k^{\text{new}} = \frac{1}{N_k} \sum_{i=1}^N \gamma_{ik} x_i}$$
+          $$\mathbf{\Sigma_k^{\text{new}} = \frac{1}{N_k} \sum_{i=1}^N \gamma_{ik} (x_i - \mu_k^{\text{new}})(x_i - \mu_k^{\text{new}})^T}$$
+          $$\mathbf{\pi_k^{\text{new}} = \frac{N_k}{N}}$$
+        </div>
+
+        <h2>2. Worked 1D Numerical Walkthrough with Real Numbers</h2>
+        <div class="example-box">
+          <h4>🧮 Concrete Numerical Calculation:</h4>
+          <p>Dataset of 4 points: $X = \{1, 2, 8, 9\}$. We want $K=2$ Gaussian components.</p>
+          <p><strong>Initial Guesses:</strong></p>
+          <ul>
+            <li>$\mu_1 = 2.0, \; \mu_2 = 7.0$</li>
+            <li>Variances $\sigma_1^2 = 4.0, \; \sigma_2^2 = 4.0$ (standard deviation $\sigma = 2.0$)</li>
+            <li>Mixing weights $\pi_1 = 0.5, \; \pi_2 = 0.5$</li>
+          </ul>
+
+          <p>Recall the 1D Gaussian probability density: $\mathcal{N}(x \mid \mu, \sigma^2) = \frac{1}{\sqrt{2\pi \times 4}} \exp\left(-\frac{(x - \mu)^2}{8}\right) = \frac{1}{5.013} \exp\left(-\frac{(x-\mu)^2}{8}\right) \approx 0.1995 \exp\left(-\frac{(x-\mu)^2}{8}\right)$.</p>
+
+          <p><strong>Step 1: Compute Densities and Responsibilities (E-step):</strong></p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>$x_i$</th><th>$(x_i - 2)^2$</th><th>$\mathcal{N}(x_i \mid 2, 4)$</th><th>$(x_i - 7)^2$</th><th>$\mathcal{N}(x_i \mid 7, 4)$</th><th>Responsibility $\gamma_{i1}$</th><th>Responsibility $\gamma_{i2}$</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td>1</td><td>$0.1995 e^{-1/8} = 0.1760$</td><td>36</td><td>$0.1995 e^{-36/8} = 0.0022$</td><td>$\frac{0.1760}{0.1760+0.0022} = \mathbf{0.988}$</td><td>$\mathbf{0.012}$</td></tr>
+                <tr><td>2</td><td>0</td><td>$0.1995 e^{0} = 0.1995$</td><td>25</td><td>$0.1995 e^{-25/8} = 0.0088$</td><td>$\frac{0.1995}{0.1995+0.0088} = \mathbf{0.958}$</td><td>$\mathbf{0.042}$</td></tr>
+                <tr><td>8</td><td>36</td><td>$0.1995 e^{-36/8} = 0.0022$</td><td>1</td><td>$0.1995 e^{-1/8} = 0.1760$</td><td>$\mathbf{0.012}$</td><td>$\mathbf{0.988}$</td></tr>
+                <tr><td>9</td><td>49</td><td>$0.1995 e^{-49/8} = 0.0004$</td><td>4</td><td>$0.1995 e^{-4/8} = 0.1210$</td><td>$\mathbf{0.003}$</td><td>$\mathbf{0.997}$</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Step 2: Update Parameters (M-step):</strong></p>
+          $$N_1 = 0.988 + 0.958 + 0.012 + 0.003 = \mathbf{1.961}, \quad N_2 = 0.012 + 0.042 + 0.988 + 0.997 = \mathbf{2.039}$$
+          $$\mu_1^{\text{new}} = \frac{(0.988)(1) + (0.958)(2) + (0.012)(8) + (0.003)(9)}{1.961} = \frac{0.988 + 1.916 + 0.096 + 0.027}{1.961} = \frac{3.027}{1.961} = \mathbf{1.54}$$
+          $$\mu_2^{\text{new}} = \frac{(0.012)(1) + (0.042)(2) + (0.988)(8) + (0.997)(9)}{2.039} = \frac{0.012 + 0.084 + 7.904 + 8.973}{2.039} = \frac{16.973}{2.039} = \mathbf{8.32}$$
+          <p>Notice how $\mu_1$ moved from $2.0 \to 1.54$ (pulling toward points $\{1, 2\}$, whose true center is $1.5$) and $\mu_2$ moved from $7.0 \to 8.32$ (pulling toward points $\{8, 9\}$, whose true center is $8.5$)!</p>
+        </div>
+
+        <h2>3. Mathematical Proof: $K$-Means is the Zero-Variance Limit of GMM</h2>
+        <div class="deep-dive">
+          <h4>Theorem: As covariance $\Sigma_k = \sigma^2 \mathbf{I} \to 0$, GMM EM reduces identically to $K$-Means.</h4>
+          <p><strong>Assumptions:</strong></p>
+          <ol>
+            <li>Equal prior mixing weights: $\pi_1 = \pi_2 = \dots = \pi_K = \frac{1}{K}$.</li>
+            <li>Isotropic spherical covariances with identical shared variance: $\Sigma_k = \sigma^2 \mathbf{I}$.</li>
+          </ol>
+          <p><strong>Step 1: Write the GMM Responsibility:</strong></p>
+          $$\gamma_{ik} = \frac{\exp\left(-\frac{\|x_i - \mu_k\|^2}{2\sigma^2}\right)}{\sum_{j=1}^K \exp\left(-\frac{\|x_i - \mu_j\|^2}{2\sigma^2}\right)} = \frac{1}{\sum_{j=1}^K \exp\left( \frac{\|x_i - \mu_k\|^2 - \|x_i - \mu_j\|^2}{2\sigma^2} \right)}$$
+
+          <p><strong>Step 2: Take the Limit as $\sigma^2 \to 0$:</strong></p>
+          <p>Consider the closest centroid $\mu_k$ to $x_i$, such that $\|x_i - \mu_k\|^2 < \|x_i - \mu_j\|^2$ for all other centroids $j \ne k$.</p>
+          <p>Then the difference $\|x_i - \mu_k\|^2 - \|x_i - \mu_j\|^2$ is strictly <strong>negative</strong>.</p>
+          <p>As $\sigma^2 \to 0^+$, the quotient $\frac{\text{negative}}{2\sigma^2} \to -\infty$. Therefore:</p>
+          $$\lim_{\sigma^2 \to 0} \exp\left( \frac{\|x_i - \mu_k\|^2 - \|x_i - \mu_j\|^2}{2\sigma^2} \right) = e^{-\infty} = 0 \quad (\text{for all } j \ne k)$$
+          $$\mathbf{\lim_{\sigma^2 \to 0} \gamma_{ik} = \begin{cases} 1 & \text{if } k = \arg\min_j \|x_i - \mu_j\|^2 \\ 0 & \text{otherwise} \end{cases}}$$
+          <p><strong>Step 3: The M-step becomes Hard $K$-Means Averaging:</strong></p>
+          <p>Because $\gamma_{ik} \in \{0, 1\}$, $N_k$ simply counts the number of points assigned to cluster $k$, and $\mu_k = \frac{1}{N_k} \sum_{i \in C_k} x_i$ is the exact centroid calculation of standard $K$-Means! $\blacksquare$</p>
+        </div>
+
+        <h2>4. Production Failure Mode: Singular Covariances in GMM</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Infinite Likelihood Singularity Trap:</h4>
+          <p>Unlike $K$-Means, GMM MLE has a serious pathological defect: If any Gaussian component collapses onto a single data point $x_n$ (so $\mu_k = x_n$), and its variance $\sigma_k^2 \to 0$, the likelihood at that point becomes:</p>
+          $$\mathcal{N}(x_n \mid x_n, \sigma_k^2) = \frac{1}{\sqrt{2\pi}\sigma_k} \exp(0) = \frac{1}{\sqrt{2\pi}\sigma_k} \xrightarrow{\sigma_k \to 0} +\infty!$$
+          <p>The likelihood surface has infinite spikes that do NOT correspond to meaningful clusters. In production (e.g. Scikit-Learn's <code>GaussianMixture</code>), this is solved by adding a tiny ridge regularization term <code>reg_covar=1e-6</code> to the diagonal of $\Sigma_k$: $\Sigma_k \leftarrow \Sigma_k + \epsilon \mathbf{I}$.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 10: MODERN BAYESIAN ML, MCMC & PRODUCTION -->
+      <section id="tab-modern" class="tab-section">
+        <h1>Modern Bayesian ML: MCMC, Thompson Sampling & MC Dropout</h1>
+        <p class="section-subtitle">Approximation techniques for intractable integrals and Bayesian methods powering industry recommendation engines.</p>
+
+        <div class="first-principles">
+          <h4>🎲 Why Bayesian Machine Learning Is Hard in Practice</h4>
+          <p>Recall the full Bayesian posterior predictive distribution for a new query $x^*$:</p>
+          $$P(y^* \mid x^*, \mathcal{D}) = \int_{\Theta} P(y^* \mid x^*, \theta) P(\theta \mid \mathcal{D}) d\theta$$
+          <p>If $\theta$ represents the 100 million weights of a deep neural network, this integral is an integral over a 100,000,000-dimensional space. Numerical grid quadrature is impossible due to the Curse of Dimensionality. Modern machine learning uses two primary paradigms to overcome this:</p>
+          <ol>
+            <li><strong>Sampling Methods (MCMC):</strong> Draw samples $\theta^{(1)}, \theta^{(2)}, \dots, \theta^{(S)} \sim P(\theta \mid \mathcal{D})$ and approximate the integral with an empirical average: $\frac{1}{S} \sum_{s=1}^S P(y^* \mid x^*, \theta^{(s)})$. Exact asymptotically, but slow.</li>
+            <li><strong>Variational Inference (VI):</strong> Approximate the intractable posterior $P(\theta \mid \mathcal{D})$ with a simpler family of tractable distributions $q_\phi(\theta)$ (e.g. diagonal Gaussian) and optimize $\phi$ to minimize $\text{KL}(q_\phi \parallel P)$. Fast, scales via gradient descent (foundation of Variational Autoencoders / VAEs).</li>
+          </ol>
+        </div>
+
+        <h2>1. Markov Chain Monte Carlo (MCMC): Metropolis-Hastings & Gibbs</h2>
+        <div class="math-box">
+          <h4>The Metropolis-Hastings Algorithm:</h4>
+          <p>To sample from unnormalized distribution $P(\theta \mid \mathcal{D}) \propto P(\mathcal{D} \mid \theta) P(\theta)$:</p>
+          <ol>
+            <li>Given current state $\theta^{(t)}$, propose candidate $\theta^* \sim q(\theta^* \mid \theta^{(t)})$.</li>
+            <li>Compute the <strong>Acceptance Ratio</strong>:
+              $$\alpha = \min\left(1, \; \frac{P(\mathcal{D} \mid \theta^*) P(\theta^*)}{P(\mathcal{D} \mid \theta^{(t)}) P(\theta^{(t)})} \cdot \frac{q(\theta^{(t)} \mid \theta^*)}{q(\theta^* \mid \theta^{(t)})}\right)$$
+            </li>
+            <li>Accept $\theta^{(t+1)} = \theta^*$ with probability $\alpha$; otherwise reject and set $\theta^{(t+1)} = \theta^{(t)}$.</li>
+          </ol>
+          <p><strong>Gibbs Sampling:</strong> A special case where proposals are drawn from exact univariate conditional distributions $P(\theta_j \mid \theta_{-j}, \mathcal{D})$. In Gibbs sampling, the acceptance ratio $\alpha$ is always identically $1.0$ (no rejected proposals!).</p>
+        </div>
+
+        <h2>2. Production Bayesian Bandit: Thompson Sampling for A/B Testing</h2>
+        <div class="deep-dive">
+          <h4>🎰 Thompson Sampling vs. Traditional $\epsilon$-Greedy A/B Testing:</h4>
+          <p>Imagine Netflix testing $K=3$ different thumbnail images for a new movie. Standard $\epsilon$-greedy sends a fixed percentage of traffic to suboptimal images. <strong>Thompson Sampling</strong> uses Bayesian probability to achieve optimal regret:</p>
+          <ol>
+            <li>Model the click-through rate (CTR) of each thumbnail $k$ with a <strong>Beta prior</strong>: $\text{Beta}(\alpha_k, \beta_k)$ (starts at $\text{Beta}(1, 1) = \text{Uniform}$).</li>
+            <li>Whenever a user arrives:
+              <ul>
+                <li>Sample a random CTR estimate from each thumbnail's posterior: $\theta_k \sim \text{Beta}(\alpha_k, \beta_k)$.</li>
+                <li>Display the thumbnail with the highest sampled value: $k^* = \arg\max_k \theta_k$.</li>
+              </ul>
+            </li>
+            <li>If user clicks: $\alpha_{k^*} \leftarrow \alpha_{k^*} + 1$. If user does not click: $\beta_{k^*} \leftarrow \beta_{k^*} + 1$.</li>
+          </ol>
+          <div class="interview-alert">
+            <h4>💡 Why Meta, Amazon & Netflix Prefer Thompson Sampling:</h4>
+            <p>Thumbnails with high uncertainty have wide Beta distributions, which naturally produce high sampled values occasionally &mdash; providing <strong>automated exploration</strong>. Once a winning thumbnail accumulates thousands of clicks, its Beta distribution narrows tightly at high CTR, naturally dominating traffic &mdash; providing <strong>automated exploitation</strong> without any manual traffic split tuning!</p>
+          </div>
+        </div>
+
+        <h2>3. Epistemic vs. Aleatoric Uncertainty & Monte Carlo Dropout</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Uncertainty Type</th>
+                <th>Definition & Cause</th>
+                <th>Can More Data Reduce It?</th>
+                <th>Production Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Epistemic (Model) Uncertainty</strong></td>
+                <td>Uncertainty due to lack of knowledge / sparse training data in that region of feature space.</td>
+                <td><strong>YES</strong> (collecting more training samples shrinks the parameter posterior).</td>
+                <td>Autonomous vehicle encountering a rare tumbleweed blowing across the highway for the first time.</td>
+              </tr>
+              <tr>
+                <td><strong>Aleatoric (Data) Uncertainty</strong></td>
+                <td>Inherent, irreducible noise in the observation process.</td>
+                <td><strong>NO</strong> (fundamental limit of the sensors / physics).</td>
+                <td>Camera lens covered in mud or noisy sensor reading.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="deep-dive">
+          <h4>🧠 Monte Carlo Dropout (Gal & Ghahramani, 2016):</h4>
+          <p>Training a full Bayesian Neural Network with weight distributions is computationally prohibitive. Yarin Gal proved that <strong>leaving Dropout ON at test/inference time</strong> is mathematically equivalent to approximate Variational Inference in a deep Gaussian Process!</p>
+          <p><strong>Production Inference Procedure:</strong></p>
+          <ol>
+            <li>Keep dropout active at inference time.</li>
+            <li>Run $T = 50$ stochastic forward passes for the same query image $x^*$: $\hat{y}^{(1)}, \dots, \hat{y}^{(50)}$.</li>
+            <li>Compute the predictive mean: $\bar{y} = \frac{1}{T} \sum_{t=1}^T \hat{y}^{(t)}$ (the final prediction).</li>
+            <li>Compute the predictive variance: $\text{Var}(y) = \frac{1}{T} \sum_{t=1}^T (\hat{y}^{(t)} - \bar{y})^2$ (<strong>The model's confidence / epistemic uncertainty!</strong>).</li>
+          </ol>
+          <p>If $\text{Var}(y)$ exceeds a safety threshold in a self-driving car or cancer detector, the model safely hands control over to a human operator!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ High-Frequency FAANG Interview Questions</h1>
+        <p class="section-subtitle">Real-world interview screening and system design questions asked at Google, Meta, Amazon, Apple, and Netflix.</p>
+
+        <h2>Part 1: Probabilistic Foundations & Bayes' Rule</h2>
+        <details open>
+          <summary><span>Q1: What is the difference between Generative and Discriminative models?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Generative Models (e.g. Na&iuml;ve Bayes, GMM, HMM, LDA, VAEs):</strong> Model the joint probability distribution $P(X, Y) = P(X \mid Y)P(Y)$. They learn how the data was generated for each class and can generate synthetic data samples. They handle missing features naturally via marginalization ($P(X_1, Y) = \sum_{X_2} P(X_1, X_2, Y)$).</li>
+              <li><strong>Discriminative Models (e.g. Logistic Regression, SVM, GBDT, Deep Neural Networks):</strong> Model the conditional probability $P(Y \mid X)$ directly. They only learn the decision boundary separating classes.</li>
+            </ul>
+            <p><em>Vapnik's Principle:</em> "Never solve a more general problem than the one you have to solve." If your only goal is classification, learning the joint distribution $P(X, Y)$ is solving a harder problem than directly learning $P(Y \mid X)$. Discriminative models generally achieve lower asymptotic error on large datasets.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: How does sample complexity compare between Na&iuml;ve Bayes and Logistic Regression? (The Ng & Jordan 2001 Result)</span> <span class="badge badge-math">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In their landmark 2001 paper, Andrew Ng and Michael I. Jordan proved:</p>
+            <ol>
+              <li><strong>Sample Complexity:</strong> Generative Na&iuml;ve Bayes reaches its asymptotic error rate with only $O(\log D)$ training samples, whereas Discriminative Logistic Regression requires $O(D)$ training samples (where $D$ is feature dimension).</li>
+              <li><strong>Asymptotic Error:</strong> As sample size $N 	o \infty$, Logistic Regression achieves strictly lower asymptotic classification error than Na&iuml;ve Bayes because it does not suffer from the restrictive conditional independence assumption.</li>
+            </ol>
+            <p><strong>Practical Takeaway:</strong> For tiny datasets ($N \ll D$), Na&iuml;ve Bayes often outperforms Logistic Regression. On large datasets ($N \gg D$), Logistic Regression wins decisively.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: What happens to the MAP estimate as the sample size $N 	o \infty$?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> As $N 	o \infty$, the MAP estimate converges exactly to the Maximum Likelihood Estimate (MLE): $\lim_{N 	o \infty} \hat{	heta}_{	ext{MAP}} = \hat{	heta}_{	ext{MLE}}$.</p>
+            <p><strong>Mathematical Explanation:</strong> The log-posterior is $\ln P(	heta \mid \mathcal{D}) = \sum_{i=1}^N \ln P(x_i \mid 	heta) + \ln P(	heta)$. The likelihood term scales linearly with $N$ ($O(N)$), while the prior $\ln P(	heta)$ remains constant ($O(1)$). As $N$ becomes huge, the data likelihood completely overwhelms the prior.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Why does OLS regression assume normal errors? Does regression fail if the features $X$ are not normal?</span> <span class="badge badge-faang">Google Classic</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> OLS regression requires <strong>errors (residuals) $\epsilon = y - \hat{y}$ to be normally distributed</strong> for MLE equivalence and for valid hypothesis testing ($t$-tests and $F$-tests for $p$-values). The features $X$ themselves do <strong>NOT</strong> need to be normally distributed &mdash; they can be binary (one-hot), categorical, uniform, or skewed. Only the residual noise given $X$ is assumed Gaussian.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: Explain the Base Rate Fallacy and why accuracy is misleading for rare fraud detection.</span> <span class="badge badge-faang">Meta Fraud</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> If fraud prevalence is $0.1\%$ ($P(	ext{Fraud}) = 0.001$), a model that predicts "Legitimate" for 100% of transactions achieves $99.9\%$ accuracy while detecting 0 fraud cases. When testing a classifier with 99% precision on general traffic, false positives from the $99.9\%$ legitimate majority swamp true positives from the $0.1\%$ minority, resulting in low Precision / Positive Predictive Value.</p>
+          </div>
+        </details>
+
+        <h2>Part 2: Na&iuml;ve Bayes & Text Classification</h2>
+        <details>
+          <summary><span>Q6: How do you handle continuous features in Na&iuml;ve Bayes?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> There are two standard approaches:</p>
+            <ol>
+              <li><strong>Gaussian Na&iuml;ve Bayes:</strong> Model continuous feature $x_d$ within class $y$ as a normal distribution: $P(x_d \mid y) = rac{1}{\sqrt{2\pi\sigma_{yd}^2}} \exp\left(-rac{(x_d - \mu_{yd})^2}{2\sigma_{yd}^2}ight)$. Compute sample mean $\mu_{yd}$ and variance $\sigma_{yd}^2$ for each class during training.</li>
+              <li><strong>Discretization (Binning):</strong> Discretize continuous values into $B$ discrete bins (e.g. equal-width or quantile binning) and apply categorical Multinomial Na&iuml;ve Bayes with Laplace smoothing.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the difference between Bernoulli Na&iuml;ve Bayes and Multinomial Na&iuml;ve Bayes in NLP?</span> <span class="badge badge-faang">NLP Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Bernoulli Na&iuml;ve Bayes:</strong> Binary bag-of-words. It only records whether a word is present ($1$) or absent ($0$) in the document. Importantly, it explicitly models absent words: $P(x_d = 0 \mid y) = 1 - P(x_d = 1 \mid y)$. Best for short texts (tweets, SMS).</li>
+              <li><strong>Multinomial Na&iuml;ve Bayes:</strong> Integer word counts ($0, 1, 2, \dots$). It models the frequency of words in documents using a multinomial distribution. Ignores absent words during probability calculation. Best for long documents.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What happens if two features in Na&iuml;ve Bayes are perfectly collinear ($x_2 = x_1$)?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Na&iuml;ve Bayes double-counts the evidence from that feature: $P(x_1, x_2 \mid y) = P(x_1 \mid y)P(x_2 \mid y) = [P(x_1 \mid y)]^2$.</p>
+            <p>This squares the likelihood term, artificially boosting the feature's weight relative to other independent features. The predicted probabilities will be overconfident and distorted, and if the collinear feature points toward an incorrect class, it double-penalizes the correct class.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why does setting the smoothing parameter $lpha = 0$ cause catastrophic test failures in Na&iuml;ve Bayes?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> With $lpha = 0$, if any feature value in a test query was never observed with class $y$ in the training data, $P(x_{	ext{new}} \mid y) = 0$. Because Na&iuml;ve Bayes multiplies probabilities across all features, that single zero sets the entire class posterior to zero ($0 	imes \dots = 0$), completely ignoring all other strong evidence in the sample.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: How do you prevent numerical underflow when computing Na&iuml;ve Bayes predictions on long documents?</span> <span class="badge badge-system">Engineering</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Switch to log-space: $\ln P(y \mid X) = \ln P(y) + \sum_{d=1}^D \ln P(x_d \mid y) - \ln P(X)$. When computing normalized probabilities, apply the <strong>Log-Sum-Exp trick</strong>: $\ln \sum_k \exp(s_k) = M + \ln \sum_k \exp(s_k - M)$ where $M = \max_k s_k$.</p>
+          </div>
+        </details>
+
+        <h2>Part 3: Graphical Models & The EM Algorithm</h2>
+        <details>
+          <summary><span>Q11: Explain the "Explaining Away" phenomenon in Bayesian Belief Networks.</span> <span class="badge badge-faang">Meta Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In a collider structure ($A 	o C \leftarrow B$), two independent causes $A$ and $B$ produce a common effect $C$. Marginally, $A$ and $B$ are independent ($P(A, B) = P(A)P(B)$).</p>
+            <p>However, when the common effect $C$ is observed, $A$ and $B$ become <strong>conditionally dependent</strong>! If we discover that cause $A$ happened, the probability of cause $B$ drops because $A$ already "explains away" why $C$ occurred.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: In a chain $X 	o Y 	o Z$, are $X$ and $Z$ independent? What if $Y$ is observed?</span> <span class="badge badge-math">d-Separation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li>When $Y$ is <strong>NOT</strong> observed: $X$ and $Z$ are <strong>dependent</strong> (information flows through the path).</li>
+              <li>When $Y$ <strong>IS</strong> observed: $X$ and $Z$ are <strong>conditionally independent</strong> ($X \perp Z \mid Y$). The node $Y$ blocks the active trail.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why does standard Maximum Likelihood fail when latent variables are present?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Because the marginal log-likelihood requires summing over unobserved latent states inside the logarithm: $\ln P(X \mid 	heta) = \sum_i \ln \left(\sum_z P(x_i, z \mid 	heta)ight)$. The log of a sum has no closed-form analytical derivative, creating a non-linear coupling between parameters.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: Does the EM algorithm guarantee finding the global optimum?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> <strong>NO.</strong> The EM algorithm is mathematically guaranteed to converge monotonically to a <strong>local maximum</strong> or stationary saddle point of the marginal likelihood surface. It can easily get trapped in poor local optima. In production, EM is run with multiple random restarts (or initialized using $K$-Means++).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: What is the Evidence Lower Bound (ELBO) and how does it relate to KL divergence?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The marginal log-likelihood decomposes exactly as: $\ln P(X \mid 	heta) = \mathcal{L}(q, 	heta) + 	ext{KL}(q(Z) \parallel P(Z \mid X, 	heta))$.</p>
+            <p>Because $	ext{KL} \ge 0$, $\mathcal{L}(q, 	heta)$ is a strict lower bound on evidence (ELBO). In the E-step, setting $q(Z) = P(Z \mid X, 	heta)$ drives $	ext{KL} = 0$, making ELBO equal the true log-likelihood at the current parameter value.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: How do you choose the number of components $K$ in a Gaussian Mixture Model?</span> <span class="badge badge-system">Production</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> You cannot use training log-likelihood because adding more components always increases likelihood (leading to overfitting). Standard industrial approaches:</p>
+            <ol>
+              <li><strong>BIC (Bayesian Information Criterion):</strong> $	ext{BIC} = -2\ln L + k \ln N$. Choose $K$ that minimizes BIC.</li>
+              <li><strong>AIC (Akaike Information Criterion):</strong> $	ext{AIC} = -2\ln L + 2k$.</li>
+              <li><strong>Variational Bayesian GMM (Dirichlet Process Priors):</strong> Uses an infinite mixture model where unneeded components automatically shrink to mixing weight $\pi_k pprox 0$.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: Why do covariance matrices collapse to infinity in GMM, and how do you prevent it?</span> <span class="badge badge-system">Production</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> If component $k$ assigns its mean $\mu_k$ directly to a single isolated data point $x_n$, as variance $\sigma_k^2 	o 0$, the likelihood density $rac{1}{\sqrt{2\pi}\sigma_k} 	o \infty$. Prevented by adding a small regularization constant $\epsilon \mathbf{I}$ (e.g. <code>reg_covar=1e-6</code> in Scikit-Learn) to the diagonal of every covariance matrix.</p>
+          </div>
+        </details>
+
+        <h2>Part 4: Modern Bayesian ML, MCMC & Systems</h2>
+        <details>
+          <summary><span>Q18: Compare MCMC and Variational Inference (VI). When would you choose one over the other?</span> <span class="badge badge-faang">Google DeepMind</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>MCMC (e.g. Metropolis-Hastings, NUTS/Stan):</strong> Stochastically samples the exact posterior. Asymptotically exact as samples $S 	o \infty$. Computationally expensive and slow to mix. Best for small-to-medium datasets where exact uncertainty intervals are mandatory (e.g. clinical drug trials, econometrics).</li>
+              <li><strong>Variational Inference (VI):</strong> Turns integration into optimization by fitting a parameterized distribution $q_\phi$ to maximize ELBO. Fast, scalable via mini-batch SGD, but underestimates posterior variance. Best for massive datasets, deep learning (VAEs), and real-time production pipelines.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: How does Thompson Sampling solve the Exploration vs. Exploitation dilemma?</span> <span class="badge badge-faang">Netflix Recommender</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Thompson Sampling samples action values from their posterior probability distributions. Arms with high uncertainty have wide distributions and occasionally yield high sampled values (spurring exploration). Winning arms accumulate tight distributions around high values, naturally winning most samples (exploitation). It achieves logarithmic regret with zero manual exploration parameter tuning.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: What is the difference between Epistemic and Aleatoric uncertainty? How do you estimate epistemic uncertainty in deep learning?</span> <span class="badge badge-system">Safety Systems</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Epistemic:</strong> Uncertainty in the model parameters due to lack of training data. Reducible with more data.</li>
+              <li><strong>Aleatoric:</strong> Irreducible noise in the observation process (sensor noise).</li>
+            </ul>
+            <p><strong>Estimation:</strong> Use <strong>Monte Carlo Dropout</strong> (leaving dropout active at inference time across $T$ forward passes and computing the variance of outputs) or <strong>Deep Ensembles</strong> (training 5 distinct neural networks with different initializations and computing prediction variance across the ensemble).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: Why is the Beta distribution used as the conjugate prior for Binomial likelihood?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Both distributions have the algebraic functional form $	heta^a (1-	heta)^b$. Multiplying Binomial likelihood $	heta^k (1-	heta)^{N-k}$ by Beta prior $	heta^{lpha-1}(1-	heta)^{eta-1}$ results in $	heta^{k+lpha-1}(1-	heta)^{N-k+eta-1}$, which is in the exact same Beta distribution family $	ext{Beta}(lpha+k, eta+N-k)$. Bayesian belief updating becomes trivial addition of counts.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: What is the Dirichlet distribution? Where is it used in production ML?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The Dirichlet distribution is the multivariate generalization of the Beta distribution over a probability simplex ($\sum_k p_k = 1, p_k \ge 0$). It is the conjugate prior for the Multinomial distribution. Heavily used in Latent Dirichlet Allocation (LDA) for unsupervised topic modeling in NLP and in Bayesian mixture models.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: How is Bayesian Optimization used in Hyperparameter Tuning?</span> <span class="badge badge-system">MLOps</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Evaluating a large deep learning model is expensive ($10+$ hours per training run). Bayesian Optimization fits a <strong>Gaussian Process (GP)</strong> surrogate model over the hyperparameter space to predict validation performance and its uncertainty. It evaluates an <strong>Acquisition Function</strong> (e.g. Expected Improvement / EI or Upper Confidence Bound / UCB) to pick the next set of hyperparameters to test, finding optimal settings in 10x fewer trials than Grid or Random Search.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: Can Na&iuml;ve Bayes be used for anomaly detection?</span> <span class="badge badge-system">Security</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Yes. Because Na&iuml;ve Bayes is a generative model, it estimates the density $P(X \mid y = 	ext{Normal})$. If a query instance $x^*$ has an extremely low likelihood $P(x^* \mid 	ext{Normal}) < 	au$, it can be flagged as an out-of-distribution anomaly or cyberattack.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: What is the Gibbs Algorithm error bound and why does it matter?</span> <span class="badge badge-math">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The Gibbs algorithm samples a single hypothesis $h \sim P(h \mid \mathcal{D})$ and uses it for prediction. Its expected error is proven to be at most <strong>twice the error of the theoretical Bayes Optimal Classifier</strong>: $\mathbb{E}[	ext{Error}_{	ext{Gibbs}}] \le 2 	imes \mathbb{E}[	ext{Error}_{	ext{BayesOptimal}}]$. It provides a theoretical baseline showing that even a quick single-hypothesis stochastic sample remains closely bounded to the gold standard.</p>
+          </div>
+        </details>
+      </section>
+    
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>Module 5 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your mastery of Bayesian learning, Graphical Models, and the EM algorithm with instant explanations.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. In Maximum Likelihood regression, minimizing Mean Squared Error assumes the target residual error follows which distribution?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) Uniform distribution on $[-1, 1]$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) Normal (Gaussian) distribution with zero mean and constant variance</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) Poisson distribution with rate $\lambda$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) Laplace distribution with mean zero</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> When errors $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$ are Gaussian, taking the logarithm of the likelihood converts the product of exponentials directly into the sum of squared residuals $\sum (y_i - \hat{y}_i)^2$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Placing an independent zero-mean Gaussian prior $\mathcal{N}(0, \sigma_0^2)$ on model weights in MAP estimation is mathematically equivalent to which regularizer?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) Lasso ($L_1$) Regularization</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) Ridge ($L_2$) Regularization</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) Elastic Net Regularization</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Early Stopping</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> The log-prior of independent Gaussians is $-rac{1}{2\sigma_0^2} \sum w_j^2 = -\lambda \|w\|_2^2$, which is exactly Ridge ($L_2$) regularization. (A Laplace prior yields Lasso $L_1$).
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. What is the fundamental assumption that makes Na&iuml;ve Bayes "Na&iuml;ve"?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) All features follow a Gaussian distribution.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">B) Prior probabilities for all classes are strictly equal.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">C) All input features are conditionally independent of each other given the class label.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) The target labels are continuous real numbers.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> Na&iuml;ve Bayes assumes $P(x_1, \dots, x_D \mid y) = \prod_{d=1}^D P(x_d \mid y)$, treating all features as completely independent given the class label.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. Why is Laplace (Add-1) smoothing necessary in Na&iuml;ve Bayes?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) To speed up matrix multiplications on GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">B) To prevent a probability of 0 for unseen words from wiping out the entire product.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) To ensure the prior probabilities sum to 1.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) To convert continuous features into integers.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> Without smoothing, if a test word never occurred in training class $y$, $P(w \mid y) = 0$. Since probabilities are multiplied together, a single 0 wipes out the overall probability for that class.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. In a Bayesian Belief Network with collider structure $A 	o C \leftarrow B$, what happens to $A$ and $B$ when $C$ is observed?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) They remain conditionally independent.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) They become conditionally DEPENDENT (Explaining Away).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) Both $A$ and $B$ must equal zero.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) The graph becomes cyclic.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> Conditioning on a collider $C$ (or any of its descendants) opens the path and creates conditional dependence between previously independent causes $A$ and $B$ (the "Explaining Away" effect).
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. In the Expectation-Maximization (EM) algorithm, what does the E-step compute?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) The optimal parameters $	heta$ using stochastic gradient descent.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">B) The posterior responsibilities of the latent variables $P(Z \mid X, 	heta^{(t)})$ given current parameters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) The inversion of the covariance matrix.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) The cross-entropy validation loss.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> The E-step sets $q(Z) = P(Z \mid X, 	heta^{(t)})$ to drive the KL divergence to zero, calculating the responsibilities of the hidden states under current parameter estimates.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. How is $K$-Means clustering mathematically related to a Gaussian Mixture Model (GMM)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) There is no mathematical connection.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">B) GMM is a special case of $K$-Means when $K 	o \infty$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">C) $K$-Means is the limiting case of GMM when components have equal spherical covariance $\sigma^2 \mathbf{I}$ and variance $\sigma^2 	o 0$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) $K$-Means computes soft probabilities while GMM computes hard assignments.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> As spherical variance $\sigma^2 	o 0$, the soft responsibilities $\gamma_{ik}$ polarize into $\{0, 1\}$ indicator assignments (closest cluster), and the GMM M-step becomes exact $K$-Means centroid averaging.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the theoretical error bound of the Gibbs Algorithm relative to the Bayes Optimal Classifier?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">A) Expected error of Gibbs is at most twice the error of Bayes Optimal: $\mathbb{E}[	ext{Error}] \le 2 	imes \mathbb{E}[	ext{Error}_{	ext{BOC}}]$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">B) Expected error of Gibbs is strictly lower than Bayes Optimal.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) Expected error of Gibbs is $O(\sqrt{N})$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) Expected error is unbounded.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> The famous theoretical guarantee states that the expected error of the stochastic Gibbs algorithm is at most twice the expected error of the Bayes Optimal Classifier.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. In production A/B testing and multi-armed bandits, how does Thompson Sampling balance exploration and exploitation?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) By always picking the arm with the most total clicks.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) By sampling from each arm's posterior Beta distribution and choosing the arm with the highest sample.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) By exploring with a fixed 10% epsilon rate for 30 days.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) By running linear regression on user demographics.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> Thompson Sampling draws $	heta_k \sim 	ext{Beta}(lpha_k, eta_k)$ from each arm's posterior. Wide uncertain distributions naturally explore, while winning arms naturally dominate samples.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. What is Monte Carlo Dropout used for in modern deep learning?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Speeding up training throughput on TPU clusters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) Estimating epistemic (model) uncertainty by leaving dropout active during inference across multiple forward passes.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Compressing neural network weights into 8-bit integers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Replacing convolutional layers with self-attention.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Yarin Gal & Zoubin Ghahramani proved that running $T$ stochastic forward passes with active dropout at test time approximates Variational Inference in deep Gaussian processes, providing model uncertainty.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

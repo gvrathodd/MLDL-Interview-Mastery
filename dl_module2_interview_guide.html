@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DL Module 2: Deep Optimization, Regularization & Normalization — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #34d399;
+      --accent-glow: rgba(52, 211, 153, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --cyan: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(52, 211, 153, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--cyan); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">DL<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link">DL1: Foundations</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link active">DL2: Optimization</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link">DL3: CNNs & CV</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link">DL4: RNNs & Attention</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link">DL5: Transformers & LLMs</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">DL Module 2 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-landscapes')"><span>🏔️</span> 1. Loss Landscapes & Curvature</li>
+        <li class="nav-item" onclick="switchTab('tab-sgd-momentum')"><span>🎳</span> 2. Momentum & Nesterov (NAG)</li>
+        <li class="nav-item" onclick="switchTab('tab-adaptive')"><span>🎯</span> 3. AdaGrad, RMSProp & Adam</li>
+        <li class="nav-item" onclick="switchTab('tab-adamw')"><span>🧩</span> 4. AdamW & Decoupled Decay</li>
+        <li class="nav-item" onclick="switchTab('tab-schedules')"><span>📉</span> 5. LR Schedules & Warmup</li>
+        <li class="nav-item" onclick="switchTab('tab-batchnorm')"><span>🧼</span> 6. BatchNorm & Smoothing</li>
+        <li class="nav-item" onclick="switchTab('tab-norm-zoo')"><span>🧩</span> 7. Normalization Zoo (RMSNorm)</li>
+        <li class="nav-item" onclick="switchTab('tab-regularization')"><span>🛡️</span> 8. Dropout & Label Smoothing</li>
+        <li class="nav-item" onclick="switchTab('tab-double-descent')"><span>📉</span> 9. Deep Double Descent</li>
+        <li class="nav-item" onclick="switchTab('tab-distributed')"><span>⚡</span> 10. DDP, Ring-AllReduce & ZeRO</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: LOSS LANDSCAPES & OPTIMIZATION PHYSICS -->
+      <section id="tab-landscapes" class="tab-section active">
+        <h1>Loss Landscapes & High-Dimensional Optimization</h1>
+        <p class="section-subtitle">Why saddle points dominate local minima, ill-conditioned curvature, and the geometry of deep loss surfaces.</p>
+
+        <div class="first-principles">
+          <h4>🏔️ The Geography of 100-Million-Dimensional Spaces</h4>
+          <p>In classical 2D intuition, we picture optimization as a ball rolling down a smooth bowl toward a single global minimum. In deep learning, parameter spaces have $D = 10^7$ to $10^{11}$ dimensions.</p>
+          <p>This astronomical dimensionality fundamentally alters the geometry of calculus:</p>
+          <ul>
+            <li><strong>Local Minima are Extremely Rare:</strong> For a critical point ($\nabla \mathcal{L} = 0$) to be a local minimum, <em>every single eigenvalue of the Hessian matrix must be positive</em> ($\lambda_i > 0$ for all $i=1, \dots, D$). If eigenvalues have random signs, the probability that all $D$ are positive is $\approx (0.5)^D \approx 0$!</li>
+            <li><strong>Saddle Points Dominate (Dauphin et al., 2014):</strong> Almost all critical points in high dimensions are <strong>saddle points</strong> &mdash; points where some directions curve upwards while other directions curve downwards!</li>
+          </ul>
+        </div>
+
+        <h2>1. The Hessian Matrix & The Condition Number $\kappa$</h2>
+        <div class="math-box">
+          <h4>Mathematical Formulation:</h4>
+          <p>The second-order Taylor expansion around parameter vector $\theta$ is:</p>
+          $$\mathcal{L}(\theta + \Delta\theta) \approx \mathcal{L}(\theta) + \nabla \mathcal{L}^T \Delta\theta + \frac{1}{2} \Delta\theta^T \mathbf{H} \Delta\theta$$
+          <p>Where $\mathbf{H} = \nabla^2 \mathcal{L} \in \mathbb{R}^{D \times D}$ is the <strong>Hessian matrix of second derivatives</strong>: $H_{ij} = \frac{\partial^2 \mathcal{L}}{\partial \theta_i \partial \theta_j}$.</p>
+
+          <h4>The Condition Number of the Hessian:</h4>
+          $$\mathbf{\kappa = \frac{\lambda_{\max}(\mathbf{H})}{\lambda_{\min}(\mathbf{H})}}$$
+          <ul>
+            <li>$\lambda_{\max}$: Maximum principal curvature (steepest cliff).</li>
+            <li>$\lambda_{\min}$: Minimum principal curvature (shallowest valley floor).</li>
+          </ul>
+          <p><strong>The Ravine Catastrophe ($\kappa \gg 1$):</strong> In deep networks, $\kappa$ often exceeds $10^4$ or $10^6$. The loss surface resembles an extremely steep, narrow canyon:</p>
+          <ol>
+            <li>Standard gradient descent oscillates wildly between the steep walls ($\lambda_{\max}$ direction) because the gradient is perpendicular to the canyon floor.</li>
+            <li>It makes virtually zero progress along the gentle canyon floor toward the true minimum ($\lambda_{\min}$ direction)!</li>
+            <li>If you increase learning rate $\eta > \frac{2}{\lambda_{\max}}$, gradient descent diverges to infinity.</li>
+          </ol>
+        </div>
+
+        <h2>2. Flat vs. Sharp Minima & Generalization (Hochreiter & Schmidhuber, 1997)</h2>
+        <div class="interview-alert">
+          <h4>💡 Why Flat Minima Generalize Better:</h4>
+          <p>At test time, the data distribution slightly shifts from the training set, causing the test loss surface to be shifted by a small displacement $\epsilon$ relative to the training surface:</p>
+          <ul>
+            <li><strong>Sharp Minimum:</strong> A tiny shift $\epsilon$ in parameter space sends the model climbing a steep cliff, causing test loss to skyrocket!</li>
+            <li><strong>Flat Minimum:</strong> The loss curvature is broad and forgiving ($\lambda_i \approx 0$). A small test shift $\epsilon$ maintains virtually identical low loss!</li>
+          </ul>
+          <p><strong>Key Takeaway:</strong> Stochastic Gradient Descent with small batch sizes acts as an implicit regularizer: the stochastic noise continuously knocks parameters out of sharp crevices and settles them into broad, flat basins that generalize robustly.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 2: SGD WITH MOMENTUM & NESTEROV -->
+      <section id="tab-sgd-momentum" class="tab-section">
+        <h1>SGD with Momentum & Nesterov Accelerated Gradient</h1>
+        <p class="section-subtitle">Damping oscillations in narrow ravines, heavy ball physics, and look-ahead gradient corrections.</p>
+
+        <div class="first-principles">
+          <h4>🎳 The Heavy Ball Analogy (Polyak, 1964)</h4>
+          <p>Imagine pushing a heavy bowling ball down a steep V-shaped ravine:</p>
+          <ul>
+            <li><strong>Standard SGD (A feather without mass):</strong> Every step responds purely to the local slope. It bounces violently from the left wall to the right wall, cancelling out forward momentum.</li>
+            <li><strong>Momentum (A heavy ball with mass and inertia):</strong> Transverse oscillations back and forth cancel each other out because the gradients point in opposite directions (+, -, +, -). Meanwhile, forward gradients along the canyon floor point consistently in the same direction, accumulating kinetic velocity!</li>
+          </ul>
+        </div>
+
+        <h2>1. Standard SGD with Momentum Equations</h2>
+        <div class="math-box">
+          <h4>The Formulation:</h4>
+          $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + (1 - \beta) \mathbf{g}_t \quad (\text{or classically: } \mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_t)$$
+          $$\mathbf{\theta}_t = \mathbf{\theta}_{t-1} - \eta \mathbf{v}_t$$
+          <ul>
+            <li>$\mathbf{g}_t = \nabla_\theta \mathcal{L}(\theta_{t-1})$: Current mini-batch gradient.</li>
+            <li>$\mathbf{v}_t$: Velocity vector (exponential moving average of past gradients).</li>
+            <li>$\beta \in [0, 1)$: Momentum coefficient (friction factor, typically $\beta = 0.9$).</li>
+          </ul>
+          <p><strong>Terminal Velocity Analysis:</strong> If gradients remain constant ($\mathbf{g}_t = \mathbf{g}$), the effective step size accelerates from $\eta \mathbf{g}$ to $\frac{\eta}{1 - \beta} \mathbf{g}$. For $\beta = 0.9$, the effective step size is <strong>10x larger</strong> in persistent directions!</p>
+        </div>
+
+        <h2>2. Nesterov Accelerated Gradient (NAG): The Look-Ahead Correction</h2>
+        <div class="deep-dive">
+          <h4>Why Standard Momentum Over-shoots:</h4>
+          <p>When the heavy ball approaches the bottom of a hill, it carries enormous momentum and rolls right past the minimum, ascending the opposite hill before friction slows it down.</p>
+          <p><strong>Nesterov's Brilliant Idea:</strong> Don't evaluate the gradient at current position $\theta_{t-1}$! First take a momentum leap to anticipated future position $\theta_{t-1} - \beta \mathbf{v}_{t-1}$, and evaluate the gradient <em>there</em>:</p>
+          $$\mathbf{g}_t^{\text{NAG}} = \nabla_\theta \mathcal{L}(\mathbf{\theta}_{t-1} - \beta \mathbf{v}_{t-1})$$
+          $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \eta \mathbf{g}_t^{\text{NAG}}$$
+          $$\mathbf{\theta}_t = \mathbf{\theta}_{t-1} - \mathbf{v}_t$$
+          <div class="interview-alert">
+            <h4>💡 Intuition: Look Before You Leap!</h4>
+            <p>If the anticipated position is heading back up a steep slope, $\mathbf{g}_t^{\text{NAG}}$ immediately detects the uphill climb and applies a braking force <em>before</em> the model overshoots, improving convergence rate on convex functions from $O(1/t)$ to $O(1/t^2)$!</p>
+          </div>
+        </div>
+      </section>
+    
+      <!-- TAB 3: ADAPTIVE OPTIMIZERS: ADAGRAD, RMSPROP & ADAM -->
+      <section id="tab-adaptive" class="tab-section">
+        <h1>Adaptive Optimizers: AdaGrad, RMSProp & Adam Math</h1>
+        <p class="section-subtitle">Per-parameter learning rates, overcoming gradient decay, and the complete Adam bias-correction proof.</p>
+
+        <div class="first-principles">
+          <h4>🎯 Why A Single Global Learning Rate Fails</h4>
+          <p>In a deep neural network, some weights receive frequent, massive gradients (e.g. popular word embeddings or early layers), while other weights receive sparse, tiny gradients (e.g. rare tokens or final layer classifiers).</p>
+          <p>A single global learning rate $\eta$ is either too large for steep coordinates (causing divergence) or too small for flat coordinates (causing stagnation). <strong>Adaptive optimizers maintain a customized, independent learning rate for every single parameter.</strong></p>
+        </div>
+
+        <h2>1. The Evolution of Adaptive Optimizers</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Optimizer</th><th>Second-Moment Accumulator $v_t$</th><th>Parameter Update Rule</th><th>Fatal Flaw / Breakthrough</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>AdaGrad</strong> (Duchi et al., 2011)</td>
+                <td>$$v_t = v_{t-1} + g_t^2$$</td>
+                <td>$$\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{v_t} + \epsilon} g_t$$</td>
+                <td><strong>Fatal Flaw:</strong> $v_t$ monotonically increases without bound ($\sum g^2 \to \infty$). Effective learning rate permanently shrinks to zero; model stops learning prematurely.</td>
+              </tr>
+              <tr>
+                <td><strong>RMSProp</strong> (Hinton, 2012)</td>
+                <td>$$v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$$</td>
+                <td>$$\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{v_t} + \epsilon} g_t$$</td>
+                <td><strong>Breakthrough:</strong> Replaces monotonic sum with Exponential Moving Average ($\beta_2 = 0.99$), discarding ancient gradients and preventing learning rate death!</td>
+              </tr>
+              <tr>
+                <td><strong>Adam</strong> (Kingma & Ba, 2014)</td>
+                <td>$$\begin{aligned} m_t &= \beta_1 m_{t-1} + (1 - \beta_1) g_t \\ v_t &= \beta_2 v_{t-1} + (1 - \beta_2) g_t^2 \end{aligned}$$</td>
+                <td>$$\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$</td>
+                <td><strong>Breakthrough:</strong> Combines Momentum (1st moment $m_t$) + RMSProp (2nd moment $v_t$) with <strong>analytical bias-correction</strong> for initialization!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Mathematical Derivation: Why Adam Needs Bias Correction</h2>
+        <div class="deep-dive">
+          <h4>Theorem: Uncorrected moments are severely biased toward zero during early iterations.</h4>
+          <p>In Adam, initial moments start at zero: $m_0 = 0$ and $v_0 = 0$. Let's expand $m_t$ recursively:</p>
+          $$m_t = (1 - \beta_1) g_t + \beta_1 m_{t-1} = (1 - \beta_1) \sum_{i=1}^t \beta_1^{t - i} g_i$$
+          <p>Taking the expectation $\mathbb{E}[m_t]$ under the assumption that past gradients come from a stationary distribution ($\mathbb{E}[g_i] = \mathbb{E}[g_t]$):</p>
+          $$\mathbb{E}[m_t] = \mathbb{E}\left[ (1 - \beta_1) \sum_{i=1}^t \beta_1^{t - i} g_i \right] = \mathbb{E}[g_t] (1 - \beta_1) \sum_{i=1}^t \beta_1^{t - i}$$
+          <p>The finite geometric sum is $\sum_{j=0}^{t-1} \beta_1^j = \frac{1 - \beta_1^t}{1 - \beta_1}$. Substituting:</p>
+          $$\mathbb{E}[m_t] = \mathbb{E}[g_t] (1 - \beta_1) \left( \frac{1 - \beta_1^t}{1 - \beta_1} \right) = \mathbf{\mathbb{E}[g_t] (1 - \beta_1^t)}$$
+          <p><strong>The Discrepancy:</strong> Notice the extra factor $(1 - \beta_1^t)$! At iteration $t = 1$ with $\beta_1 = 0.9$:</p>
+          $$\mathbb{E}[m_1] = \mathbb{E}[g_1] (1 - 0.9^1) = \mathbf{0.10 \times \mathbb{E}[g_1]}$$
+          <p>The expected momentum is only 10% of the true gradient! For the second moment with $\beta_2 = 0.999$, $\mathbb{E}[v_1] = 0.001 \times \mathbb{E}[g_1^2]$ &mdash; an error of 1000x!</p>
+          <p>To eliminate this bias, Kingma & Ba divided by $(1 - \beta^t)$:</p>
+          $$\mathbf{\hat{m}_t = \frac{m_t}{1 - \beta_1^t} \implies \mathbb{E}[\hat{m}_t] = \mathbb{E}[g_t]}$$
+          $$\mathbf{\hat{v}_t = \frac{v_t}{1 - \beta_2^t} \implies \mathbb{E}[\hat{v}_t] = \mathbb{E}[g_t^2]}$$
+          <p>As $t \to \infty$, $\beta^t \to 0$, so $(1 - \beta^t) \to 1$, and the correction gracefully fades away! $\blacksquare$</p>
+        </div>
+      </section>
+    
+      <!-- TAB 4: ADAMW & THE DECOUPLED WEIGHT DECAY PROOF -->
+      <section id="tab-adamw" class="tab-section">
+        <h1>AdamW: The Decoupled Weight Decay Mathematical Proof</h1>
+        <p class="section-subtitle">Why $L_2$ regularization $\ne$ weight decay in adaptive gradient optimizers (Loshchilov & Hutter, 2017).</p>
+
+        <div class="first-principles">
+          <h4>🧩 The Million-Dollar Bug in Deep Learning Libraries</h4>
+          <p>For decades, machine learning textbooks stated that <strong>$L_2$ Regularization</strong> (adding $\frac{1}{2}\lambda \|\theta\|^2$ to the loss function) is mathematically identical to <strong>Weight Decay</strong> (multiplying weights by $(1 - \lambda)$ at each step).</p>
+          <p>For standard SGD, this equivalence is exact. <strong>For Adam, it is completely false.</strong> Because of this misconception, every Adam model trained between 2014 and 2017 had broken regularization! Ilya Loshchilov & Frank Hutter fixed this in 2017 with <strong>AdamW</strong>, which is now the universal standard optimizer for Transformers (LLaMA, GPT-4, Claude).</p>
+        </div>
+
+        <h2>1. The Mathematical Breakdown of $L_2$ Inside Adam</h2>
+        <div class="deep-dive">
+          <h4>Theorem: $L_2$ penalty in Adam penalizes large weights LESS than small weights.</h4>
+          <p>Suppose we add $L_2$ regularization to the objective: $\mathcal{L}_{\text{reg}}(\theta) = \mathcal{L}(\theta) + \frac{\lambda}{2} \|\theta\|_2^2$.</p>
+          <p>The gradient of the regularized loss is:</p>
+          $$\tilde{g}_t = \nabla \mathcal{L}(\theta) + \lambda \theta_t = g_t + \lambda \theta_t$$
+          <p>Now pass this combined gradient $\tilde{g}_t$ into standard Adam:</p>
+          <ol>
+            <li>$m_t = \beta_1 m_{t-1} + (1 - \beta_1)(g_t + \lambda \theta_t)$</li>
+            <li>$v_t = \beta_2 v_{t-1} + (1 - \beta_2)(g_t + \lambda \theta_t)^2$</li>
+            <li>Parameter update:
+              $$\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t$$
+            </li>
+          </ol>
+          <p>Look at the effective weight decay term inside the update:</p>
+          $$\text{Effective Regularization Step} \propto \frac{\lambda \theta_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+          <p><strong>The Catastrophe:</strong></p>
+          <ul>
+            <li>Parameters with <strong>huge gradients</strong> have large $\hat{v}_t$, so the denominator $\sqrt{\hat{v}_t}$ is massive &mdash; which <strong>suppresses the regularization penalty</strong>!</li>
+            <li>Parameters with <strong>tiny gradients</strong> have small $\hat{v}_t$, so they receive a <strong>massive regularization penalty</strong>!</li>
+          </ul>
+          <p>This is the exact opposite of what regularizers should do! Parameters with large weights and frequent updates fail to be regularized.</p>
+        </div>
+
+        <h2>2. The AdamW Fix: Decoupled Weight Decay</h2>
+        <div class="math-box">
+          <h4>The AdamW Algorithm:</h4>
+          <p>AdamW removes the $\lambda \theta$ term from the gradient calculation entirely. The moments $m_t$ and $v_t$ are computed using <em>only the true loss gradient</em> $g_t$. The weight decay is applied directly to the parameter as a decoupled linear shrinkage step:</p>
+          $$\mathbf{\theta_{t+1} = \theta_t - \eta \lambda \theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t = (1 - \eta \lambda)\theta_t - \frac{\eta}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t}$$
+          <div class="interview-alert">
+            <h4>💡 Interview Summary:</h4>
+            <p><em>"In standard SGD, $L_2$ regularization and weight decay are mathematically equivalent. In adaptive gradient algorithms like Adam, $L_2$ regularizes parameters through the second moment denominator $\sqrt{v_t}$, which penalizes large weights less than small weights. AdamW decouples weight decay from the gradient moments, applying uniform multiplicative shrinkage $(1 - \eta \lambda)\theta$ to all weights regardless of gradient scale."</em></p>
+          </div>
+        </div>
+      </section>
+    
+      <!-- TAB 5: LEARNING RATE SCHEDULES & WARMUP -->
+      <section id="tab-schedules" class="tab-section">
+        <h1>Learning Rate Schedules: Warmup, Cosine Annealing & OneCycle</h1>
+        <p class="section-subtitle">Why initial learning rates blow up Adam, cyclical restarts, and optimal annealing curves.</p>
+
+        <div class="first-principles">
+          <h4>📉 Why Static Learning Rates Fail</h4>
+          <p>Early in training, weights are randomly initialized and gradients are noisy and volatile. Late in training, weights are near a local minimum and large steps cause chaotic oscillations around the valley floor.</p>
+          <p>A static learning rate $\eta$ is either too aggressive at the beginning (causing gradient explosions) or too coarse at the end (preventing convergence to sharp precision).</p>
+        </div>
+
+        <h2>1. Why Learning Rate Warmup Is Mandatory for Adam</h2>
+        <div class="deep-dive">
+          <h4>The Physics of Early Adam Volatility:</h4>
+          <p>Recall Adam's second moment update: $v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2$ with $\beta_2 = 0.999$.</p>
+          <ul>
+            <li>In the first few iterations ($t < 100$), $v_t$ is an estimate of gradient variance based on only a handful of samples.</li>
+            <li>If a parameter accidentally receives a few near-zero gradients early on, its second moment estimate $\hat{v}_t$ is extremely small.</li>
+            <li>The effective step size $\frac{\eta}{\sqrt{\hat{v}_t} + \epsilon}$ becomes <strong>astronomically large</strong>, causing huge destabilizing parameter updates that can permanently damage the model!</li>
+          </ul>
+          <p><strong>Linear Warmup Solution:</strong> Linearly ramp learning rate from $0$ up to target $\eta_{\max}$ over the first $T_{\text{warmup}}$ steps (typically $2\%$ to $5\%$ of total training):</p>
+          $$\eta_t = \eta_{\max} \cdot \frac{t}{T_{\text{warmup}}} \quad (\text{for } t \le T_{\text{warmup}})$$
+          <p>This allows Adam's second moment statistics to stabilize <em>before</em> large steps are taken.</p>
+        </div>
+
+        <h2>2. Cosine Annealing with Warm Restarts (SGDR, Loshchilov & Hutter)</h2>
+        <div class="math-box">
+          <h4>The Cosine Decay Formula:</h4>
+          <p>After warmup, decrease learning rate along a cosine curve down to $\eta_{\min}$:</p>
+          $$\mathbf{\eta_t = \eta_{\min} + \frac{1}{2}(\eta_{\max} - \eta_{\min}) \left( 1 + \cos\left( \frac{t - T_{\text{warmup}}}{T_{\text{max}} - T_{\text{warmup}}} \pi \right) \right)}$$
+          <ul>
+            <li>Smooth decay: Spends significant time at moderate learning rates before dropping sharply near the end.</li>
+            <li><strong>Warm Restarts:</strong> Periodically resetting $\eta$ back to $\eta_{\max}$ acts as a thermodynamic jolt, kicking parameters out of suboptimal local minima to explore new valleys.</li>
+          </ul>
+        </div>
+
+        <h2>3. The OneCycleLR Policy (Leslie Smith, 2018)</h2>
+        <div class="interview-alert">
+          <h4>🚀 Super-Convergence in Modern Deep Learning:</h4>
+          <p>The OneCycle policy ramps learning rate up from $\eta_{\max}/25$ to $\eta_{\max}$ during the first 30% of training, while simultaneously <strong>dropping momentum from $0.95 \to 0.85$</strong>. In the remaining 70%, it decays $\eta$ down to $\eta_{\max}/1000$ while increasing momentum back to $0.95$.</p>
+          <p>This reciprocal relationship allows the model to traverse flat regions at blistering speeds without diverging, often speeding up convergence by <strong>5x to 10x</strong>!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 6: BATCH NORMALIZATION IN-DEPTH -->
+      <section id="tab-batchnorm" class="tab-section">
+        <h1>Batch Normalization: Equations, Running Stats & Landscape Smoothing</h1>
+        <p class="section-subtitle">Ioffe & Szegedy (2015), Santurkar (2018) Lipschitz smoothing proof, and multi-GPU SyncBatchNorm.</p>
+
+        <div class="first-principles">
+          <h4>🧼 Why Does Normalizing Intermediate Layers Accelerate Training?</h4>
+          <p>In a 50-layer network, as layer 1 updates its weights, the distribution of inputs received by layer 50 shifts continuously &mdash; forcing later layers to constantly adapt to moving targets (originally termed <em>Internal Covariate Shift</em>).</p>
+          <p><strong>Batch Normalization (BN)</strong> fixes the mean and variance of channel activations across the mini-batch, ensuring every layer receives well-conditioned inputs centered at 0 with standard deviation 1.</p>
+        </div>
+
+        <h2>1. The Four Mathematical Equations of Batch Normalization</h2>
+        <div class="math-box">
+          <p>Given mini-batch $\mathcal{B} = \{x_1, \dots, x_B\}$ of a particular channel:</p>
+          <ol>
+            <li><strong>Mini-Batch Mean:</strong>
+              $$\mu_{\mathcal{B}} = \frac{1}{B} \sum_{i=1}^B x_i$$
+            </li>
+            <li><strong>Mini-Batch Variance:</strong>
+              $$\sigma_{\mathcal{B}}^2 = \frac{1}{B} \sum_{i=1}^B (x_i - \mu_{\mathcal{B}})^2$$
+            </li>
+            <li><strong>Normalization:</strong>
+              $$\hat{x}_i = \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}$$
+            </li>
+            <li><strong>Scale and Shift (Learnable Affine Transformation):</strong>
+              $$\mathbf{y_i = \gamma \hat{x}_i + \beta}$$
+            </li>
+          </ol>
+          <p><strong>Why are learnable $\gamma$ and $\beta$ necessary?</strong> Without them, normalization would strictly force activations into a standardized bell curve, destroying the layer's capacity to represent non-linearities (e.g. forcing Sigmoid inputs into the linear regime $[-1, 1]$). If the network desires the identity mapping, it can learn $\gamma = \sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}$ and $\beta = \mu_{\mathcal{B}}$!</p>
+        </div>
+
+        <h2>2. Training vs. Inference Mode & Running Statistics</h2>
+        <div class="deep-dive">
+          <h4>🚨 The Inference Catastrophe:</h4>
+          <p>At test/inference time, we often process a single image ($B = 1$). If we computed $\mu$ and $\sigma^2$ on a single image, variance would be 0, dividing by zero!</p>
+          <p><strong>The Solution: Running Exponential Moving Averages:</strong></p>
+          <p>During training, BatchNorm maintains running estimates of global population statistics using momentum $m \approx 0.1$:</p>
+          $$\mu_{\text{run}} \leftarrow (1 - m)\mu_{\text{run}} + m \mu_{\mathcal{B}}$$
+          $$\sigma_{\text{run}}^2 \leftarrow (1 - m)\sigma_{\text{run}}^2 + m \sigma_{\mathcal{B}}^2$$
+          <p>At inference time (<code>model.eval()</code> in PyTorch), $\mu_{\mathcal{B}}$ and $\sigma_{\mathcal{B}}^2$ are <strong>frozen</strong>, and the fixed running statistics are used:</p>
+          $$y = \gamma \left( \frac{x - \mu_{\text{run}}}{\sqrt{\sigma_{\text{run}}^2 + \epsilon}} \right) + \beta$$
+        </div>
+
+        <h2>3. The Modern Understanding: Landscape Smoothing (Santurkar et al., NeurIPS 2018)</h2>
+        <div class="interview-alert">
+          <h4>💡 The Myth of Internal Covariate Shift:</h4>
+          <p>Ioffe & Szegedy originally claimed BN works by reducing Internal Covariate Shift. In 2018, MIT researchers (Santurkar et al.) proved that even if you deliberately inject arbitrary covariate shift into normalized layers, the network trains just as fast!</p>
+          <p><strong>The Real Reason BN Works:</strong> BatchNorm makes the loss landscape substantially <strong>Lipschitz continuous</strong>! It bounds both the magnitude of gradients and the curvature of the Hessian ($\beta$-smoothness), preventing sudden gradient cliffs and enabling 10x larger learning rates without divergence.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 7: THE NORMALIZATION ZOO -->
+      <section id="tab-norm-zoo" class="tab-section">
+        <h1>The Normalization Zoo: LayerNorm, GroupNorm & RMSNorm</h1>
+        <p class="section-subtitle">Dimensional slicing comparison, why Transformers reject BatchNorm, and LLaMA's modern RMSNorm.</p>
+
+        <div class="first-principles">
+          <h4>🧩 The Normalization Dimension Dilemma</h4>
+          <p>Consider an activation tensor in computer vision or NLP: $[B, C, H, W]$ or $[B, L, D]$ (Batch, Channels/Dimension, Height/Length, Width).</p>
+          <p>Normalization can be applied along different slices of this 4D/3D tensor. Each slicing strategy solves a unique engineering problem.</p>
+        </div>
+
+        <h2>1. Comparison Table of Normalization Techniques</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Method</th><th>Normalized Across Which Dimensions?</th><th>Depends on Batch Size?</th><th>Primary Domain</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Batch Normalization (BN)</strong></td>
+                <td>Across Batch ($B$) and Spatial ($H, W$) per channel $C$.</td>
+                <td><strong>YES</strong> (Fails if $B < 8$)</td>
+                <td>Computer Vision (ResNet, ConvNets)</td>
+              </tr>
+              <tr>
+                <td><strong>Layer Normalization (LN)</strong></td>
+                <td>Across Channels/Features ($C$) for <strong>each individual sample</strong>.</td>
+                <td><strong>NO</strong> (Identical behavior for $B=1$ and $B=1000$)</td>
+                <td>NLP, Transformers (BERT, GPT-2/3/4)</td>
+              </tr>
+              <tr>
+                <td><strong>Instance Normalization (IN)</strong></td>
+                <td>Across Spatial ($H, W$) per channel, per sample.</td>
+                <td><strong>NO</strong></td>
+                <td>Style Transfer, GANs (removes contrast/style)</td>
+              </tr>
+              <tr>
+                <td><strong>Group Normalization (GN)</strong></td>
+                <td>Divides channels $C$ into $G$ groups; normalizes per group per sample.</td>
+                <td><strong>NO</strong></td>
+                <td>Detection/Segmentation with small batches (Mask R-CNN)</td>
+              </tr>
+              <tr>
+                <td><strong>RMSNorm</strong></td>
+                <td>Across features per sample, but <strong>omits mean centering</strong>.</td>
+                <td><strong>NO</strong></td>
+                <td>Modern LLMs (LLaMA-2/3, Mistral, Gemma)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Why Do Transformers Use LayerNorm Instead of BatchNorm?</h2>
+        <div class="interview-alert">
+          <h4>🔥 The Classic FAANG Interview Question:</h4>
+          <ol>
+            <li><strong>Variable Sequence Lengths:</strong> In NLP, sentences in a batch have different lengths (padded with zeros). In BatchNorm, padding tokens corrupt the channel mean and variance of real words! LayerNorm normalizes each token position independently.</li>
+            <li><strong>Batch Independence at Inference:</strong> Real-time LLM generation generates 1 token at a time for 1 user ($B = 1$). LayerNorm has no concept of batch running statistics &mdash; training and inference equations are 100% identical.</li>
+          </ol>
+        </div>
+
+        <h2>3. RMSNorm (Root Mean Square Normalization): The LLM Standard</h2>
+        <div class="math-box">
+          <h4>Formula (Zhang & Sennrich, 2019):</h4>
+          <p>RMSNorm hypothesizes that the scaling property of LayerNorm is what drives training stability, while the mean-centering step ($x - \mu$) provides negligible benefit:</p>
+          $$\mathbf{\text{RMS}(x) = \sqrt{\frac{1}{D} \sum_{i=1}^D x_i^2 + \epsilon}}$$
+          $$\mathbf{y = \frac{x}{\text{RMS}(x)} \odot \gamma}$$
+          <p><strong>Hardware Efficiency Advantage:</strong> Dropping the mean centering eliminates 1 synchronization barrier and multiple memory reads/writes across GPU registers, accelerating Transformer block execution by <strong>10% to 20%</strong>!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 8: DEEP REGULARIZATION -->
+      <section id="tab-regularization" class="tab-section">
+        <h1>Deep Regularization: Dropout, DropPath & Label Smoothing</h1>
+        <p class="section-subtitle">Ensemble interpretations, inverted dropout scaling, and preventing overconfident logits.</p>
+
+        <div class="first-principles">
+          <h4>🛡️ Regularizing Million-Parameter Models</h4>
+          <p>Modern neural networks have more parameters than training samples, giving them the capacity to memorize random labels (Zhang et al., 2016). Regularization techniques inject stochastic noise or structural constraints to force models to learn robust, generalizable features.</p>
+        </div>
+
+        <h2>1. Inverted Dropout (Srivastava et al., 2014)</h2>
+        <div class="deep-dive">
+          <h4>A. The Co-adaptation Problem:</h4>
+          <p>In unregularized networks, neurons often develop complex co-dependencies: neuron A relies on neuron B to fix its mistakes. If neuron B's input is corrupted, both neurons fail.</p>
+          <p><strong>Dropout Mechanism:</strong> During training, each neuron is randomly dropped (set to 0) with probability $p$ (keep probability $q = 1 - p$):</p>
+          $$r_j \sim \text{Bernoulli}(1 - p)$$
+          $$\tilde{a}_j = r_j \cdot a_j$$
+          <p>Every training step samples a completely different sub-network architecture. Training with dropout across $N$ neurons is mathematically equivalent to training an implicit ensemble of <strong>$2^N$ sub-networks sharing weights</strong>!</p>
+
+          <br>
+          <h4>B. Why Modern Frameworks Use "Inverted Dropout":</h4>
+          <p>In classical dropout, forward activations are scaled down at test time by multiplying by $(1 - p)$.</p>
+          <p><strong>Inverted Dropout scales activations during training:</strong></p>
+          $$\mathbf{\tilde{a}_j = \frac{r_j \cdot a_j}{1 - p}}$$
+          <p><strong>The Benefit:</strong> Because activations are scaled by $\frac{1}{1-p}$ during the training forward pass, the expected value $\mathbb{E}[\tilde{a}_j] = a_j$ is preserved! At inference time, <strong>dropout is simply disabled with zero extra operations</strong> (no test-time scaling required)!</p>
+        </div>
+
+        <h2>2. Label Smoothing: Curing Overconfident Logits (Szegedy et al., 2016)</h2>
+        <div class="math-box">
+          <h4>The Problem with Hard One-Hot Labels:</h4>
+          <p>With standard cross-entropy and one-hot labels ($y_c = 1, y_{k \ne c} = 0$), the loss $-\ln \hat{y}_c$ drives the target logit $z_c \to +\infty$ and non-target logits $z_k \to -\infty$. This leads to <strong>overconfident, poorly calibrated probability estimates</strong> and weight saturation.</p>
+
+          <h4>The Label Smoothing Formula:</h4>
+          <p>Replace hard ground truth $y$ with a smoothed mixture of the true label and a uniform distribution across $K$ classes:</p>
+          $$\mathbf{\tilde{y}_k = (1 - \epsilon) y_k + \frac{\epsilon}{K}}$$
+          <p>For example, with $K = 10$ and $\epsilon = 0.1$, the true class target is $0.91$ and all other 9 classes are $0.01$.</p>
+          <p><strong>Mathematical Consequence:</strong> The optimal logit difference between the true class and incorrect classes becomes finite ($z_c^* - z_k^* = \ln\frac{(K-1)(1-\epsilon)}{\epsilon}$), preventing weights from growing to infinity and acting as a powerful regularizer in modern models.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 9: DEEP DOUBLE DESCENT & OVERPARAMETERIZATION -->
+      <section id="tab-double-descent" class="tab-section">
+        <h1>Overparameterization & Deep Double Descent</h1>
+        <p class="section-subtitle">Challenging classical statistical intuition: Why massive overparameterized models don't overfit.</p>
+
+        <div class="first-principles">
+          <h4>📉 The Classical U-Curve vs. Modern Deep Learning Reality</h4>
+          <p>Classical statistical learning theory teaches the <strong>U-shaped Bias-Variance Tradeoff curve</strong>: As model capacity increases, training error decreases, but test error eventually increases due to overfitting.</p>
+          <p>Yet in modern deep learning, GPT-4, LLaMA-3 (405B parameters), and ResNet-152 have vastly more parameters than training samples, interpolate training data to near 0 loss, and yet achieve state-of-the-art generalization! Why?</p>
+        </div>
+
+        <h2>1. The Deep Double Descent Phenomenon (Belkin et al., PNAS 2019)</h2>
+        <div class="deep-dive">
+          <h4>The Three Regimes of Model Capacity:</h4>
+          <ol>
+            <li><strong>Under-parameterized Regime ($P < N$):</strong> Classical machine learning. Increasing capacity reduces bias; test error follows the classical U-curve down.</li>
+            <li><strong>Interpolation Threshold ($P \approx N$):</strong> The model has just barely enough parameters to memorize every training point. The model is forced to fit training noise with extreme function oscillations, causing test error to <strong>spike to a massive peak</strong>!</li>
+            <li><strong>Over-parameterized Regime ($P \gg N$):</strong> Beyond the interpolation threshold, there are infinitely many interpolating solutions that achieve zero training error. Stochastic gradient descent naturally selects the <strong>minimum-norm, flattest, smoothest interpolating function</strong>, driving test error down a <em>second descent</em>!</li>
+          </ol>
+        </div>
+
+        <h2>2. Epoch Double Descent & Sample Double Descent</h2>
+        <div class="interview-alert">
+          <h4>💡 Double Descent Can Happen Along 3 Dimensions:</h4>
+          <ul>
+            <li><strong>Model Size:</strong> Increasing parameter count (layers or width).</li>
+            <li><strong>Training Epochs:</strong> Training longer can cause test error to temporarily rise and then fall again!</li>
+            <li><strong>Dataset Size:</strong> Adding a small amount of extra data can push the model into the dangerous $P \approx N$ interpolation boundary, temporarily worsening test performance!</li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 10: DISTRIBUTED OPTIMIZATION & PRECISION -->
+      <section id="tab-distributed" class="tab-section">
+        <h1>Distributed Optimization: DDP, Ring-AllReduce & ZeRO</h1>
+        <p class="section-subtitle">Multi-GPU parallelism, communication bandwidth physics, and memory sharding for giant models.</p>
+
+        <div class="first-principles">
+          <h4>⚡ Why Single-GPU Training Is Obsolete</h4>
+          <p>A 70-billion parameter model (LLaMA-3 70B) requires 140 GB of VRAM just to hold FP16 weights. During training with AdamW, optimizer states require an additional 12 bytes per parameter (840 GB!). Training across clusters of 8 to 16,384 GPUs is mandatory.</p>
+        </div>
+
+        <h2>1. Distributed Data Parallel (DDP) & Ring-AllReduce</h2>
+        <div class="deep-dive">
+          <h4>A. How PyTorch DDP Operates:</h4>
+          <ol>
+            <li>Replicates identical model weights on all $N$ GPUs.</li>
+            <li>Each GPU processes a distinct local slice of the mini-batch (batch size $B_{\text{local}}$).</li>
+            <li>In the backward pass, each GPU computes local gradients $\nabla \mathcal{L}_i$.</li>
+            <li>An <strong>AllReduce</strong> operation computes the average gradient across all GPUs in parallel, keeping weights synchronized.</li>
+          </ol>
+
+          <h4>B. The Ring-AllReduce Algorithm (Baidu, 2017):</h4>
+          <p>Naive master-worker AllReduce bottlenecks the central node's bandwidth ($O(N \cdot M)$ data transfer). Ring-AllReduce arranges GPUs in a logical ring where each GPU sends slices to its neighbor:</p>
+          $$\mathbf{\text{Communication Volume} = 2 \times \left( \frac{N - 1}{N} \right) \cdot M \approx 2M \quad \text{bytes}}$$
+          <p>Where $M$ is total model size. <strong>The total time to synchronize gradients is completely independent of the number of GPUs $N$!</strong></p>
+        </div>
+
+        <h2>2. DeepSpeed ZeRO (Zero Redundancy Optimizer, Rajbhandari et al.)</h2>
+        <div class="math-box">
+          <h4>The 3 Stages of ZeRO Memory Sharding:</h4>
+          <p>In standard DDP, every GPU duplicates: Parameters ($2$ bytes), Gradients ($2$ bytes), and Adam Optimizer States ($12$ bytes: FP32 master weights $4$B + 1st moment $4$B + 2nd moment $4$B) = <strong>$16$ bytes per parameter</strong>.</p>
+          <ul>
+            <li><strong>ZeRO-Stage 1 ($P_{os}$):</strong> Shards only the <strong>Optimizer States</strong> across $N$ GPUs. Reduces memory by <strong>4x</strong> with zero communication overhead!</li>
+            <li><strong>ZeRO-Stage 2 ($P_{os+g}$):</strong> Shards Optimizer States AND <strong>Gradients</strong>. Reduces memory by <strong>8x</strong>.</li>
+            <li><strong>ZeRO-Stage 3 ($P_{os+g+p}$):</strong> Shards Optimizer States, Gradients, AND <strong>Model Parameters</strong> (Fully Sharded Data Parallel / FSDP). Memory scales linearly with cluster size ($16/N$ bytes per GPU), allowing trillion-parameter models to fit into VRAM!</li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ High-Frequency FAANG Interview Questions: Optimization</h1>
+        <p class="section-subtitle">Battle-tested screening and architectural questions asked at Google, Meta, Amazon, and NVIDIA.</p>
+
+        <h2>Part 1: Optimizers & Loss Surfaces</h2>
+        <details open>
+          <summary><span>Q1: Why is AdamW preferred over Adam when training Transformers?</span> <span class="badge badge-faang">Core LLM</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In standard Adam, $L_2$ regularization is added directly to the loss function, meaning the weight decay term passes through Adam's second moment accumulator $\sqrt{v_t}$. As a result, weights with large gradients receive small regularization updates, while weights with small gradients receive disproportionately large regularization updates.</p>
+            <p>AdamW decouples weight decay from the gradient update, applying uniform multiplicative shrinkage $(1 - \eta \lambda)\theta$ directly to all weights, restoring true weight decay and significantly improving generalization in Transformers.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: Why does Adam require a learning rate warmup phase? What happens if you skip it?</span> <span class="badge badge-system">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> During the initial iterations of training, the second moment accumulator $v_t$ is computed from very few gradient samples. If initial gradients are small, the denominator $\sqrt{\hat{v}_t} + \epsilon$ is tiny, causing the effective step size $\frac{\eta}{\sqrt{\hat{v}_t}}$ to explode.</p>
+            <p>This causes large parameter spikes that destabilize training or cause early divergence. Linear warmup keeps $\eta$ small until the second moment statistics stabilize.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: What is the difference between Momentum and Nesterov Accelerated Gradient (NAG)?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard Momentum evaluates the gradient at current position $\theta_t$ and adds it to the velocity vector. Nesterov evaluates the gradient at the <em>anticipated future position</em> $\theta_t - \beta v_t$ ("look-ahead"). This acts as an adaptive brake: if the momentum is about to carry the model uphill, NAG detects the upward slope in advance and decelerates, damping oscillations.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Why are saddle points much more common than local minima in deep learning?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> For a critical point to be a local minimum, all $D$ eigenvalues of the Hessian must be strictly positive. In high dimensions ($D = 10^7$), the probability of all eigenvalues sharing the same positive sign at random is $(0.5)^D \approx 0$. Almost all critical points have a mixture of positive and negative eigenvalues, making them saddle points (Dauphin et al., 2014).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: How does the condition number $\kappa$ of the Hessian affect gradient descent?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The condition number $\kappa = \frac{\lambda_{\max}}{\lambda_{\min}}$ measures curvature anisotropy. When $\kappa \gg 1$ (ill-conditioned Hessian), the loss surface is a narrow ravine: gradients point predominantly across the steep walls rather than along the gentle valley floor, causing severe oscillations. The maximum stable learning rate is bounded by $\eta < \frac{2}{\lambda_{\max}}$, forcing progress along the valley floor to be painfully slow.</p>
+          </div>
+        </details>
+
+        <h2>Part 2: Normalization Zoo</h2>
+        <details>
+          <summary><span>Q6: Why can't we use Batch Normalization in Transformers for autoregressive text generation?</span> <span class="badge badge-faang">Transformers</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ol>
+              <li>In text processing, sentences have variable lengths padded with zeros. Padding tokens alter the mini-batch mean and variance, corrupting the representations of real tokens.</li>
+              <li>During autoregressive text generation, generation is sequential with batch size $B=1$ (or variable user requests). BatchNorm cannot compute batch statistics for $B=1$ without relying on running statistics, which mismatch sequence dynamics. LayerNorm normalizes across feature dimensions independently per token, with zero batch size dependency.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is RMSNorm and why is it used in LLaMA-2, LLaMA-3, and Gemma?</span> <span class="badge badge-system">LLMs</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> RMSNorm (Root Mean Square Normalization) normalizes features by their root mean square $\sqrt{\frac{1}{D}\sum x_i^2 + \epsilon}$, entirely omitting the mean-centering step ($x - \mu$) of LayerNorm. It preserves scale invariance while eliminating the computational overhead of computing and subtracting the mean, speeding up GPU Transformer block execution by 10% to 20%.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is the difference between Group Normalization and Layer Normalization?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> LayerNorm normalizes across all channels $C$ together for a given sample ($G=1$). Group Normalization divides channels into $G$ separate groups (typically $G=32$) and normalizes each group independently. GN is widely used in computer vision (Mask R-CNN) when batch sizes are tiny ($B=1$ or $2$ per GPU) and BatchNorm fails.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why does Batch Normalization behave differently during training vs. evaluation?</span> <span class="badge badge-system">PyTorch</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> During training, BN normalizes using the current batch's mean $\mu_{\mathcal{B}}$ and variance $\sigma_{\mathcal{B}}^2$, and updates running population statistics via moving average. During evaluation (<code>model.eval()</code>), BN freezes learning and uses the accumulated running statistics $\mu_{\text{run}}$ and $\sigma_{\text{run}}^2$ so predictions are deterministic and independent of batch composition.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: What is SyncBatchNorm and when is it necessary?</span> <span class="badge badge-system">Distributed</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In multi-GPU Distributed Data Parallel (DDP), standard BatchNorm computes statistics locally on each GPU. If each GPU only holds 2 samples ($B_{\text{local}} = 2$), local batch statistics are noisy and degrade performance. SyncBatchNorm uses an AllReduce communication collective across all GPUs to compute the true global mini-batch mean and variance, enabling stable training with large effective batch sizes.</p>
+          </div>
+        </details>
+
+        <h2>Part 3: Regularization & Modern Generalization</h2>
+        <details>
+          <summary><span>Q11: Explain Inverted Dropout and why it is preferred over standard Dropout.</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard dropout scales down activations at test time by $(1-p)$. Inverted dropout scales active neurons <em>during training</em> by $\frac{1}{1-p}$ ($a \leftarrow \frac{a \cdot r}{1-p}$). This ensures that the expected activation value matches test time, allowing the inference forward pass to run without any modifications or scaling operations.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: How does Label Smoothing prevent overconfidence and improve calibration?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard cross-entropy with one-hot labels ($y_c=1, y_{k \ne c}=0$) drives target logits $z_c \to \infty$, pushing softmax into extreme saturation. Label smoothing replaces one-hot labels with $(1-\epsilon)y + \frac{\epsilon}{K}$, which bounds the optimal difference between logits to a finite value, preventing the model from becoming overly confident on ambiguous or noisy samples.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: What is the Deep Double Descent phenomenon?</span> <span class="badge badge-faang">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Belkin et al. (2019) demonstrated that as model capacity increases, test error initially follows the classical U-curve down, peaks at the <strong>interpolation threshold</strong> (where parameter count $\approx$ sample size and models fit noise with wild oscillations), and then <strong>decreases a second time</strong> in the overparameterized regime ($P \gg N$) because gradient descent acts as an implicit regularizer toward minimum-norm smooth solutions.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: What is DropPath (Stochastic Depth) and where is it used?</span> <span class="badge badge-system">Architectures</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> DropPath (Huang et al., 2016) randomly drops entire residual branch blocks during training with linear decay probability across depth, leaving only the identity skip connection. Used heavily in modern Vision Transformers (Swin, ConvNeXt) to train very deep networks without degradation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: Why does large batch training often lead to a generalization gap? How do you fix it?</span> <span class="badge badge-system">Scaling</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Very large batches have low gradient variance, causing optimizer trajectory to settle into sharp local minima that do not generalize well. Fixed by scaling the learning rate linearly with batch size (Goyal et al. 2017: $\eta \propto B$) along with gradual warmup, or using adaptive layer-wise optimizers like LAMB or LARS.</p>
+          </div>
+        </details>
+
+        <h2>Part 4: Distributed Training & Large-Scale Systems</h2>
+        <details>
+          <summary><span>Q16: How does Ring-AllReduce make gradient communication independent of cluster size?</span> <span class="badge badge-system">Hardware</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In a ring of $N$ GPUs, each GPU sends and receives $\frac{1}{N}$ of the model parameters to/from its immediate neighbors in $2(N-1)$ communication steps. The total volume of data transmitted per GPU is $2\frac{N-1}{N} M \approx 2M$, which is bounded by a constant regardless of whether $N = 8$ or $N = 10,000$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: What are the three stages of ZeRO (DeepSpeed / FSDP)?</span> <span class="badge badge-faang">LLM Training</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>ZeRO-1:</strong> Shards the optimizer states (e.g. Adam 1st/2nd moments) across all GPUs. (4x memory reduction).</li>
+              <li><strong>ZeRO-2:</strong> Shards optimizer states and gradients. (8x memory reduction).</li>
+              <li><strong>ZeRO-3 (FSDP):</strong> Shards optimizer states, gradients, and model parameters. Each GPU only holds its own partition, gathering full weights on-the-fly during forward/backward passes.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: What is Gradient Accumulation and when should you use it?</span> <span class="badge badge-system">VRAM</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> When GPU VRAM cannot fit a desired batch size (e.g. target batch 256, but only batch 32 fits in memory), gradient accumulation runs $8$ consecutive forward and backward passes without zeroing gradients, accumulating gradients in <code>param.grad</code>. The optimizer step is called once after 8 steps, simulating a batch size of 256 with the memory footprint of 32.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: Explain the difference between Data Parallelism, Tensor Parallelism, and Pipeline Parallelism.</span> <span class="badge badge-faang">Systems Architecture</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Data Parallelism (DDP/FSDP):</strong> Replicates or shards the model across GPUs; divides data samples.</li>
+              <li><strong>Tensor Parallelism (Megatron-LM):</strong> Splits individual weight matrices across GPUs within the same layer (e.g. row/column parallel linear projections in attention blocks). High intra-node NVLink bandwidth required.</li>
+              <li><strong>Pipeline Parallelism (PipeDream):</strong> Partitions consecutive layers of the network across different GPUs (GPU 1 runs layers 1-10, GPU 2 runs layers 11-20). Inter-node friendly, but requires micro-batch scheduling to minimize bubbles.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: Why does BF16 eliminate the need for Loss Scaling compared to FP16?</span> <span class="badge badge-system">Hardware</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> FP16 has 5 exponent bits, giving a small dynamic range ($\approx 6 \times 10^{-5}$ to $65,504$). Deep backprop gradients often drop below $10^{-5}$, underflowing to zero without loss scaling. BF16 has 8 exponent bits (identical to FP32), preserving full dynamic range up to $10^{38}$, completely eliminating underflow and the need for loss scaling.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: What is Cosine Annealing with Warm Restarts (SGDR)?</span> <span class="badge badge-concept">Schedules</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Decreases the learning rate along a cosine curve down to a minimum value, then suddenly resets it to the maximum value at periodic cycle intervals. The sudden jump kicks parameters out of sharp, suboptimal local basins to search for flatter, more generalizable global minima.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: How does Santurkar et al. (2018) explain the true mechanism of Batch Normalization?</span> <span class="badge badge-math">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> BatchNorm smooths the optimization landscape by making gradients Lipschitz continuous and bounding the Hessian's maximum eigenvalue. This prevents gradient explosions and sharp cliffs, allowing optimizers to take significantly larger, more stable steps without divergence.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: What is the memory cost of Adam per parameter in bytes?</span> <span class="badge badge-system">VRAM</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In mixed-precision training: FP16 model weights ($2$B), FP16 gradients ($2$B), FP32 master weights ($4$B), FP32 first moment $m_t$ ($4$B), and FP32 second moment $v_t$ ($4$B) = <strong>$16$ bytes per parameter</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: Can Dropout be used alongside Batch Normalization in the same layer?</span> <span class="badge badge-system">Best Practice</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Generally avoided or used with great caution. Li et al. (2019) proved "the Disharmony of Dropout and BatchNorm": Dropout causes a shift in the variance of activations between training and testing, which conflicts with BatchNorm's running variance statistics, degrading accuracy.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: Why does AdaGrad fail on deep neural networks while succeeding on sparse linear models?</span> <span class="badge badge-concept">Optimizers</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> AdaGrad monotonically sums squared gradients: $v_t = v_{t-1} + g_t^2$. In non-convex deep learning where training requires thousands of epochs, $v_t$ grows indefinitely, driving the effective learning rate $\frac{\eta}{\sqrt{v_t}}$ to zero before the model converges. RMSProp solved this by replacing the sum with an exponential moving average.</p>
+          </div>
+        </details>
+      </section>
+    
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>DL Module 2 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your deep optimization and normalization mastery with instant explanations.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. Why is AdamW mathematically different from Adam with $L_2$ regularization?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) AdamW runs only on CPU.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) In Adam, $L_2$ regularization is divided by the second moment $\sqrt{v_t}$, penalizing large weights less than small weights; AdamW applies decoupled linear weight decay.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) AdamW sets the momentum coefficient $\beta_1 = 0$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) AdamW does not use learning rate warmup.</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> In Adam, the $L_2$ gradient passes through the second moment denominator $\sqrt{v_t}$, dampening regularization on weights with large gradients. AdamW decouples weight decay, applying direct shrinkage $(1 - \eta \lambda)\theta$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Why does Kingma & Ba's Adam algorithm divide momentum by $(1 - \beta_1^t)$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) To implement learning rate warmup.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) To correct for initialization bias toward zero during early training steps.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) To prevent division by zero in floating point numbers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) To convert gradients to FP16.</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> Because initial moment vectors start at 0, their expected value is $\mathbb{E}[m_t] = \mathbb{E}[g_t](1 - \beta_1^t)$. Dividing by $(1 - \beta_1^t)$ provides an unbiased estimate.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. Why do Transformer models predominantly use Layer Normalization rather than Batch Normalization?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">A) LayerNorm normalizes across feature dimensions independently per token, functioning properly with variable sequence lengths and batch size 1 at inference.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">B) BatchNorm is patented and cannot be used in open-source software.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) LayerNorm requires zero GPU memory.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) BatchNorm cannot be computed on GPUs.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> Sequence padding tokens in NLP corrupt batch statistics, and real-time generation uses batch size 1. LayerNorm normalizes each token independently of batch size.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. What is the key mathematical difference between RMSNorm and standard LayerNorm?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) RMSNorm uses $L_1$ norm instead of $L_2$ norm.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">B) RMSNorm omits the mean-centering step ($x - \mu$), scaling only by root mean square to save compute.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) RMSNorm normalizes across the batch dimension.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) RMSNorm is used only in Convolutional networks.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> RMSNorm drops the mean-centering step, normalizing strictly by $\sqrt{\frac{1}{D}\sum x_i^2 + \epsilon}$, saving 10-20% Transformer block execution time in LLaMA-2/3.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. In the Deep Double Descent curve, where does test error reach its highest peak?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) When the model has only 1 parameter.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) At the interpolation threshold, where parameter count $\approx$ number of training samples.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) When parameter count is infinite.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) At epoch 0 before training begins.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> At the interpolation threshold ($P \approx N$), the model is forced to interpolate noise with wild function oscillations, creating a massive test error spike before descending again.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. What is the total memory footprint per parameter when training with FP16 mixed precision using AdamW?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) 4 bytes</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">B) 8 bytes</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">C) 16 bytes (2B weights + 2B grads + 4B FP32 master weights + 4B 1st moment + 4B 2nd moment)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) 32 bytes</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> FP16 weights (2B) + FP16 gradients (2B) + FP32 master weights (4B) + FP32 momentum (4B) + FP32 variance (4B) = 16 bytes per parameter.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why does Inverted Dropout scale activations by $\frac{1}{1-p}$ during the training forward pass?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) To make gradients zero.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) To preserve expected activation scale during training, eliminating any test-time scaling operations.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) To prevent division by zero in Softmax.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) To convert tensors to double precision.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> Scaling by $\frac{1}{1-p}$ during training keeps the expected value constant ($\mathbb{E}[\tilde{a}] = a$), allowing inference to run with zero extra operations.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What memory does DeepSpeed ZeRO-Stage 1 shard across GPUs?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">A) Optimizer states only</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">B) Model parameters only</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) Activations only</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) Dataset batches only</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> ZeRO-1 shards the 12 bytes/param optimizer states across GPUs, reducing memory by 4x without communication overhead. (ZeRO-2 adds gradients; ZeRO-3 adds parameters).
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. What primary benefit does Label Smoothing provide in classification tasks?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) It converts multi-class problems into binary problems.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) It prevents logit values from growing to infinity, preventing overconfidence and improving probability calibration.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) It eliminates the need for cross-entropy loss.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) It doubles model training speed.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> Replacing hard one-hot targets with $(1-\epsilon)y + \frac{\epsilon}{K}$ bounds logit differences to finite values, preventing overconfidence.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. Why is Ring-AllReduce communication volume independent of the number of GPUs $N$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Because all GPUs share the same physical memory bus.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) Because data is split into $N$ chunks and communicated in a ring where each GPU sends $\approx 2M$ bytes regardless of $N$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Because only the master GPU communicates.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Because gradients are compressed to 1 bit.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Ring-AllReduce divides the tensor into $N$ segments and transfers $2\frac{N-1}{N}M \approx 2M$ bytes per GPU, making communication bandwidth independent of cluster size.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

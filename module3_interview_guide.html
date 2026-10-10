@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 3: Linear Models, Optimization & Regularization Mastery</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #fbbf24;
+      --accent-glow: rgba(251, 191, 36, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --sky: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Bar */
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+      z-index: 100;
+    }
+    .sidebar-title {
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+    /* Main Content Area */
+    #main-content {
+      flex-grow: 1;
+      padding: 2.2rem 3.5rem;
+      max-width: 1100px;
+      overflow-x: hidden;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Typography & Structural Elements */
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.4rem; letter-spacing: -0.5px; }
+    .section-subtitle { font-size: 1.02rem; color: var(--text-muted); margin-bottom: 1.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+    h2 { font-size: 1.45rem; margin: 2rem 0 0.8rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.3rem 0 0.6rem 0; color: #e2e8f0; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.4rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    /* Specialized Callout Cards */
+    .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .interview-alert { background: rgba(251, 191, 36, 0.08); border-left: 4px solid var(--warning); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .interview-alert h4 { color: var(--warning); margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .math-box { background: rgba(192, 132, 252, 0.08); border-left: 4px solid var(--purple); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; overflow-x: auto; }
+    .math-box h4 { color: var(--purple); margin-bottom: 0.4rem; font-size: 1rem; }
+    .missing-box { background: rgba(52, 211, 153, 0.08); border-left: 4px solid var(--success); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .missing-box h4 { color: var(--success); margin-bottom: 0.4rem; font-size: 1rem; }
+    .first-principles { background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--sky); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .first-principles h4 { color: var(--sky); margin-bottom: 0.4rem; font-size: 1rem; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border: 1px solid var(--border); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #162238; color: var(--accent); font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Code & Syntax */
+    pre { background: var(--code-bg); border: 1px solid #1a273f; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.1rem 0 1.5rem 0; font-family: 'Consolas', 'Fira Code', monospace; font-size: 0.88rem; color: #e2e8f0; line-height: 1.55; }
+    code { font-family: 'Consolas', 'Fira Code', monospace; background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.88em; color: var(--accent); }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    /* Collapsible Details / Accordions */
+    details { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; transition: border-color 0.2s; }
+    details[open] { border-color: var(--accent); }
+    summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { padding: 0 1.25rem 1.25rem 1.25rem; border-top: 1px solid var(--border); padding-top: 0.9rem; font-size: 0.94rem; color: #cbd5e1; }
+
+    /* Quiz Widget */
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.9rem; color: #fff; font-size: 1rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { background: var(--bg-primary); border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.91rem; transition: all 0.2s; color: #cbd5e1; }
+    .quiz-option:hover { border-color: var(--accent); color: #fff; }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #16243d; border-left: 3px solid var(--accent); font-size: 0.9rem; margin-top: 0.7rem; color: #e2e8f0; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-missing { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+    .badge-core { background: rgba(251, 191, 36, 0.2); color: var(--warning); }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { position: fixed; left: -330px; top: 49px; bottom: 0; z-index: 150; transition: left 0.25s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">ML<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="module1_interview_guide.html" class="mod-link">M1: Foundations</a>
+      <a href="module2_interview_guide.html" class="mod-link">M2: Pipelines</a>
+      <a href="module3_interview_guide.html" class="mod-link active">M3: Regression</a>
+      <a href="module4_interview_guide.html" class="mod-link">M4: Trees/Ensembles</a>
+      <a href="module5_interview_guide.html" class="mod-link">M5: Bayesian</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">Module 3 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-linear101')"><span>📐</span> 1. Linear Regression 101</li>
+        <li class="nav-item" onclick="switchTab('tab-normal')"><span>⚡</span> 2. Normal Equation & SVD Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-gd')"><span>🏔️</span> 3. Gradient Descent Deep Dive</li>
+        <li class="nav-item" onclick="switchTab('tab-optimizers')"><span>🚀</span> 4. Momentum, RMSProp & Adam</li>
+        <li class="nav-item" onclick="switchTab('tab-poly')"><span>🔄</span> 5. Poly & Bias-Variance Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-regularization')"><span>💎</span> 6. Ridge, Lasso & ElasticNet Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-assumptions')"><span>📊</span> 7. L.I.N.E. Assumptions & VIF</li>
+        <li class="nav-item" onclick="switchTab('tab-logistic')"><span>📈</span> 8. Logistic Regression & MLE</li>
+        <li class="nav-item" onclick="switchTab('tab-convexity')"><span>🛡️</span> 9. MSE Fails & BCE Convexity</li>
+        <li class="nav-item" onclick="switchTab('tab-softmax')"><span>🎯</span> 10. Softmax Multi-Class & Gradients</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 22+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: LINEAR REGRESSION 101 -->
+      <section id="tab-linear101" class="tab-section active">
+        <h1>Linear Regression 101: From Slopes to Vector Spaces</h1>
+        <p class="section-subtitle">First-principles intuition, simple vs. multiple linear regression, and framing the continuous prediction problem.</p>
+
+        <div class="first-principles">
+          <h4>🌟 What is Linear Regression? (From First Principles)</h4>
+          <p>Imagine you run a lemonade stand. On a 70&deg;F day, you sell 20 cups. On an 80&deg;F day, you sell 30 cups. On a 90&deg;F day, you sell 40 cups. You notice a striking trend: <strong>for every 10&deg;F increase in temperature, sales consistently jump by 10 cups</strong>.</p>
+          <p>You can summarize this entire business pattern with a simple high-school equation for a straight line:</p>
+          $$y = w \cdot x + b$$
+          <ul>
+            <li>$y$: The continuous <strong>target</strong> you want to predict (Lemonade sales).</li>
+            <li>$x$: The input <strong>feature</strong> (Outdoor temperature).</li>
+            <li>$w$: The <strong>weight / slope</strong> (Sensitivity: how much $y$ changes when $x$ increases by 1 unit).</li>
+            <li>$b$: The <strong>bias / intercept</strong> (Baseline sales when temperature $x = 0$).</li>
+          </ul>
+          <p><strong>Linear Regression</strong> is the mathematical process of finding the optimal $w$ and $b$ that best fit a cloud of observed historical data points!</p>
+        </div>
+
+        <h2>1. Step-by-Step 2-Point Toy Numerical Walkthrough</h2>
+        <p>Let's calculate the slope $w$ and bias $b$ manually with real numbers using two simple data points:</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Temperature ($x$)</th>
+                <th>Lemonade Sales ($y$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Point 1 ($x_1, y_1$)</td>
+                <td>70</td>
+                <td>20</td>
+              </tr>
+              <tr>
+                <td>Point 2 ($x_2, y_2$)</td>
+                <td>90</td>
+                <td>40</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <p><strong>Step 1: Calculate the slope $w$:</strong></p>
+          $$w = \frac{\Delta y}{\Delta x} = \frac{y_2 - y_1}{x_2 - x_1} = \frac{40 - 20}{90 - 70} = \frac{20}{20} = \mathbf{1.0}$$
+          <p><strong>Step 2: Solve for the bias $b$ using Point 1 ($x=70, y=20$):</strong></p>
+          $$20 = (1.0 \times 70) + b \implies b = 20 - 70 = \mathbf{-50}$$
+          <p><strong>Step 3: Predict sales for an 85&deg;F day:</strong></p>
+          $$\hat{y} = (1.0 \times 85) - 50 = \mathbf{35 \text{ cups}}$$
+          <p>This is linear regression in its purest, simplest form!</p>
+        </div>
+
+        <h2>2. Generalizing to Multiple Dimensions: Multiple Linear Regression</h2>
+        <p>In the real world, house prices or lemonade sales depend on dozens of variables simultaneously (temperature, humidity, day of week, advertising spend, price per cup). We extend the straight line into a <strong>hyperplane</strong> in $D$-dimensional space:</p>
+        $$\hat{y} = \theta_0 + \theta_1 x_1 + \theta_2 x_2 + \dots + \theta_D x_D$$
+
+        <div class="math-box">
+          <h4>The Vectorized Inner Product Formulation:</h4>
+          <p>To compute predictions lightning-fast on modern hardware, we pack the weights into a parameter vector $\mathbf{\theta}$ and the features into an input vector $\mathbf{x}$ (appending a dummy feature $x_0 = 1$ for the bias $\theta_0$):</p>
+          $$\mathbf{\theta} = \begin{bmatrix} \theta_0 \\ \theta_1 \\ \vdots \\ \theta_D \end{bmatrix}, \quad \mathbf{x} = \begin{bmatrix} 1 \\ x_1 \\ \vdots \\ x_D \end{bmatrix}$$
+          $$\hat{y} = h_\mathbf{\theta}(\mathbf{x}) = \mathbf{\theta}^T \mathbf{x} = \mathbf{x}^T \mathbf{\theta}$$
+          <p>For an entire dataset of $m$ training instances packed into matrix $\mathbf{X} \in \mathbb{R}^{m \times (D+1)}$:</p>
+          $$\mathbf{\hat{y}} = \mathbf{X} \mathbf{\theta}$$
+        </div>
+
+        <h2>3. The Loss Function: Mean Squared Error (MSE)</h2>
+        <p>Real-world data points never line up in a perfectly straight line because of sensor noise, unmeasured variables, and human randomness. For each observation $i$, there is a residual error $e^{(i)} = \hat{y}^{(i)} - y^{(i)}$.</p>
+        <p>To find the best fitting hyperplane, we minimize the <strong>Mean Squared Error (MSE)</strong>:</p>
+        $$\text{MSE}(\mathbf{\theta}) = J(\mathbf{\theta}) = \frac{1}{m} \sum_{i=1}^m \left( \mathbf{\theta}^T \mathbf{x}^{(i)} - y^{(i)} \right)^2 = \frac{1}{m} \|\mathbf{X}\mathbf{\theta} - \mathbf{y}\|_2^2$$
+
+        <div class="interview-alert">
+          <h4>💡 Why do we square the errors $(e^{(i)})^2$ instead of taking absolute values $|e^{(i)}|$?</h4>
+          <ul>
+            <li><strong>Mathematical Tractability:</strong> Squaring produces a smooth, everywhere continuous, strictly differentiable parabola. Its derivative is linear, yielding an elegant closed-form solution. Absolute values have a non-differentiable sharp corner at $0$.</li>
+            <li><strong>Severe Outlier Penalty:</strong> Squaring penalizes large blunders heavily: an error of \$10,000 is penalized 100 times more severely than an error of \$1,000.</li>
+            <li><strong>Probabilistic Grounding:</strong> Under Gauss's theorem, minimizing MSE is mathematically identical to <strong>Maximum Likelihood Estimation (MLE)</strong> under the assumption that residuals follow a zero-mean Gaussian distribution $\epsilon \sim \mathcal{N}(0, \sigma^2)$!</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 2: NORMAL EQUATION & SVD -->
+      <section id="tab-normal" class="tab-section">
+        <h1>The Normal Equation & SVD Pseudoinverse Proof</h1>
+        <p class="section-subtitle">Analytical closed-form matrix derivation, computational complexity, singularity issues, and Moore-Penrose pseudoinverse.</p>
+
+        <h2>1. Deriving the Normal Equation via Matrix Calculus</h2>
+        <p>To find the parameter vector $\mathbf{\theta}$ that minimizes the MSE cost function $J(\mathbf{\theta})$, we compute the gradient with respect to $\mathbf{\theta}$ and set it to zero:</p>
+
+        <div class="math-box">
+          <h4>Step-by-Step Matrix Calculus Derivation:</h4>
+          <p>Express the MSE cost function in pure matrix notation:</p>
+          $$J(\mathbf{\theta}) = \frac{1}{m} (\mathbf{X}\mathbf{\theta} - \mathbf{y})^T (\mathbf{X}\mathbf{\theta} - \mathbf{y})$$
+          <p>Expand the product using matrix transpose properties $(AB)^T = B^T A^T$:</p>
+          $$J(\mathbf{\theta}) = \frac{1}{m} \left( (\mathbf{\theta}^T \mathbf{X}^T - \mathbf{y}^T)(\mathbf{X}\mathbf{\theta} - \mathbf{y}) \right)$$
+          $$J(\mathbf{\theta}) = \frac{1}{m} \left( \mathbf{\theta}^T \mathbf{X}^T \mathbf{X} \mathbf{\theta} - \mathbf{\theta}^T \mathbf{X}^T \mathbf{y} - \mathbf{y}^T \mathbf{X} \mathbf{\theta} + \mathbf{y}^T \mathbf{y} \right)$$
+          <p>Notice that $\mathbf{\theta}^T \mathbf{X}^T \mathbf{y}$ is a scalar ($1 \times 1$), so it equals its own transpose: $(\mathbf{\theta}^T \mathbf{X}^T \mathbf{y})^T = \mathbf{y}^T \mathbf{X} \mathbf{\theta}$. Combine them:</p>
+          $$J(\mathbf{\theta}) = \frac{1}{m} \left( \mathbf{\theta}^T \mathbf{X}^T \mathbf{X} \mathbf{\theta} - 2 \mathbf{\theta}^T \mathbf{X}^T \mathbf{y} + \mathbf{y}^T \mathbf{y} \right)$$
+          <p>Now take the matrix derivative $\nabla_\mathbf{\theta} J(\mathbf{\theta})$ using standard matrix identities $\frac{\partial (\mathbf{a}^T \mathbf{\theta})}{\partial \mathbf{\theta}} = \mathbf{a}$ and $\frac{\partial (\mathbf{\theta}^T \mathbf{A} \mathbf{\theta})}{\partial \mathbf{\theta}} = 2\mathbf{A}\mathbf{\theta}$ (for symmetric $\mathbf{A} = \mathbf{X}^T \mathbf{X}$):</p>
+          $$\nabla_\mathbf{\theta} J(\mathbf{\theta}) = \frac{2}{m} \left( \mathbf{X}^T \mathbf{X} \mathbf{\theta} - \mathbf{X}^T \mathbf{y} \right)$$
+          <p>Set the gradient to the zero vector $\mathbf{0}$ to find the global minimum:</p>
+          $$\mathbf{X}^T \mathbf{X} \mathbf{\theta} - \mathbf{X}^T \mathbf{y} = \mathbf{0} \implies \mathbf{X}^T \mathbf{X} \mathbf{\theta} = \mathbf{X}^T \mathbf{y}$$
+          <p>Multiply both sides by the inverse $(\mathbf{X}^T \mathbf{X})^{-1}$:</p>
+          $$\mathbf{\hat{\theta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$$
+        </div>
+
+        <p>This legendary result is <strong>The Normal Equation</strong>!</p>
+
+        <h2>2. Computational Complexity & Scalability Limits</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Normal Equation</th>
+                <th>Gradient Descent</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Complexity vs. Features ($D$)</strong></td>
+                <td>$$\mathcal{O}(D^3) \text{ to } \mathcal{O}(D^{2.4})$$
+                Inverting a $D \times D$ matrix scales cubically. Painfully slow or crashes RAM if $D > 50,000$.</td>
+                <td>$$\mathcal{O}(k \cdot N \cdot D)$$
+                Scales linearly with feature count $D$. Handles millions of features gracefully.</td>
+              </tr>
+              <tr>
+                <td><strong>Complexity vs. Samples ($N$)</strong></td>
+                <td>$$\mathcal{O}(N \cdot D^2)$$
+                Linear in sample count $N$. Handles large $N$ efficiently if $D$ is small.</td>
+                <td>Linear in $N$. Mini-batch and SGD scale to streaming, infinite datasets out-of-core.</td>
+              </tr>
+              <tr>
+                <td><strong>Hyperparameter Tuning</strong></td>
+                <td><strong>Zero!</strong> No learning rate $\eta$, no batch size, no epochs.</td>
+                <td>Requires careful tuning of learning rate $\eta$, schedules, epochs, and batch size.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. What If $\mathbf{X}^T \mathbf{X}$ is Singular (Non-Invertible)?</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Non-Invertibility Trap:</h4>
+          <p>A matrix $\mathbf{X}^T \mathbf{X}$ is singular (has zero determinant $\det = 0$) under two common circumstances:</p>
+          <ol>
+            <li><strong>Multicollinearity:</strong> Two or more features are linearly dependent (e.g. $x_2 = 2.5 x_1$, or including size in square feet and size in square meters).</li>
+            <li><strong>More Features Than Samples ($D > N$):</strong> If you have 1,000 gene features but only 100 cancer patients, the matrix has rank at most 100 and cannot be inverted!</li>
+          </ol>
+        </div>
+
+        <h2>4. The Modern Solution: SVD & Moore-Penrose Pseudoinverse ($\mathbf{X}^+$)</h2>
+        <p>In Scikit-Learn, <code>LinearRegression</code> does <strong>not</strong> compute $(\mathbf{X}^T \mathbf{X})^{-1}$ directly! Instead, it computes the <strong>Moore-Penrose Pseudoinverse $\mathbf{X}^+$</strong> using Singular Value Decomposition (SVD):</p>
+        $$\mathbf{\hat{\theta}} = \mathbf{X}^+ \mathbf{y}$$
+
+        <div class="math-box">
+          <h4>Singular Value Decomposition (SVD) Formulation:</h4>
+          <p>Any matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$ can be factored into three matrices:</p>
+          $$\mathbf{X} = \mathbf{U} \mathbf{\Sigma} \mathbf{V}^T$$
+          <ul>
+            <li>$\mathbf{U} \in \mathbb{R}^{m \times m}$: Orthogonal matrix of left singular vectors.</li>
+            <li>$\mathbf{\Sigma} \in \mathbb{R}^{m \times n}$: Diagonal matrix of singular values $\sigma_1 \ge \sigma_2 \ge \dots \ge 0$.</li>
+            <li>$\mathbf{V} \in \mathbb{R}^{n \times n}$: Orthogonal matrix of right singular vectors.</li>
+          </ul>
+          <p>The Moore-Penrose pseudoinverse is computed by inverting the non-zero singular values:</p>
+          $$\mathbf{X}^+ = \mathbf{V} \mathbf{\Sigma}^+ \mathbf{U}^T$$
+          <p>Where $\mathbf{\Sigma}^+$ is formed by replacing every non-zero singular value $\sigma_i > \epsilon$ with $\frac{1}{\sigma_i}$, and setting all zero or near-zero singular values strictly to $0$!</p>
+        </div>
+
+        <div class="first-principles">
+          <h4>🌟 Why SVD Pseudoinverse Dominates the Raw Normal Equation:</h4>
+          <ol>
+            <li><strong>Always Exists:</strong> Unlike $(\mathbf{X}^T \mathbf{X})^{-1}$, the pseudoinverse $\mathbf{X}^+$ is mathematically defined and computable for <em>every single matrix</em>, even singular or rectangular ones!</li>
+            <li><strong>Minimal $L_2$ Norm Solution:</strong> When $D > N$ (infinite solutions exist), $\mathbf{X}^+ \mathbf{y}$ automatically picks the unique solution with the smallest Euclidean parameter norm $\|\mathbf{\theta}\|_2$.</li>
+            <li><strong>Numerical Stability:</strong> Inverting small floating-point numbers in $(\mathbf{X}^T \mathbf{X})^{-1}$ causes severe catastrophic numerical cancellation errors. SVD isolates small singular values safely.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- TAB 3: GRADIENT DESCENT -->
+      <section id="tab-gd" class="tab-section">
+        <h1>Gradient Descent Deep Dive: Batch, SGD & Mini-Batch</h1>
+        <p class="section-subtitle">Iterative first-order optimization, learning rate dynamics, convergence trajectories, and numerical stepping.</p>
+
+        <div class="first-principles">
+          <h4>🏔️ The Foggy Mountain Intuition:</h4>
+          <p>Imagine you are blindfolded on a foggy mountain ridge and want to reach the bottom of the valley (the minimum cost):</p>
+          <ul>
+            <li>You feel the slope of the ground beneath your boots with your feet. The steepest downhill direction is the <strong>negative gradient $-\nabla J(\mathbf{\theta})$</strong>.</li>
+            <li>You take a step in that direction. The size of your stride is the <strong>learning rate $\eta$</strong>.</li>
+            <li>You repeat this process step by step until the ground feels completely flat ($\nabla J \approx 0$). You have arrived at the valley floor!</li>
+          </ul>
+        </div>
+
+        <h2>1. Step-by-Step Toy Numerical Walkthrough of Gradient Descent</h2>
+        <p>Let's trace 3 iterations of Gradient Descent on a simple 1D convex parabola: $J(\theta) = (\theta - 3)^2$. We start with an initial guess $\theta_0 = 10.0$ and learning rate $\eta = 0.2$:</p>
+        <div class="card">
+          <p>The derivative is: $\frac{dJ}{d\theta} = 2(\theta - 3)$. The update rule is: $\theta_{t+1} = \theta_t - \eta \cdot \frac{dJ}{d\theta}$.</p>
+          <ul>
+            <li><strong>Iteration 0:</strong> $\theta_0 = 10.0$.
+              <br>Gradient $= 2(10.0 - 3) = 14.0$.
+              <br>Step $= 0.2 \times 14.0 = 2.8$.
+              <br>New $\theta_1 = 10.0 - 2.8 = \mathbf{7.2}$ | Cost $J(7.2) = (4.2)^2 = \mathbf{17.64}$.
+            </li>
+            <li><strong>Iteration 1:</strong> $\theta_1 = 7.2$.
+              <br>Gradient $= 2(7.2 - 3) = 8.4$.
+              <br>Step $= 0.2 \times 8.4 = 1.68$.
+              <br>New $\theta_2 = 7.2 - 1.68 = \mathbf{5.52}$ | Cost $J(5.52) = (2.52)^2 = \mathbf{6.35}$.
+            </li>
+            <li><strong>Iteration 2:</strong> $\theta_2 = 5.52$.
+              <br>Gradient $= 2(5.52 - 3) = 5.04$.
+              <br>Step $= 0.2 \times 5.04 = 1.008$.
+              <br>New $\theta_3 = 5.52 - 1.008 = \mathbf{4.512}$ | Cost $J(4.512) = (1.512)^2 = \mathbf{2.29}$.
+            </li>
+          </ul>
+          <p>Notice how the steps automatically shrink as $\theta$ approaches the true minimum $\theta^* = 3.0$!</p>
+        </div>
+
+        <h2>2. The Three Flavors of Gradient Descent Compared</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Variant</th>
+                <th>Samples Per Step</th>
+                <th>Path to Minimum</th>
+                <th>Pros & Cons</th>
+                <th>Hardware / Cache Fit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Batch GD</strong></td>
+                <td>$100\%$ of dataset ($m$ samples)</td>
+                <td>Smooth, deterministic, straight line down the gradient vector.</td>
+                <td><strong>Pros:</strong> Guaranteed stable convergence.<br><strong>Cons:</strong> Extremely slow per step on large datasets; requires full dataset in RAM.</td>
+                <td>Poor for massive data; fails if dataset exceeds memory.</td>
+              </tr>
+              <tr>
+                <td><strong>Stochastic GD (SGD)</strong></td>
+                <td>1 random instance</td>
+                <td>Violent, erratic zigzagging. Never stops at minimum; bounces indefinitely around it.</td>
+                <td><strong>Pros:</strong> Lightning fast updates; can bounce out of local minima.<br><strong>Cons:</strong> High variance gradient noise; requires learning rate decay schedule.</td>
+                <td>Underutilizes GPU tensor cores (batch size 1 cannot saturate parallel threads).</td>
+              </tr>
+              <tr>
+                <td><strong>Mini-Batch GD</strong></td>
+                <td>Small batch (32, 64, 128, 256)</td>
+                <td>Moderately noisy path, substantially smoother than SGD.</td>
+                <td><strong>Pros:</strong> Combines speed of SGD with stability of Batch GD.<br><strong>Cons:</strong> Introduces batch size hyperparameter.</td>
+                <td><strong style="color:var(--success);">The Gold Standard!</strong> Perfectly saturates GPU SIMD architectures and L1/L2 cache lines.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. Learning Rate ($\eta$) Dynamics: Divergence vs. Stagnation</h2>
+        <div class="math-box">
+          <h4>Three Learning Rate Regimes:</h4>
+          <ul>
+            <li><strong>$\eta$ Too Small ($\eta = 10^{-6}$):</strong> The algorithm takes microscopic baby steps. Training takes millions of epochs to converge, wasting compute and time.</li>
+            <li><strong>$\eta$ Just Right ($\eta = 0.01 - 0.1$):</strong> Steady, rapid convergence toward the minimum within a reasonable number of iterations.</li>
+            <li><strong>$\eta$ Too Large ($\eta = 10.0$):</strong> Steps overshoot the bottom and land higher up on the opposite wall of the bowl. Subsequent steps bounce even higher, causing the cost function to <strong>diverge towards positive infinity</strong>!</li>
+          </ul>
+        </div>
+
+        <h2>4. Learning Rate Schedules (Decay Strategies)</h2>
+        <p>To help Stochastic and Mini-Batch GD settle down smoothly into the true global minimum rather than bouncing around it forever, we gradually reduce the learning rate over time using a <strong>learning schedule</strong>:</p>
+
+        <pre><code># 1. Power Scheduling (Inverse Time Decay)
+def learning_schedule(epoch, decay_rate=0.01, initial_lr=0.1):
+    return initial_lr / (1 + decay_rate * epoch)
+
+# 2. Exponential Scheduling
+def exp_schedule(epoch, initial_lr=0.1, gamma=0.95):
+    return initial_lr * (gamma ** epoch)
+
+# 3. Step Decay
+def step_decay(epoch, initial_lr=0.1):
+    return initial_lr * 0.5 ** (epoch // 10)</code></pre>
+      </section>
+
+      <!-- TAB 4: ADVANCED OPTIMIZERS -->
+      <section id="tab-optimizers" class="tab-section">
+        <h1>Advanced Optimizers: Momentum, RMSProp & Adam Intuition <span class="badge badge-missing">Missing in PDF</span></h1>
+        <p class="section-subtitle">Why standard SGD gets stuck in ravines, and how modern adaptive optimizers solve curvature imbalance.</p>
+
+        <h2>1. The Pathologies of Vanilla Gradient Descent</h2>
+        <div class="card">
+          <p>Vanilla SGD updates weights strictly along the instantaneous negative gradient: $\theta \leftarrow \theta - \eta \nabla J(\theta)$. This causes two major failures:</p>
+          <ul>
+            <li><strong>Ravines (Ill-conditioned Hessians):</strong> Valleys where the surface curves much more steeply in one dimension than in another. SGD violently bounces back and forth across the steep walls while making agonizingly slow progress along the flat base.</li>
+            <li><strong>Saddle Points & Flat Plateaus:</strong> Points where the gradient is nearly zero ($\nabla J \approx 0$). SGD grinds to an absolute halt, mistaking a flat plateau for a true global minimum.</li>
+          </ul>
+        </div>
+
+        <h2>2. Momentum: The Rolling Heavy Bowling Ball</h2>
+        <div class="first-principles">
+          <h4>🎱 The Physical Analogy:</h4>
+          <p>Imagine a heavy bowling ball rolling down a bumpy hill. When it hits a small pothole or a flat spot, it doesn't freeze—its accumulated physical <strong>inertia / momentum</strong> carries it right through! Furthermore, sideways oscillations cancel out while forward speed accelerates.</p>
+        </div>
+
+        <div class="math-box">
+          <h4>Mathematical Formulation of Momentum:</h4>
+          $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + (1 - \beta) \nabla_\mathbf{\theta} J(\mathbf{\theta})$$
+          $$\mathbf{\theta}_t = \mathbf{\theta}_{t-1} - \eta \mathbf{v}_t$$
+          <p>Where $\mathbf{v}$ is the velocity vector, and $\beta \in [0.9, 0.99]$ is the momentum friction coefficient.</p>
+          <ul>
+            <li>If consecutive gradients point in the same direction, velocity $\mathbf{v}$ grows, accelerating descent.</li>
+            <li>If gradients oscillate back and forth (like bouncing between ravine walls), the oscillating components sum to near zero, dampening useless zig-zagging!</li>
+          </ul>
+        </div>
+
+        <h2>3. RMSProp: Adaptive Learning Rates via Root Mean Square</h2>
+        <p>Introduced by Geoffrey Hinton in his Coursera lectures, <strong>RMSProp</strong> addresses the ravine problem by maintaining a moving average of <em>squared gradients</em>, and scaling the step size inversely:</p>
+
+        <div class="math-box">
+          <h4>RMSProp Formulation:</h4>
+          $$\mathbf{s}_t = \beta \mathbf{s}_{t-1} + (1 - \beta) (\nabla_\mathbf{\theta} J(\mathbf{\theta}) \odot \nabla_\mathbf{\theta} J(\mathbf{\theta}))$$
+          $$\mathbf{\theta}_t = \mathbf{\theta}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \nabla_\mathbf{\theta} J(\mathbf{\theta})$$
+          <p>Where $\odot$ represents element-wise multiplication, and $\epsilon = 10^{-8}$ prevents division by zero.</p>
+          <p><strong>The Genius Intuition:</strong> Along steep directions where gradients are massive, $s_t$ is huge, so dividing by $\sqrt{s_t}$ heavily downscales the step size. Along flat directions where gradients are tiny, $s_t$ is small, so dividing by $\sqrt{s_t}$ boosts the step size! RMSProp equalizes step speeds across all dimensions.</p>
+        </div>
+
+        <h2>4. Adam: Adaptive Moment Estimation (The Industry Champion)</h2>
+        <p><strong>Adam</strong> (Kingma & Ba, 2014) combines the best of both worlds: <strong>Momentum</strong> (tracking the 1st raw moment $\mathbf{m}_t$) and <strong>RMSProp</strong> (tracking the 2nd uncentered moment $\mathbf{v}_t$), with an essential bias correction step:</p>
+
+        <div class="math-box">
+          <h4>The Complete Adam Equations:</h4>
+          <ol>
+            <li><strong>1st Moment Vector (Velocity / Momentum):</strong>
+              $$\mathbf{m}_t = \beta_1 \mathbf{m}_{t-1} + (1 - \beta_1) \nabla_\mathbf{\theta} J(\mathbf{\theta}) \quad (\beta_1 = 0.9)$$
+            </li>
+            <li><strong>2nd Moment Vector (Squared Gradients / RMSProp):</strong>
+              $$\mathbf{v}_t = \beta_2 \mathbf{v}_{t-1} + (1 - \beta_2) (\nabla_\mathbf{\theta} J(\mathbf{\theta}))^2 \quad (\beta_2 = 0.999)$$
+            </li>
+            <li><strong>Bias Correction (Crucial for Early Steps):</strong>
+              <br>Since $\mathbf{m}_0$ and $\mathbf{v}_0$ are initialized to $\mathbf{0}$, they are severely biased toward zero during the initial iterations. We correct this:
+              $$\mathbf{\hat{m}}_t = \frac{\mathbf{m}_t}{1 - \beta_1^t}, \quad \mathbf{\hat{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_2^t}$$
+            </li>
+            <li><strong>Parameter Update:</strong>
+              $$\mathbf{\theta}_t = \mathbf{\theta}_{t-1} - \frac{\eta}{\sqrt{\mathbf{\hat{v}}_t} + \epsilon} \mathbf{\hat{m}}_t$$
+            </li>
+          </ol>
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Optimizer</th>
+                <th>Momentum (1st Moment)</th>
+                <th>Adaptive LR (2nd Moment)</th>
+                <th>Bias Correction</th>
+                <th>When to Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>SGD</strong></td>
+                <td>No</td><td>No</td><td>No</td>
+                <td>Simple convex problems, linear regression baselines.</td>
+              </tr>
+              <tr>
+                <td><strong>SGD + Momentum</strong></td>
+                <td>Yes</td><td>No</td><td>No</td>
+                <td>Computer vision, training ResNets (often achieves slightly better generalization than Adam with proper tuning).</td>
+              </tr>
+              <tr>
+                <td><strong>RMSProp</strong></td>
+                <td>No</td><td>Yes</td><td>No</td>
+                <td>Recurrent neural networks (RNNs), reinforcement learning.</td>
+              </tr>
+              <tr>
+                <td><strong>Adam</strong></td>
+                <td>Yes</td><td>Yes</td><td>Yes</td>
+                <td><strong style="color:var(--success);">Default for 95% of Deep Learning & complex optimization!</strong> Fast, robust, requires minimal tuning.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: POLYNOMIAL REGRESSION & BIAS-VARIANCE PROOF -->
+      <section id="tab-poly" class="tab-section">
+        <h1>Polynomial Regression & The Bias-Variance Mathematical Proof</h1>
+        <p class="section-subtitle">Fitting non-linear curves with linear models, the curse of dimensionality, and the complete algebraic proof of the Bias-Variance tradeoff.</p>
+
+        <h2>1. What is Polynomial Regression?</h2>
+        <div class="first-principles">
+          <h4>🔄 The Non-Linear Linear Model:</h4>
+          <p>What if your data doesn't follow a straight line, but curves like a parabola ($y = 0.5 x^2 + x + 2$)?</p>
+          <p><strong>Polynomial Regression</strong> adds powers of each feature as new features, then trains a standard Linear Regression model on this extended feature set! Even though the relationship between $y$ and $x$ is non-linear, the model remains <strong>linear in its parameters $\mathbf{\theta}$</strong>:</p>
+          $$\hat{y} = \theta_0 + \theta_1 x + \theta_2 x^2 + \dots + \theta_d x^d$$
+        </div>
+
+        <pre><code>from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+import numpy as np
+
+# Generate non-linear quadratic data
+m = 100
+X = 6 * np.random.rand(m, 1) - 3
+y = 0.5 * X**2 + X + 2 + np.random.randn(m, 1)
+
+# Degree 2 polynomial regression pipeline
+poly_reg = Pipeline([
+    ("poly_features", PolynomialFeatures(degree=2, include_bias=False)),
+    ("lin_reg", LinearRegression())
+])
+poly_reg.fit(X, y)</code></pre>
+
+        <div class="interview-alert">
+          <h4>⚠️ The Curse of Dimensionality in PolynomialFeatures:</h4>
+          <p>If you have $n$ features and expand to degree $d$, Scikit-Learn adds all polynomial combinations (including interaction terms like $x_1 x_2$, $x_1^2 x_2$). The total number of features explodes combinatorially:</p>
+          $$\text{Total Features} = \frac{(n + d)!}{n! \cdot d!} - 1$$
+          <p>For $n = 10$ features and degree $d = 4$, the feature space explodes from 10 to <strong>1,000 features</strong>! This quickly leads to catastrophic overfitting.</p>
+        </div>
+
+        <h2>2. Diagnosing Bias vs. Variance from Learning Curves</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Diagnostic Sign</th>
+                <th>Underlying Defect</th>
+                <th>Curve Characteristics</th>
+                <th>Actionable Remedy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>High Bias (Underfitting)</strong></td>
+                <td>Model is too simple (e.g. linear model on parabolic data).</td>
+                <td>Both training error and validation error are <strong>high</strong> and plateau close together with virtually zero gap.</td>
+                <td><strong style="color:var(--danger);">Adding more data will NOT help!</strong> Increase model complexity, add polynomial terms, or decrease regularization ($\alpha \downarrow$).</td>
+              </tr>
+              <tr>
+                <td><strong>High Variance (Overfitting)</strong></td>
+                <td>Model is too complex (e.g. degree 300 polynomial memorizing noise).</td>
+                <td>Training error is <strong>extremely low</strong>, but validation error is <strong>high</strong>, leaving a wide, persistent gap between curves.</td>
+                <td><strong style="color:var(--success);">Adding more data WILL help!</strong> It forces the model to generalize. Alternatively: add regularization ($\alpha \uparrow$), prune features.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. The Full Mathematical Proof: Bias-Variance Decomposition</h2>
+        <div class="first-principles">
+          <h4>🎓 The Must-Know FAANG Interview Proof:</h4>
+          <p>Suppose the true data generation process is $y = f(x) + \epsilon$, where the noise $\epsilon$ has mean zero ($\mathbb{E}[\epsilon] = 0$) and variance $\text{Var}(\epsilon) = \sigma^2$, independent of $x$ and the training set $\mathcal{D}$.</p>
+          <p>We train a model $\hat{f}(x; \mathcal{D})$ on dataset $\mathcal{D}$. We want to decompose the expected test Mean Squared Error at query point $x$ over all possible training datasets $\mathcal{D}$:</p>
+          $$\text{MSE} = \mathbb{E}\left[ (y - \hat{f}(x))^2 \right]$$
+        </div>
+
+        <div class="math-box">
+          <h4>Step-by-Step Algebraic Derivation:</h4>
+          <p><strong>Step 1: Expand $y$ into $f(x) + \epsilon$:</strong></p>
+          $$\mathbb{E}\left[ (f(x) + \epsilon - \hat{f}(x))^2 \right] = \mathbb{E}\left[ ((f(x) - \hat{f}(x)) + \epsilon)^2 \right]$$
+          $$\mathbb{E}\left[ (f(x) - \hat{f}(x))^2 + 2\epsilon(f(x) - \hat{f}(x)) + \epsilon^2 \right]$$
+          <p>Since $\epsilon$ is independent and $\mathbb{E}[\epsilon] = 0$, the cross-term $\mathbb{E}[2\epsilon(f(x) - \hat{f}(x))] = 0$. Also $\mathbb{E}[\epsilon^2] = \sigma^2$:</p>
+          $$= \mathbb{E}\left[ (f(x) - \hat{f}(x))^2 \right] + \sigma^2$$
+          
+          <p><strong>Step 2: Add and subtract the expected model prediction $\mathbb{E}[\hat{f}(x)]$ inside the squared term:</strong></p>
+          $$\mathbb{E}\left[ \left( (f(x) - \mathbb{E}[\hat{f}(x)]) + (\mathbb{E}[\hat{f}(x)] - \hat{f}(x)) \right)^2 \right]$$
+          <p>Expand the square:</p>
+          $$= \mathbb{E}\left[ (f(x) - \mathbb{E}[\hat{f}(x)])^2 \right] + 2 \mathbb{E}\left[ (f(x) - \mathbb{E}[\hat{f}(x)])(\mathbb{E}[\hat{f}(x)] - \hat{f}(x)) \right] + \mathbb{E}\left[ (\mathbb{E}[\hat{f}(x)] - \hat{f}(x))^2 \right]$$
+          
+          <p><strong>Step 3: Analyze each term:</strong></p>
+          <ul>
+            <li>$(f(x) - \mathbb{E}[\hat{f}(x)])^2$ is deterministic (not random with respect to $\mathcal{D}$), so its expectation is simply:
+              $$\left( f(x) - \mathbb{E}[\hat{f}(x)] \right)^2 = \mathbf{\text{Bias}[\hat{f}(x)]^2}$$
+            </li>
+            <li>In the middle cross-term, $(f(x) - \mathbb{E}[\hat{f}(x)])$ is a constant scalar and can be factored out:
+              $$2 (f(x) - \mathbb{E}[\hat{f}(x)]) \cdot \mathbb{E}[\mathbb{E}[\hat{f}(x)] - \hat{f}(x)] = 2 (f(x) - \mathbb{E}[\hat{f}(x)]) \cdot (\mathbb{E}[\hat{f}(x)] - \mathbb{E}[\hat{f}(x)]) = \mathbf{0}$$
+            </li>
+            <li>The third term is the definition of statistical variance of the estimator:
+              $$\mathbb{E}\left[ (\hat{f}(x) - \mathbb{E}[\hat{f}(x)])^2 \right] = \mathbf{\text{Var}[\hat{f}(x)]}$$
+            </li>
+          </ul>
+
+          <p><strong>Step 4: Putting it all together:</strong></p>
+          $$\mathbf{\mathbb{E}\left[ (y - \hat{f}(x))^2 \right] = \text{Bias}[\hat{f}(x)]^2 + \text{Var}[\hat{f}(x)] + \sigma^2} \quad \blacksquare$$
+        </div>
+
+        <div class="interview-alert">
+          <h4>🌟 The 3 Components Decoded:</h4>
+          <ul>
+            <li><strong>$\text{Bias}^2$:</strong> Error caused by incorrect inductive assumptions (e.g. assuming the world is strictly linear when it is cubic). High bias $\implies$ Underfitting.</li>
+            <li><strong>$\text{Variance}$:</strong> Sensitivity of the model to small fluctuations in the training dataset. High variance $\implies$ Overfitting.</li>
+            <li><strong>$\sigma^2$ (Irreducible Error):</strong> Inherent noisiness in the system (measurement errors, quantum noise, unobserved latent variables). No algorithm can ever reduce this!</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 6: REGULARIZATION (RIDGE, LASSO, ELASTICNET) -->
+      <section id="tab-regularization" class="tab-section">
+        <h1>Ridge, Lasso & ElasticNet: The Diamond vs. Circle Geometric Proof</h1>
+        <p class="section-subtitle">Constraining parameter weights, closed-form Ridge derivation, and the geometric KKT proof of Lasso sparsity.</p>
+
+        <h2>1. Why Regularize? (Hoerl & Kennard, 1970)</h2>
+        <div class="card">
+          <p>When features are highly correlated or when $D \approx N$, the matrix $\mathbf{X}^T \mathbf{X}$ is near-singular (ill-conditioned). Standard Ordinary Least Squares (OLS) produces massive, unstable coefficients:</p>
+          $$\hat{y} = 10,000 x_1 - 9,998 x_2 + 5$$
+          <p>Even though training error is near zero, a tiny fluctuation in $x_1$ causes wild, volatile swings in predictions on test data! <strong>Regularization</strong> forces weights $\mathbf{\theta}$ to remain small, trading a tiny increase in bias for a massive drop in model variance.</p>
+        </div>
+
+        <h2>2. Ridge Regression ($L_2$ Regularization)</h2>
+        <p>Ridge adds a penalty equal to the sum of squared weights ($\|\mathbf{\theta}\|_2^2$) to the MSE loss:</p>
+        $$J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \frac{1}{2} \sum_{i=1}^n \theta_i^2 = \frac{1}{m} \|\mathbf{X}\mathbf{\theta} - \mathbf{y}\|_2^2 + \alpha \frac{1}{2} \|\mathbf{\theta}_{1:n}\|_2^2$$
+        <p><em>(Note: The bias term $\theta_0$ is never regularized!)</em></p>
+
+        <div class="math-box">
+          <h4>Closed-Form Analytical Solution of Ridge Regression:</h4>
+          <p>Compute the gradient with respect to $\mathbf{\theta}$ and set to zero:</p>
+          $$\nabla_\mathbf{\theta} J(\mathbf{\theta}) = \frac{2}{m} \mathbf{X}^T (\mathbf{X}\mathbf{\theta} - \mathbf{y}) + 2 \alpha \mathbf{\theta} = \mathbf{0}$$
+          $$\mathbf{X}^T \mathbf{X} \mathbf{\theta} + m \alpha \mathbf{A} \mathbf{\theta} = \mathbf{X}^T \mathbf{y} \implies (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{A}) \mathbf{\theta} = \mathbf{X}^T \mathbf{y}$$
+          $$\mathbf{\hat{\theta}}_{\text{Ridge}} = (\mathbf{X}^T \mathbf{X} + \lambda \mathbf{A})^{-1} \mathbf{X}^T \mathbf{y}$$
+          <p>Where $\mathbf{A}$ is the $(D+1) \times (D+1)$ identity matrix with a $0$ in the top-left corner (so the bias is not penalized).</p>
+          <p><strong>🌟 The Mathematical Miracle of Ridge:</strong> Even if $\mathbf{X}^T \mathbf{X}$ is completely singular, adding $\lambda \mathbf{I}$ shifts all eigenvalues upward by $\lambda$. The matrix $(\mathbf{X}^T \mathbf{X} + \lambda \mathbf{I})$ is <strong>strictly positive definite and ALWAYS invertible</strong>!</p>
+        </div>
+
+        <h2>3. Lasso Regression ($L_1$ Regularization — Tibshirani, 1996)</h2>
+        <p>Lasso (Least Absolute Shrinkage and Selection Operator) adds a penalty equal to the sum of absolute weights ($\|\mathbf{\theta}\|_1$):</p>
+        $$J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + \alpha \sum_{i=1}^n |\theta_i|$$
+        <p>Because the absolute value function $|x|$ is not differentiable at $x = 0$, Lasso has no closed-form solution. It is optimized using <strong>Subgradient Descent</strong> or Coordinate Descent.</p>
+
+        <h2>4. The Geometric Proof: "Why Does Lasso Produce Exact Zero Weights?"</h2>
+        <div class="interview-alert">
+          <h4>🎓 The Must-Know FAANG Interview Proof:</h4>
+          <p>Minimizing penalized loss is mathematically equivalent (via Lagrange Multipliers / KKT conditions) to minimizing unconstrained elliptical MSE contours subject to a strict geometric budget constraint:</p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Model</th>
+                  <th>Constraint Equation</th>
+                  <th>Geometric Shape (2D)</th>
+                  <th>Point of Tangency</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Ridge ($L_2$)</strong></td>
+                  <td>$$\theta_1^2 + \theta_2^2 \le C$$</td>
+                  <td><strong>Smooth Hypersphere (Circle)</strong></td>
+                  <td>Smooth curve everywhere. As the elliptical MSE contour expands, it makes contact at a curved boundary point where $\theta_1 \neq 0$ and $\theta_2 \neq 0$. Coefficients shrink, but <strong>never become exactly zero</strong>!</td>
+                </tr>
+                <tr>
+                  <td><strong>Lasso ($L_1$)</strong></td>
+                  <td>$$|\theta_1| + |\theta_2| \le C$$</td>
+                  <td><strong>Diamond (Rhombus with Sharp Corners)</strong></td>
+                  <td>The sharp corners of the diamond lie <strong>directly on the coordinate axes</strong> (where $\theta_1 = 0$ or $\theta_2 = 0$). An expanding ellipse is geometrically far more likely to make first contact at a protruding sharp corner! At that corner, irrelevant feature weights are <strong>strictly, mathematically zero</strong>.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p><strong>Conclusion:</strong> Lasso automatically performs <strong>feature selection</strong>, outputting a sparse model where useless features are eliminated!</p>
+        </div>
+
+        <h2>5. ElasticNet: The Best of Both Worlds (Zou & Hastie, 2005)</h2>
+        <p>ElasticNet combines $L_1$ and $L_2$ penalties with mixing parameter $r \in [0, 1]$:</p>
+        $$J(\mathbf{\theta}) = \text{MSE}(\mathbf{\theta}) + r \cdot \alpha \sum_{i=1}^n |\theta_i| + \frac{1 - r}{2} \cdot \alpha \sum_{i=1}^n \theta_i^2$$
+        <p><em>($r = 1 \implies$ Pure Lasso; $r = 0 \implies$ Pure Ridge).</em></p>
+
+        <div class="first-principles">
+          <h4>🚨 The 2 Fatal Flaws of Lasso that ElasticNet Fixes:</h4>
+          <ol>
+            <li><strong>When $D > N$ (More features than samples):</strong> Lasso can select at most $N$ features before it saturates. ElasticNet can select all relevant features regardless of sample size.</li>
+            <li><strong>Collinear Feature Groups:</strong> If 5 features are strongly correlated ($r > 0.95$), Lasso arbitrarily picks one at random and zeros out the other 4. ElasticNet's $L_2$ component forces correlated features to be retained and shrunk together (grouping effect), while its $L_1$ component zeros out irrelevant noise.</li>
+          </ol>
+        </div>
+
+        <h2>6. Early Stopping: "Free Lunch" Regularization</h2>
+        <p>Introduced by Geoffrey Hinton, <strong>Early Stopping</strong> halts training the moment validation error begins to rise, capturing the parameters right before overfitting begins. Zero math penalties added!</p>
+      </section>
+
+      <!-- TAB 7: LINE ASSUMPTIONS & VIF -->
+      <section id="tab-assumptions" class="tab-section">
+        <h1>Assumptions of Linear Regression: L.I.N.E. & VIF <span class="badge badge-missing">Missing in PDF</span></h1>
+        <p class="section-subtitle">The four foundational assumptions of classical OLS regression, diagnostic residual plots, and detecting multicollinearity.</p>
+
+        <div class="first-principles">
+          <h4>🔍 Why Do Assumptions Matter?</h4>
+          <p>Ordinary Least Squares (OLS) is guaranteed to be the <strong>BLUE</strong> (Best Linear Unbiased Estimator) by the Gauss-Markov Theorem <em>only if</em> specific statistical conditions hold. If these assumptions are violated, standard errors are completely wrong, confidence intervals collapse, and $p$-values become meaningless!</p>
+        </div>
+
+        <h2>1. The L.I.N.E. Checklist</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Assumption</th>
+                <th>Mathematical Condition</th>
+                <th>Diagnostic Tool</th>
+                <th>Remedy If Violated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>L — Linearity</strong></td>
+                <td>$$\mathbb{E}[y \mid \mathbf{x}] = \mathbf{\theta}^T \mathbf{x}$$
+                Expected value of $y$ is a linear function of $\mathbf{x}$.</td>
+                <td><strong>Residuals vs. Fitted Values Plot:</strong> Points should form a random cloud around horizontal line $y=0$. If a distinct U-shape or curve appears, linearity fails!</td>
+                <td>Add polynomial features ($x^2, x^3$), take log transformations ($\ln(x)$), or switch to non-linear tree models.</td>
+              </tr>
+              <tr>
+                <td><strong>I — Independence</strong></td>
+                <td>$$\text{Cov}(\epsilon_i, \epsilon_j) = 0 \quad \forall i \neq j$$
+                Residual errors are completely uncorrelated.</td>
+                <td><strong>Durbin-Watson Test Statistic:</strong>
+                $$d = \frac{\sum_{t=2}^m (e_t - e_{t-1})^2}{\sum_{t=1}^m e_t^2}$$
+                Values near $2.0$ indicate zero autocorrelation. Values $< 1.5$ signal strong positive autocorrelation (common in time-series).</td>
+                <td>Include autoregressive lag terms ($y_{t-1}$), difference the series ($\Delta y$), or use ARIMA / GARCH models.</td>
+              </tr>
+              <tr>
+                <td><strong>N — Normality</strong></td>
+                <td>$$\epsilon \sim \mathcal{N}(0, \sigma^2)$$
+                Residual errors are normally distributed.</td>
+                <td><strong>Q-Q Plot (Quantile-Quantile):</strong> Points should hug the 45-degree diagonal line. Also Shapiro-Wilk or Jarque-Bera tests.</td>
+                <td>Apply Box-Cox / Yeo-Johnson transformations to target $y$, or use robust Huber regression.</td>
+              </tr>
+              <tr>
+                <td><strong>E — Equal Variance<br>(Homoscedasticity)</strong></td>
+                <td>$$\text{Var}(\epsilon_i \mid \mathbf{x}_i) = \sigma^2 \quad \forall i$$
+                Error spread is constant across all predicted values.</td>
+                <td><strong>Scale-Location Plot:</strong> A classic "funnel" or "megaphone" shape indicates <strong>Heteroscedasticity</strong> (variance explodes as $\hat{y}$ grows).</td>
+                <td>Apply log transform $\ln(y)$ to compress tail variance, or use Weighted Least Squares (WLS) / White robust standard errors.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Multicollinearity & Variance Inflation Factor (VIF)</h2>
+        <p><strong>Multicollinearity</strong> occurs when two or more predictor features are strongly linearly correlated (e.g. including both <code>square_feet</code> and <code>square_meters</code>).</p>
+
+        <div class="math-box">
+          <h4>The Impact of Multicollinearity:</h4>
+          <ul>
+            <li>Predictions $\hat{y}$ remain accurate! (The model can still interpolate well).</li>
+            <li><strong>Coefficients become completely erratic:</strong> Standard errors $\text{SE}(\theta_j)$ explode. Individual $t$-tests report that neither feature is statistically significant ($p > 0.05$), even though their joint $F$-test is overwhelmingly significant!</li>
+          </ul>
+        </div>
+
+        <h3>Variance Inflation Factor (VIF) Formula:</h3>
+        <p>To test feature $x_j$, regress $x_j$ against all other $D-1$ features and obtain the coefficient of determination $R_j^2$:</p>
+        $$\text{VIF}_j = \frac{1}{1 - R_j^2}$$
+
+        <div class="card">
+          <h4>VIF Interpretation Guide:</h4>
+          <ul>
+            <li><strong>$\text{VIF} = 1$:</strong> Completely orthogonal / zero correlation with other features.</li>
+            <li><strong>$\text{VIF} \in [1, 5]$:</strong> Mild correlation; completely safe for linear models.</li>
+            <li><strong>$\text{VIF} > 5 \text{ to } 10$:</strong> Severe multicollinearity! Feature $j$ is heavily redundant.</li>
+          </ul>
+          <p><strong>Engineering Fixes:</strong> (1) Drop feature $j$, (2) Combine features via PCA / dimensionality reduction, or (3) Apply <strong>Ridge Regression</strong> ($L_2$) to stabilize matrix inversion.</p>
+        </div>
+
+        <pre><code>from statsmodels.stats.outliers_influence import variance_inflation_factor
+import pandas as pd
+
+# Compute VIF for all numerical features in dataframe X
+vif_data = pd.DataFrame()
+vif_data["feature"] = X.columns
+vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
+print(vif_data.sort_values(by="VIF", ascending=False))</code></pre>
+      </section>
+
+      <!-- TAB 8: LOGISTIC REGRESSION (ODDS TO MLE) -->
+      <section id="tab-logistic" class="tab-section">
+        <h1>Logistic Regression: Odds, Logit & MLE Derivation</h1>
+        <p class="section-subtitle">Why Linear Regression fails for classification, deriving the Sigmoid from Odds, and Maximum Likelihood Estimation.</p>
+
+        <h2>1. What is Logistic Regression?</h2>
+        <div class="first-principles">
+          <h4>🤔 Why is it called "Regression" if it classifies?</h4>
+          <p>Despite its name, <strong>Logistic Regression is a supervised classification algorithm</strong>! It models the posterior class probability: $P(y = 1 \mid \mathbf{x})$.</p>
+          <p>It is called "Regression" because under the hood, it performs <strong>linear regression on the log-odds (logit)</strong>! It fits a linear equation $\mathbf{\theta}^T \mathbf{x}$, and then maps that real-valued score $(-\infty, +\infty)$ into a valid probability $[0, 1]$ via the <strong>Logistic (Sigmoid) function</strong>.</p>
+        </div>
+
+        <h2>2. Why Can't We Just Use Linear Regression for Classification?</h2>
+        <div class="card">
+          <ol>
+            <li><strong>Unbounded Predictions:</strong> Linear regression produces continuous outputs in $(-\infty, +\infty)$. Predicting a probability of $-0.45$ or $+1.89$ violates Kolmogorov's axioms of probability.</li>
+            <li><strong>Outlier Vulnerability:</strong> A single extreme positive outlier far to the right shifts the linear regression slope upward, pulling the $0.5$ decision threshold and misclassifying previously correct samples!</li>
+            <li><strong>Heteroscedasticity:</strong> For binary targets $y \in \{0, 1\}$, residual variance is $p(1 - p)$, which varies with $x$, violating OLS equal variance assumptions.</li>
+          </ol>
+        </div>
+
+        <h2>3. Full Algebraic Derivation: From Odds to Sigmoid</h2>
+        <div class="math-box">
+          <h4>Step-by-Step Mathematical Derivation:</h4>
+          <ol>
+            <li><strong>Probability $p$:</strong> Bounded strictly within $[0, 1]$:
+              $$p = P(y = 1 \mid \mathbf{x})$$
+            </li>
+            <li><strong>Odds:</strong> Ratio of probability of success to probability of failure:
+              $$\text{Odds} = \frac{p}{1 - p} \quad \in [0, +\infty)$$
+              <em>(If probability of winning is 80%, odds are $\frac{0.8}{0.2} = 4$, or 4 to 1).</em>
+            </li>
+            <li><strong>Log-Odds (Logit):</strong> Taking the natural logarithm maps odds from $[0, +\infty)$ to the entire real line $(-\infty, +\infty)$:
+              $$\text{Logit}(p) = \ln\left( \frac{p}{1 - p} \right) \quad \in (-\infty, +\infty)$$
+            </li>
+            <li><strong>Model the Logit as a Linear Equation:</strong>
+              $$\ln\left( \frac{p}{1 - p} \right) = \theta_0 + \theta_1 x_1 + \dots + \theta_D x_D = \mathbf{\theta}^T \mathbf{x}$$
+            </li>
+            <li><strong>Invert the equation to solve for $p$:</strong>
+              $$\frac{p}{1 - p} = e^{\mathbf{\theta}^T \mathbf{x}}$$
+              $$p = e^{\mathbf{\theta}^T \mathbf{x}} (1 - p) = e^{\mathbf{\theta}^T \mathbf{x}} - p e^{\mathbf{\theta}^T \mathbf{x}}$$
+              $$p (1 + e^{\mathbf{\theta}^T \mathbf{x}}) = e^{\mathbf{\theta}^T \mathbf{x}}$$
+              $$p = \frac{e^{\mathbf{\theta}^T \mathbf{x}}}{1 + e^{\mathbf{\theta}^T \mathbf{x}}} = \frac{1}{1 + e^{-\mathbf{\theta}^T \mathbf{x}}} = \mathbf{\sigma(\mathbf{\theta}^T \mathbf{x})}$$
+            </li>
+          </ol>
+        </div>
+
+        <p>This is the famous <strong>Standard Logistic (Sigmoid) Function</strong> $\sigma(z) = \frac{1}{1 + e^{-z}}$!</p>
+
+        <h2>4. Mathematical Properties of the Sigmoid Function</h2>
+        <ul>
+          <li><strong>Symmetric around 0:</strong> $\sigma(0) = 0.5$. As $z \to +\infty$, $\sigma(z) \to 1.0$. As $z \to -\infty$, $\sigma(z) \to 0.0$.</li>
+          <li><strong>Complement Property:</strong> $1 - \sigma(z) = \sigma(-z)$.</li>
+          <li><strong>Derivative Property (Lightning Fast for Backprop):</strong>
+            $$\frac{d\sigma(z)}{dz} = \sigma(z) \cdot (1 - \sigma(z))$$
+          </li>
+        </ul>
+
+        <h2>5. Parameter Estimation: Maximum Likelihood Estimation (MLE)</h2>
+        <p>How do we learn the optimal parameter vector $\mathbf{\theta}$? We formulate the <strong>Bernoulli Likelihood Function</strong>:</p>
+
+        <div class="math-box">
+          <h4>Deriving Log-Loss from Bernoulli Likelihood:</h4>
+          <p>For a single observation $(\mathbf{x}_i, y_i)$ where $y_i \in \{0, 1\}$ and $\hat{p}_i = \sigma(\mathbf{\theta}^T \mathbf{x}_i)$:</p>
+          $$P(y_i \mid \mathbf{x}_i) = \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}$$
+          <p>Assuming all $m$ training instances are independent and identically distributed (i.i.d.), the total likelihood is their product:</p>
+          $$\mathcal{L}(\mathbf{\theta}) = \prod_{i=1}^m \hat{p}_i^{y_i} (1 - \hat{p}_i)^{1 - y_i}$$
+          <p>Taking the natural logarithm yields the <strong>Log-Likelihood</strong>:</p>
+          $$\ln \mathcal{L}(\mathbf{\theta}) = \sum_{i=1}^m \left[ y_i \ln(\hat{p}_i) + (1 - y_i) \ln(1 - \hat{p}_i) \right]$$
+          <p>Maximizing likelihood is mathematically identical to minimizing the <strong>Negative Log-Likelihood (Binary Cross-Entropy Loss)</strong>:</p>
+          $$J(\mathbf{\theta}) = -\frac{1}{m} \sum_{i=1}^m \left[ y_i \ln(\hat{p}_i) + (1 - y_i) \ln(1 - \hat{p}_i) \right]$$
+        </div>
+      </section>
+
+      <!-- TAB 9: LOSS FUNCTIONS & CONVEXITY PROOF -->
+      <section id="tab-convexity" class="tab-section">
+        <h1>Loss Functions: Why MSE Fails & BCE Global Convexity Proof</h1>
+        <p class="section-subtitle">The non-convexity and gradient vanishing of MSE, log-loss formulation, and the mathematical Hessian proof of global convexity.</p>
+
+        <h2>1. Why Mean Squared Error (MSE) Fails for Classification</h2>
+        <div class="first-principles">
+          <h4>💥 The Catastrophe of Combining MSE with Sigmoid:</h4>
+          <p>What if you try to train Logistic Regression using the standard Mean Squared Error loss?</p>
+          $$J_{\text{MSE}}(\mathbf{\theta}) = \frac{1}{m} \sum_{i=1}^m \left( \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)}) - y^{(i)} \right)^2$$
+          <p>This creates two fatal mathematical bugs that completely destroy gradient descent:</p>
+          <ol>
+            <li><strong>Non-Convex Error Surface:</strong> The composition of the non-linear sigmoid with a quadratic squared error introduces dozens of local minima, valleys, and saddle points. Gradient descent gets trapped in poor sub-optimal local minima.</li>
+            <li><strong>Severe Gradient Vanishing (Freezing on Gross Errors):</strong>
+              <br>Let's calculate the gradient of MSE with respect to weight $\theta_j$ for a single instance:
+              $$\frac{\partial J_{\text{MSE}}}{\partial \theta_j} = 2 (\sigma(z) - y) \cdot \frac{\partial \sigma(z)}{\partial z} \cdot x_j = 2 (\sigma(z) - y) \cdot \mathbf{\sigma(z)(1 - \sigma(z))} \cdot x_j$$
+              <p>Suppose the true label is $y = 1$, but the model makes a completely catastrophic blunder: it predicts $\mathbf{\theta}^T \mathbf{x} = -10$, so $\sigma(z) \approx 0.000045$.</p>
+              <p>The derivative term $\sigma(z)(1 - \sigma(z)) \approx 0.000045 \times 0.999955 \approx \mathbf{0.000045}$!</p>
+              <p>The gradient is virtually <strong>zero</strong>! Exactly when the model is most confident and completely wrong, the gradient vanishes and updates freeze. The model cannot learn!</p>
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. The Log-Loss (Binary Cross-Entropy) Solution</h2>
+        <p>Log-loss fixes both problems permanently:</p>
+        $$J(\mathbf{\theta}) = -\frac{1}{m} \sum_{i=1}^m \left[ y^{(i)} \ln(\hat{p}^{(i)}) + (1 - y^{(i)}) \ln(1 - \hat{p}^{(i)}) \right]$$
+
+        <div class="math-box">
+          <h4>Gradient of Binary Cross-Entropy Loss:</h4>
+          <p>Differentiating $J(\mathbf{\theta})$ with respect to weight $\theta_j$:</p>
+          $$\nabla_\mathbf{\theta} J(\mathbf{\theta}) = \frac{1}{m} \sum_{i=1}^m \left( \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)}) - y^{(i)} \right) \mathbf{x}^{(i)} = \frac{1}{m} \mathbf{X}^T (\sigma(\mathbf{X}\mathbf{\theta}) - \mathbf{y})$$
+          <p><strong>🌟 Stunning Mathematical Symmetry:</strong> Look closely at this gradient vector! It has the <strong>exact same mathematical structure</strong> as the gradient of Linear Regression with MSE, except the predictions pass through the non-linear sigmoid function $\sigma(\mathbf{X}\mathbf{\theta})$!</p>
+          <p>When the error $(\sigma(z) - y)$ is huge, the gradient is huge. There is zero vanishing gradient!</p>
+        </div>
+
+        <h2>3. The Full Mathematical Proof: Global Convexity of Log-Loss</h2>
+        <div class="first-principles">
+          <h4>🎓 The Must-Know FAANG Interview Proof:</h4>
+          <p>To prove that Log-Loss has <strong>zero local minima</strong> and is strictly globally convex, we must prove that its <strong>Hessian Matrix $\mathbf{H} = \nabla^2 J(\mathbf{\theta})$ is Positive Semi-Definite ($\mathbf{H} \succeq 0$)</strong> everywhere in $\mathbb{R}^D$.</p>
+        </div>
+
+        <div class="math-box">
+          <h4>Step-by-Step Hessian Derivation:</h4>
+          <p><strong>Step 1: Compute the second partial derivatives of $J(\mathbf{\theta})$:</strong></p>
+          <p>Recall the gradient with respect to $\theta_j$ is $\frac{\partial J}{\partial \theta_j} = \frac{1}{m} \sum_{i=1}^m (\sigma(\mathbf{\theta}^T \mathbf{x}^{(i)}) - y^{(i)}) x_{ij}$.</p>
+          <p>Differentiate again with respect to $\theta_k$:</p>
+          $$\frac{\partial^2 J}{\partial \theta_j \partial \theta_k} = \frac{1}{m} \sum_{i=1}^m \frac{\partial \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)})}{\partial \theta_k} x_{ij} = \frac{1}{m} \sum_{i=1}^m \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)})(1 - \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)})) x_{ij} x_{ik}$$
+          
+          <p><strong>Step 2: Express the Hessian in matrix notation:</strong></p>
+          <p>Let $\hat{p}_i = \sigma(\mathbf{\theta}^T \mathbf{x}^{(i)})$. Define an $m \times m$ diagonal weight matrix $\mathbf{S}$:</p>
+          $$\mathbf{S} = \begin{bmatrix} \hat{p}_1(1 - \hat{p}_1) & 0 & \dots & 0 \\ 0 & \hat{p}_2(1 - \hat{p}_2) & \dots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \dots & \hat{p}_m(1 - \hat{p}_m) \end{bmatrix}$$
+          <p>The Hessian matrix $\mathbf{H} \in \mathbb{R}^{D \times D}$ can be written compactly as:</p>
+          $$\mathbf{H} = \nabla^2 J(\mathbf{\theta}) = \frac{1}{m} \mathbf{X}^T \mathbf{S} \mathbf{X}$$
+
+          <p><strong>Step 3: Test Positive Semi-Definiteness:</strong></p>
+          <p>For any arbitrary non-zero real vector $\mathbf{v} \in \mathbb{R}^D$, compute the quadratic form $\mathbf{v}^T \mathbf{H} \mathbf{v}$:</p>
+          $$\mathbf{v}^T \mathbf{H} \mathbf{v} = \mathbf{v}^T \left( \frac{1}{m} \mathbf{X}^T \mathbf{S} \mathbf{X} \right) \mathbf{v} = \frac{1}{m} (\mathbf{X}\mathbf{v})^T \mathbf{S} (\mathbf{X}\mathbf{v})$$
+          <p>Let $\mathbf{u} = \mathbf{X}\mathbf{v} \in \mathbb{R}^m$. Then:</p>
+          $$\mathbf{v}^T \mathbf{H} \mathbf{v} = \frac{1}{m} \mathbf{u}^T \mathbf{S} \mathbf{u} = \frac{1}{m} \sum_{i=1}^m u_i^2 \cdot \mathbf{\hat{p}_i (1 - \hat{p}_i)}$$
+          <p>Because the sigmoid function is strictly bounded in $(0, 1)$, $\hat{p}_i \in (0, 1)$. Therefore:</p>
+          $$\hat{p}_i (1 - \hat{p}_i) > 0 \quad \forall i$$
+          <p>Since $u_i^2 \ge 0$ and all diagonal entries of $\mathbf{S}$ are strictly positive:</p>
+          $$\mathbf{v}^T \mathbf{H} \mathbf{v} \ge 0 \quad \forall \mathbf{v} \in \mathbb{R}^D$$
+          <p><strong>Conclusion:</strong> The Hessian $\mathbf{H}$ is strictly Positive Semi-Definite ($\mathbf{H} \succeq 0$) for all possible values of $\mathbf{\theta}$. Log-Loss is <strong>globally convex</strong>, forming a single smooth parabolic bowl with <strong>zero local minima</strong>! Gradient descent is guaranteed to converge to the global minimum. $\blacksquare$</p>
+        </div>
+      </section>
+
+      <!-- TAB 10: SOFTMAX REGRESSION -->
+      <section id="tab-softmax" class="tab-section">
+        <h1>Softmax (Multinomial Logistic) Regression & Gradients</h1>
+        <p class="section-subtitle">Multi-class classification directly from logits without heuristic One-vs-Rest splits, cross-entropy cost, and analytical gradient vectors.</p>
+
+        <h2>1. What is Softmax Regression?</h2>
+        <div class="first-principles">
+          <h4>🔢 Beyond Binary Classification:</h4>
+          <p>Standard Logistic Regression handles binary problems ($y \in \{0, 1\}$). What if you need to classify $K > 2$ classes (e.g. Iris flowers: <em>Setosa, Versicolor, Virginica</em>)?</p>
+          <p><strong>Softmax Regression</strong> (Multinomial Logistic Regression) generalizes the logistic model to predict probability distributions across $K$ mutually exclusive classes simultaneously.</p>
+          <p><strong>Why not just use One-vs-Rest (OvR)?</strong> In OvR, you train $K$ independent binary classifiers whose probabilities don't sum to 1. Softmax optimizes all $K$ classes jointly, producing mathematically normalized probabilities that strictly sum to $1.0$.</p>
+        </div>
+
+        <h2>2. The Softmax Equations Step-by-Step</h2>
+        <div class="math-box">
+          <h4>Step 1: Compute Raw Class Scores (Logits):</h4>
+          <p>For an input sample $\mathbf{x}$, compute an independent linear score for every class $k \in \{1, \dots, K\}$ using class-specific weight vectors $\mathbf{\theta}^{(k)}$:</p>
+          $$s_k(\mathbf{x}) = \mathbf{x}^T \mathbf{\theta}^{(k)}$$
+
+          <h4>Step 2: The Softmax Normalization Function:</h4>
+          <p>Convert raw scores into valid probabilities $\hat{p}_k = P(y = k \mid \mathbf{x})$:</p>
+          $$\hat{p}_k = \sigma(\mathbf{s}(\mathbf{x}))_k = \frac{\exp(s_k(\mathbf{x}))}{\sum_{j=1}^K \exp(s_j(\mathbf{x}))}$$
+          <ul>
+            <li><strong>Why Exponentiate?</strong> Forces all scores to be strictly positive numbers ($e^s > 0$).</li>
+            <li><strong>Why Divide by the Sum?</strong> Ensures the sum of probabilities across all $K$ classes equals exactly $1.0$!</li>
+          </ul>
+
+          <h4>Step 3: Prediction Decision Rule:</h4>
+          <p>Predict the class with the highest probability (which is identical to the class with the highest logit score):</p>
+          $$\hat{y} = \arg\max_k \hat{p}_k = \arg\max_k s_k(\mathbf{x})$$
+        </div>
+
+        <h2>3. Cross-Entropy Cost Function for Softmax</h2>
+        <p>The loss function is the <strong>Categorical Cross-Entropy</strong> (generalized negative log-likelihood):</p>
+        $$J(\mathbf{\Theta}) = -\frac{1}{m} \sum_{i=1}^m \sum_{k=1}^K y_k^{(i)} \ln(\hat{p}_k^{(i)})$$
+        <p>Where $y_k^{(i)}$ is $1$ if the target class of instance $i$ is $k$, and $0$ otherwise (One-Hot Encoded target).</p>
+
+        <h2>4. The Gradient Vector of Softmax Cross-Entropy</h2>
+        <div class="math-box">
+          <h4>Analytical Gradient Vector:</h4>
+          <p>Taking the gradient of $J(\mathbf{\Theta})$ with respect to the parameter vector of class $k$:</p>
+          $$\nabla_{\mathbf{\theta}^{(k)}} J(\mathbf{\Theta}) = \frac{1}{m} \sum_{i=1}^m \left( \hat{p}_k^{(i)} - y_k^{(i)} \right) \mathbf{x}^{(i)}$$
+          <p>Notice the incredible elegance: The gradient vector for class $k$ is simply the error $(\hat{p}_k - y_k)$ multiplied by the feature vector $\mathbf{x}$, averaged across all samples!</p>
+        </div>
+
+        <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_iris
+
+iris = load_iris()
+X = iris["data"][:, (2, 3)]  # petal length, petal width
+y = iris["target"]
+
+# Train Softmax Regression (multinomial) with l2 regularization
+softmax_reg = LogisticRegression(multi_class="multinomial", solver="lbfgs", C=10, random_state=42)
+softmax_reg.fit(X, y)
+
+# Predict probabilities for petal length 5cm, petal width 2cm
+print(softmax_reg.predict_proba([[5, 2]]))
+# [[0.00000003, 0.04249, 0.9575]] -> Class 2 (Virginica) with 95.8% confidence!</code></pre>
+      </section>
+
+      <!-- TAB 11: 22+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>22+ FAANG / Top ML Role Interview Scenarios</h1>
+        <p class="section-subtitle">Real-world scenario questions, mathematical proofs, and system design challenges for senior machine learning roles.</p>
+
+        <details open>
+          <summary><span>Q1: What are the fundamental trade-offs between the Normal Equation and Gradient Descent?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Normal Equation ($\mathbf{\hat{\theta}} = (\mathbf{X}^T \mathbf{X})^{-1} \mathbf{X}^T \mathbf{y}$):</strong> Exact analytical solution. Zero hyperparameters to tune. Computational complexity is $\mathcal{O}(D^3)$ to $\mathcal{O}(D^{2.4})$ in feature count $D$. Fast on small $D$, but completely crashes if $D > 50,000$.</li>
+              <li><strong>Gradient Descent:</strong> Iterative first-order optimizer. Complexity is $\mathcal{O}(k \cdot N \cdot D)$. Scales linearly with features, making it capable of handling millions of features ($D \gg 10^6$). In mini-batch or SGD mode, it scales out-of-core to infinite streaming data. Requires tuning learning rate $\eta$, schedules, and epochs.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: What happens if $\mathbf{X}^T \mathbf{X}$ is singular (non-invertible)? How does Scikit-Learn resolve it?</span> <span class="badge badge-math">Linear Algebra</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>$\mathbf{X}^T \mathbf{X}$ becomes singular when features are collinear (redundant) or when $D > N$ (more features than samples). Inverting it causes a division by zero error.</p>
+            <p>Scikit-Learn's <code>LinearRegression</code> uses <strong>Singular Value Decomposition (SVD)</strong> to calculate the <strong>Moore-Penrose Pseudoinverse $\mathbf{X}^+ = \mathbf{V} \mathbf{\Sigma}^+ \mathbf{U}^T$</strong>. SVD inverts only the non-zero singular values, setting zero values to zero. It always exists for any matrix and finds the unique solution that minimizes the Euclidean norm $\|\mathbf{\theta}\|_2$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: Why does Mean Squared Error (MSE) fail when training Logistic Regression?</span> <span class="badge badge-core">Core ML</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Combining the non-linear sigmoid $\sigma(\mathbf{\theta}^T \mathbf{x})$ with quadratic MSE loss creates a <strong>non-convex error surface</strong> riddled with local minima and flat plateaus where gradient descent gets trapped.</p>
+            <p>Furthermore, it suffers from <strong>gradient vanishing</strong>: The derivative includes $\sigma(z)(1 - \sigma(z))$. If the model makes a gross error ($\hat{p} \approx 0$ when true $y = 1$), $\sigma(z)(1 - \sigma(z)) \approx 0$, causing updates to freeze. Log-loss avoids this by producing linear error gradients $(\hat{p} - y)$ with zero gradient vanishing.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Prove that Binary Cross-Entropy Loss is globally convex.</span> <span class="badge badge-math">Math Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>The Hessian matrix of Log-Loss is $\mathbf{H} = \frac{1}{m} \mathbf{X}^T \mathbf{S} \mathbf{X}$, where $\mathbf{S} = \text{diag}(\hat{p}_i(1 - \hat{p}_i))$.</p>
+            <p>Since $\hat{p}_i \in (0, 1)$, $\hat{p}_i(1 - \hat{p}_i) > 0$, making $\mathbf{S}$ strictly positive definite. For any non-zero vector $\mathbf{v}$, the quadratic form is $\mathbf{v}^T \mathbf{H} \mathbf{v} = \frac{1}{m} (\mathbf{X}\mathbf{v})^T \mathbf{S} (\mathbf{X}\mathbf{v}) = \frac{1}{m} \sum u_i^2 S_{ii} \ge 0$.</p>
+            <p>Thus $\mathbf{H}$ is Positive Semi-Definite ($\mathbf{H} \succeq 0$) everywhere, proving global convexity with zero local minima.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: Prove geometrically why Lasso ($L_1$) yields sparse weights while Ridge ($L_2$) only shrinks them.</span> <span class="badge badge-faang">Geometric Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Minimizing penalized loss is equivalent to minimizing elliptical MSE contours subject to a constraint boundary:</p>
+            <ul>
+              <li><strong>Ridge ($L_2$):</strong> $\sum \theta_i^2 \le C$ is a smooth circle. Expanding ellipses make tangential contact along a curve where both $\theta_1 \neq 0$ and $\theta_2 \neq 0$. Weights shrink, but remain non-zero.</li>
+              <li><strong>Lasso ($L_1$):</strong> $\sum |\theta_i| \le C$ is a diamond with sharp corners lying directly on the coordinate axes ($\theta_1 = 0$ or $\theta_2 = 0$). Expanding ellipses are geometrically far more likely to make first contact at a protruding sharp corner, driving irrelevant weights strictly to zero.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q6: When would you choose ElasticNet over pure Lasso?</span> <span class="badge badge-core">Regularization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ol>
+              <li>When the number of features exceeds sample size ($D > N$): Lasso saturates and selects at most $N$ features. ElasticNet can select all relevant features.</li>
+              <li>When features are strongly correlated ($r > 0.90$): Lasso arbitrarily picks one feature at random and zeros out the others, causing instability. ElasticNet's $L_2$ term enforces a <strong>grouping effect</strong>, keeping correlated features together and shrinking them in unison.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: Walk through the algebraic proof of the Bias-Variance Decomposition.</span> <span class="badge badge-math">Math Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>For $y = f(x) + \epsilon$ with $\mathbb{E}[\epsilon]=0, \text{Var}(\epsilon)=\sigma^2$:</p>
+            $$\mathbb{E}[(y - \hat{f})^2] = \mathbb{E}[((f - \hat{f}) + \epsilon)^2] = \mathbb{E}[(f - \hat{f})^2] + \sigma^2$$
+            <p>Add and subtract $\mathbb{E}[\hat{f}]$:</p>
+            $$\mathbb{E}[(f - \hat{f})^2] = \mathbb{E}[((f - \mathbb{E}[\hat{f}]) + (\mathbb{E}[\hat{f}] - \hat{f}))^2] = (f - \mathbb{E}[\hat{f}])^2 + \mathbb{E}[(\hat{f} - \mathbb{E}[\hat{f}])^2] + 0$$
+            $$= \text{Bias}^2 + \text{Variance} + \sigma^2 \quad \blacksquare$$
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is Early Stopping and why is it called "Free Lunch" regularization?</span> <span class="badge badge-core">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Early Stopping monitors validation loss during iterative optimization (Gradient Descent) and halts training the moment validation loss hits a minimum and begins to increase. It prevents overfitting without adding mathematical penalty hyperparameters or modifying the loss function.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: State the four classical assumptions of Linear Regression (L.I.N.E.) and how to diagnose each.</span> <span class="badge badge-faang">Assumptions</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ol>
+              <li><strong>Linearity:</strong> Diagnosed via Residuals vs. Fitted plot (should be random scatter; curves indicate non-linearity).</li>
+              <li><strong>Independence:</strong> Diagnosed via Durbin-Watson statistic (value near 2 means independent; $< 1.5$ means autocorrelation).</li>
+              <li><strong>Normality:</strong> Diagnosed via Q-Q plot (points should hug the 45-degree diagonal).</li>
+              <li><strong>Equal Variance (Homoscedasticity):</strong> Diagnosed via Scale-Location plot (funnel shape indicates heteroscedasticity).</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: What is Variance Inflation Factor (VIF) and how do you interpret it?</span> <span class="badge badge-core">Statistics</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>$\text{VIF}_j = \frac{1}{1 - R_j^2}$, measuring how much the variance of coefficient $\theta_j$ is inflated due to multicollinearity with other features.</p>
+            <ul>
+              <li>$\text{VIF} = 1$: Completely independent.</li>
+              <li>$\text{VIF} \in [1, 5]$: Moderate, acceptable correlation.</li>
+              <li>$\text{VIF} > 5 \text{ to } 10$: Severe multicollinearity! Feature should be dropped, compressed with PCA, or regularized with Ridge.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q11: Why is Mini-Batch Gradient Descent preferred over Batch GD and pure SGD in industry?</span> <span class="badge badge-core">Systems</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Mini-Batch GD balances optimization stability with hardware hardware saturation. Batch GD is too slow per step and overflows GPU VRAM. Pure SGD has batch size 1, which cannot saturate GPU parallel SIMD cores and exhibits extreme gradient noise. Mini-batches (32–256) maximize GPU Tensor Core matrix multiplication throughput while providing smooth gradient descent.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: Explain the physical intuition of Momentum in Gradient Descent.</span> <span class="badge badge-core">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Momentum maintains a velocity vector $\mathbf{v} \leftarrow \beta \mathbf{v} + (1-\beta) \nabla J$, like a heavy bowling ball rolling downhill. In narrow ravines with oscillating gradients, sideways components cancel out to zero while forward downhill velocity accumulates, dramatically accelerating convergence and rolling over small local bumps/plateaus.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why is Bias Correction necessary in the Adam optimizer?</span> <span class="badge badge-math">Deep Learning</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Because $\mathbf{m}_0$ and $\mathbf{v}_0$ are initialized to zero vectors, exponentially decaying moving averages are severely biased toward zero in the initial iterations: $\mathbb{E}[\mathbf{m}_t] = (1 - \beta_1^t) \mathbb{E}[\nabla J]$. Dividing by $(1 - \beta_1^t)$ and $(1 - \beta_2^t)$ corrects for this initialization bias, preventing tiny initial step sizes.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: What is the combinatorial explosion formula for PolynomialFeatures?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>$\frac{(n + d)!}{n! \cdot d!} - 1$. For $n=10$ features and degree $d=4$, the feature space jumps to 1,000 features. For degree 5, it exceeds 3,000 features. This rapid growth leads to high variance and severe memory bloat.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: How does Softmax Regression differ from One-vs-Rest (OvR) multi-class classification?</span> <span class="badge badge-core">Multi-class</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>OvR trains $K$ separate binary classifiers independently; their predicted probabilities do not sum to 1. Softmax optimizes all $K$ classes jointly in a single model with a unified Cross-Entropy loss, guaranteeing that estimated class probabilities form a valid probability distribution summing to 1.0.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: What is the decision boundary of Logistic Regression and is it always linear?</span> <span class="badge badge-core">Classification</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>The decision boundary occurs where $\hat{p} = 0.5 \iff \sigma(\mathbf{\theta}^T \mathbf{x}) = 0.5 \iff \mathbf{\theta}^T \mathbf{x} = 0$. In original feature space, it is strictly a <strong>linear hyperplane</strong>. However, if polynomial features are added ($\theta_1 x_1 + \theta_2 x_1^2 + \dots$), the boundary becomes non-linear in original space while remaining linear in transformed space.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: What happens to Ridge Regression coefficients as regularization strength $\alpha \to \infty$?</span> <span class="badge badge-core">Regularization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>As $\alpha \to \infty$, all feature weights $\theta_1, \dots, \theta_D \to 0$. The model collapses to predicting a flat horizontal line equal to the mean of the target variable: $\hat{y} = \theta_0 = \bar{y}$. Bias is maximized and variance is zero.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: What is Heteroscedasticity and what are 2 ways to fix it?</span> <span class="badge badge-core">Statistics</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Heteroscedasticity occurs when error variance is non-constant across fitted values (e.g. residual spread grows wider like a funnel as predicted price increases). Fixes: (1) Apply concave log transform to target $\ln(y)$ to stabilize variance, (2) Use Weighted Least Squares (WLS) where weights are inversely proportional to variance.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: Can you train Linear Regression on streaming data that does not fit in memory?</span> <span class="badge badge-faang">Production</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Yes, using <code>SGDRegressor</code> with its <code>partial_fit()</code> method! It updates parameters one mini-batch at a time as data streams from disk or Kafka, requiring only one mini-batch in RAM at any given millisecond.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: Why does multiplying the learning rate by a decay schedule help SGD?</span> <span class="badge badge-core">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Because SGD uses 1 sample per step, gradient noise prevents it from settling at the minimum, causing it to bounce around forever. Decaying $\eta(t)$ reduces the step size as training progresses, dampening fluctuations and allowing SGD to settle into the valley bottom.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: How do you interpret a Logistic Regression coefficient $\theta_j = 0.5$?</span> <span class="badge badge-math">Interpretation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Because $\ln(\text{Odds}) = \mathbf{\theta}^T \mathbf{x}$, a 1-unit increase in feature $x_j$ increases the log-odds by $0.5$. In terms of odds, the odds ratio multiplies by $e^{0.5} \approx 1.65$ (a 65% increase in the odds of success), holding all other features constant.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: Why is the bias term $\theta_0$ never regularized in Ridge or Lasso?</span> <span class="badge badge-core">Regularization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Regularizing weights penalizes model complexity and slope sensitivity. The bias term $\theta_0$ merely controls the vertical baseline offset of the predictions. Penalizing $\theta_0$ would artificially force the regression line to pass near the origin $(0, 0)$, introducing severe unwanted bias if the true mean of $y$ is far from zero.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>Module 3 Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your mastery of linear models, optimization algorithms, and regularization.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. Geometrically, why does Lasso ($L_1$) drive feature weights to exact zero while Ridge ($L_2$) does not?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) Lasso uses a higher learning rate during optimization.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) The diamond-shaped L1 constraint ball has sharp corners located directly on the coordinate axes.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) Ridge uses logarithms instead of absolute values.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) Lasso only operates on binary features.</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> The diamond corners of the $L_1$ norm lie on the axes where parameters equal 0. Expanding elliptical MSE contours almost always intersect the diamond at these protruding sharp corners first.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. What happens if you attempt to train Logistic Regression using Mean Squared Error (MSE) loss?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) The model converges 10x faster than with cross-entropy.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) The error surface becomes non-convex with multiple local minima and suffers from severe gradient vanishing when predictions are completely wrong.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) Scikit-Learn automatically converts it to a Decision Tree.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) MSE guarantees global convexity.</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> Combining the non-linear sigmoid with quadratic loss yields a non-convex loss surface. When predictions are grossly wrong ($\hat{p} \approx 0$ for $y=1$), the derivative term $\sigma(1-\sigma) \to 0$, freezing gradient updates.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. Why is the Moore-Penrose Pseudoinverse (SVD) preferred over the standard Normal Equation $(X^T X)^{-1} X^T y$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) Because SVD is an iterative algorithm that requires learning rate tuning.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) Because the pseudoinverse always exists and is numerically stable even if X^T X is singular or features exceed sample count (D > N).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) Because SVD only works for integer matrices.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) Because the Normal Equation cannot compute regression slopes.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> SVD inverts only the non-zero singular values, safely setting zero values to zero. It always exists, handles collinear features, and selects the minimum Euclidean norm solution.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. In the Bias-Variance Decomposition proof, which term cannot be reduced by any machine learning model regardless of complexity or data size?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) Bias squared</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">B) Variance</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">C) Irreducible error (sigma^2)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) Regularization loss</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> The irreducible error $\sigma^2 = \text{Var}(\epsilon)$ stems from inherent noise in the data generation process (sensor noise, unmeasured latent factors). No model can predict true random noise.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. When should you choose ElasticNet over pure Lasso?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">A) When features are strongly correlated or when feature count exceeds sample count (D > N).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">B) When you want to eliminate all regularization penalties.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) Only when performing binary classification.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) When you want every feature weight to be strictly zero.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> When features correlate, Lasso randomly selects one and drops the others. Furthermore, Lasso can select at most $N$ features when $D > N$. ElasticNet overcomes both limitations via its combined $L_1$ and $L_2$ penalties.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. What does a Variance Inflation Factor (VIF) of 12 for a feature indicate?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) The feature has zero correlation with all other features.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">B) The feature has a 12% missing rate.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">C) Severe multicollinearity exists; the feature is heavily explained by other features and should be addressed.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) The feature is strictly normally distributed.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> VIF values greater than 5 to 10 indicate severe multicollinearity, meaning the feature's variance is inflated by over 10x due to linear correlation with other predictors.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why is the Hessian matrix of Binary Cross-Entropy Loss guaranteed to be Positive Semi-Definite?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) Because all features are positive.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) Because H = (1/m) X^T S X, where S is a diagonal matrix of p_i(1 - p_i) > 0, ensuring v^T H v >= 0 for all vectors v.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) Because it uses the normal equation.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) Because the learning rate is decaying.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> Since the sigmoid $\hat{p}_i \in (0, 1)$, all diagonal entries $\hat{p}_i(1-\hat{p}_i)$ are strictly positive. The quadratic form is a sum of squares multiplied by positive numbers, proving positive semi-definiteness and global convexity.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the key mechanism behind the Momentum optimizer?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) It computes the Hessian matrix on every iteration.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">B) It maintains an exponentially decaying moving average of past gradients, building velocity along consistent directions and dampening oscillations.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) It randomly drops 50% of the weights.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) It converts continuous variables into binary classes.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> Momentum mimics a heavy ball rolling downhill. By tracking accumulated velocity, oscillating cross-ravine components cancel out, while consistent downhill descent accelerates.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. If your model exhibits High Bias (Underfitting) on learning curves, what will happen if you collect 100,000 additional training samples?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">A) It will not help; both training and validation error will remain high and plateau together.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">B) Training error will drop to zero and the model will achieve 99% accuracy.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) The model will automatically become non-linear.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) Variance will explode.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> In high bias (underfitting), the model is fundamentally too simplistic to capture the true underlying pattern. More data merely reinforces the same flawed straight-line assumption. You must increase model complexity.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. Why is the bias parameter theta_0 excluded from the L1 or L2 regularization penalty?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Because theta_0 cannot be updated by gradient descent.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) Because regularizing theta_0 would artificially force the regression line to pass near the origin, distorting the baseline intercept of the data.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Because theta_0 is always equal to 1.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Because theta_0 has an imaginary eigenvalue.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Regularizing weights constrains sensitivity and prevents wild slopes. The bias $\theta_0$ merely captures the vertical baseline of the data. Penalizing it forces the line toward $(0, 0)$, introducing unnecessary bias.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DL Module 4: Sequence Modeling, RNNs, LSTMs & Attention Mechanics — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --cyan: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--cyan); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">DL<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link">DL1: Foundations</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link">DL2: Optimization</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link">DL3: CNNs & CV</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link active">DL4: RNNs & Attention</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link">DL5: Transformers & LLMs</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">DL Module 4 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-seq-physics')"><span>⏳</span> 1. Sequence Physics & Memory</li>
+        <li class="nav-item" onclick="switchTab('tab-vanilla-rnn')"><span>🔄</span> 2. Vanilla RNN & BPTT Unrolling</li>
+        <li class="nav-item" onclick="switchTab('tab-bptt-math')"><span>📉</span> 3. Vanishing Gradient Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-lstm')"><span>🚪</span> 4. LSTM & Error Carousel Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-gru')"><span>⚡</span> 5. GRU Architecture & Math</li>
+        <li class="nav-item" onclick="switchTab('tab-bidirectional')"><span>↔️</span> 6. Bidirectional & Stacked RNNs</li>
+        <li class="nav-item" onclick="switchTab('tab-seq2seq')"><span>🍾</span> 7. Seq2Seq Bottleneck Crisis</li>
+        <li class="nav-item" onclick="switchTab('tab-attention')"><span>🔍</span> 8. Bahdanau & Luong Attention</li>
+        <li class="nav-item" onclick="switchTab('tab-numerical')"><span>🧮</span> 9. Worked Toy Attention Numbers</li>
+        <li class="nav-item" onclick="switchTab('tab-production')"><span>🎙️</span> 10. Beam Search & CTC Loss</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: SEQUENCE MODELING & MARKOVIAN DILEMMA -->
+      <section id="tab-seq-physics" class="tab-section active">
+        <h1>Sequence Modeling: Temporal Physics & Dynamic Memory</h1>
+        <p class="section-subtitle">Why feedforward networks fail on sequential data, the Markov dilemma, and recurrent state transitions.</p>
+
+        <div class="first-principles">
+          <h4>⏳ Why Standard MLPs Cannot Model Sequences</h4>
+          <p>Consider language, audio, or financial time-series data:</p>
+          <ol>
+            <li><strong>Variable Input Lengths:</strong> A sentence can have 3 words or 150 words. A standard MLP requires a fixed input vector size $D$. Padding to 1000 words wastes compute and breaks position semantics.</li>
+            <li><strong>Temporal Ordering & Context:</strong> The meaning of a word depends heavily on words that appeared 10 steps earlier: <em>"The bank of the river..."</em> vs. <em>"The bank approved my loan..."</em>. MLPs treat input positions as independent coordinates, destroying sequential relationships.</li>
+            <li><strong>Parameter Explosion:</strong> If we concatenate a sliding window of 50 words into an MLP, the model learns separate weights for word 1, word 2, and word 50 &mdash; failing to share temporal knowledge!</li>
+          </ol>
+        </div>
+
+        <h2>1. The Concept of Recurrent Hidden Memory ($h_t$)</h2>
+        <div class="math-box">
+          <h4>State Transition Formulation:</h4>
+          <p>A Recurrent Neural Network (RNN) processes a sequence step-by-step, maintaining an internal <strong>hidden state vector $h_t \in \mathbb{R}^H$</strong> that acts as a lossy compression of all historical inputs seen from time $1$ to $t$:</p>
+          $$\mathbf{h_t = f_W(h_{t-1}, x_t)}$$
+          <ul>
+            <li>$x_t$: Current input at time step $t$.</li>
+            <li>$h_{t-1}$: Hidden state inherited from the previous time step $t-1$.</li>
+            <li>$W$: <strong>Shared weight parameters</strong> applied identically across every time step $t=1, \dots, T$.</li>
+          </ul>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 2: STANDARD RNN & BPTT -->
+      <section id="tab-vanilla-rnn" class="tab-section">
+        <h1>Vanilla RNN: Forward Transitions & BPTT Unrolling</h1>
+        <p class="section-subtitle">Step-by-step matrix equations, computational graph unrolling, and shared weight gradient accumulation.</p>
+
+        <div class="first-principles">
+          <h4>🔄 Forward Recurrence Equations</h4>
+          <p>At each time step $t$, the standard RNN performs a linear combination of the current input $x_t$ and previous hidden memory $h_{t-1}$, passed through a non-linear $\tanh$ activation:</p>
+          $$\mathbf{h_t = \tanh(W_{hh} h_{t-1} + W_{xh} x_t + b_h)}$$
+          $$\mathbf{\hat{y}_t = \text{softmax}(W_{hy} h_t + b_y)}$$
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Matrix</th><th>Dimensions</th><th>Functional Role</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>$W_{xh}$</td><td>$(H \times D)$</td><td>Projects input $x_t$ into hidden representation space.</td></tr>
+                <tr><td>$W_{hh}$</td><td>$(H \times H)$</td><td>Recurrent transition matrix (temporal memory mixing).</td></tr>
+                <tr><td>$W_{hy}$</td><td>$(C \times H)$</td><td>Projects hidden state $h_t$ to class logits.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>1. Backpropagation Through Time (BPTT)</h2>
+        <div class="deep-dive">
+          <h4>Unrolling the Computational Graph:</h4>
+          <p>Total sequence loss is the sum of losses across all time steps: $\mathcal{L} = \sum_{t=1}^T \mathcal{L}_t$.</p>
+          <p>Because weight matrix $W_{hh}$ is reused across every time step, its total gradient is the <strong>sum of gradients accumulated over all time steps</strong>:</p>
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial W_{hh}} = \sum_{t=1}^T \sum_{k=1}^t \frac{\partial \mathcal{L}_t}{\partial h_t} \frac{\partial h_t}{\partial h_k} \frac{\partial h_k}{\partial W_{hh}}}$$
+          <p>Where the key chain rule term $\frac{\partial h_t}{\partial h_k}$ tracks gradient flow backwards from step $t$ to earlier step $k$.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 3: VANISHING GRADIENTS IN RNNS PROOF -->
+      <section id="tab-bptt-math" class="tab-section">
+        <h1>Mathematical Proof: Vanishing Gradients in RNNs</h1>
+        <p class="section-subtitle">Bengio et al. (1994), Pascanu et al. (2013), the Jacobian chain product, and spectral radius limits.</p>
+
+        <div class="first-principles">
+          <h4>🛑 The Fatal Flaw of Vanilla RNNs</h4>
+          <p>In practice, vanilla RNNs cannot learn dependencies longer than 8 to 10 time steps. If the first word of a sentence determines the subject, an RNN fails to pass that information to the verb at step 20.</p>
+        </div>
+
+        <h2>1. Complete Mathematical Derivation</h2>
+        <div class="deep-dive">
+          <h4>Theorem: The temporal gradient decomposes into a product of $T - t$ Jacobian matrices.</h4>
+          <p>Consider the derivative of hidden state $h_T$ with respect to an earlier state $h_t$:</p>
+          $$\frac{\partial h_T}{\partial h_t} = \prod_{k=t+1}^T \frac{\partial h_k}{\partial h_{k-1}}$$
+          <p>Recall $h_k = \tanh(z_k)$ where $z_k = W_{hh} h_{k-1} + W_{xh} x_k + b_h$. The Jacobian matrix $\frac{\partial h_k}{\partial h_{k-1}}$ is:</p>
+          $$\frac{\partial h_k}{\partial h_{k-1}} = \text{diag}(1 - h_k^2) \cdot W_{hh}^T$$
+          <p>Substituting into the chain product:</p>
+          $$\mathbf{\frac{\partial h_T}{\partial h_t} = \prod_{k=t+1}^T \Big( \text{diag}(1 - h_k^2) \cdot W_{hh}^T \Big)}$$
+
+          <h4>Spectral Analysis (Pascanu et al., 2013):</h4>
+          <ul>
+            <li>Let the maximum eigenvalue (spectral radius) of $W_{hh}$ be $\lambda_{\max}$.</li>
+            <li>Since $\tanh'(z) = 1 - \tanh^2(z) \in (0, 1]$, the diagonal matrix has values $\le 1.0$.</li>
+            <li>The norm of the gradient product is bounded by:
+              $$\left\| \frac{\partial h_T}{\partial h_t} \right\| \le (\lambda_{\max})^{T - t}$$
+            </li>
+          </ul>
+          <p><strong>The Two Catastrophes:</strong></p>
+          <ol>
+            <li><strong>Vanishing Gradient ($\lambda_{\max} < 1$):</strong> As sequence length $(T - t) \to 20$, $(\lambda_{\max})^{20} \to 0$. Gradients decay exponentially to zero! The network physically cannot learn long-term temporal dependencies.</li>
+            <li><strong>Exploding Gradient ($\lambda_{\max} > 1$):</strong> As $(T - t)$ grows, $(\lambda_{\max})^{T-t} \to \infty$. Gradients explode to <code>NaN</code>! Solved using <strong>Gradient Clipping by Norm</strong>.</li>
+          </ol>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 4: LSTM IN-DEPTH & THE CONSTANT ERROR CAROUSEL -->
+      <section id="tab-lstm" class="tab-section">
+        <h1>LSTM In-Depth & The Constant Error Carousel</h1>
+        <p class="section-subtitle">Hochreiter & Schmidhuber (1997), the additive Cell State highway, and gate interaction calculus.</p>
+
+        <div class="first-principles">
+          <h4>🗄️ How LSTM Cured Vanishing Gradients</h4>
+          <p>In 1997, Sepp Hochreiter and J&uuml;rgen Schmidhuber introduced the <strong>Long Short-Term Memory (LSTM)</strong> architecture. Instead of overwriting hidden memory via matrix multiplication, LSTM maintains a protected conveyor belt &mdash; the <strong>Cell State ($C_t$)</strong> &mdash; regulated by 3 non-linear gates.</p>
+        </div>
+
+        <h2>1. The Four Mathematical Steps of an LSTM Unit</h2>
+        <div class="math-box">
+          <ol>
+            <li><strong>Forget Gate ($f_t$):</strong> Decides what percentage of old cell memory to discard:
+              $$\mathbf{f_t = \sigma(W_f [h_{t-1}, x_t] + b_f) \in (0, 1)^H}$$
+              <em>($f_t = 0 \implies$ completely erase; $f_t = 1 \implies$ completely retain).</em>
+            </li>
+            <br>
+            <li><strong>Input Gate ($i_t$) & Candidate Memory ($\tilde{C}_t$):</strong> Decides what new information to add:
+              $$\mathbf{i_t = \sigma(W_i [h_{t-1}, x_t] + b_i) \in (0, 1)^H}$$
+              $$\mathbf{\tilde{C}_t = \tanh(W_c [h_{t-1}, x_t] + b_c) \in (-1, 1)^H}$$
+            </li>
+            <br>
+            <li><strong>Cell State Update ($C_t$):</strong> <em>The Additive Highway!</em>
+              $$\mathbf{C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t}$$
+            </li>
+            <br>
+            <li><strong>Output Gate ($o_t$) & Hidden State ($h_t$):</strong> Decides what to output to the next layer:
+              $$\mathbf{o_t = \sigma(W_o [h_{t-1}, x_t] + b_o) \in (0, 1)^H}$$
+              $$\mathbf{h_t = o_t \odot \tanh(C_t)}$$
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Mathematical Proof: Why LSTM Does Not Vanish Gradients</h2>
+        <div class="deep-dive">
+          <h4>Theorem: The derivative of $C_T$ with respect to $C_t$ contains an additive identity path.</h4>
+          <p>Compute the partial derivative of current cell state $C_t$ with respect to previous cell state $C_{t-1}$:</p>
+          $$\frac{\partial C_t}{\partial C_{t-1}} = f_t + \frac{\partial f_t}{\partial C_{t-1}} C_{t-1} + \frac{\partial i_t}{\partial C_{t-1}} \tilde{C}_t + i_t \frac{\partial \tilde{C}_t}{\partial C_{t-1}}$$
+          <p>Across $T - t$ time steps:</p>
+          $$\mathbf{\frac{\partial C_T}{\partial C_t} = \prod_{k=t+1}^T f_k + \dots}$$
+          <ul>
+            <li>Notice the first term: It is the product of forget gates $\prod f_k$ without any matrix multiplications by $W$!</li>
+            <li>If the network learns to keep the forget gate open ($f_k \approx 1.0$), the gradient passes backward across 100+ time steps with <strong>zero attenuation</strong> ($\prod 1.0 = 1.0$)!</li>
+            <li>This uninterrupted additive mechanism is known as the <strong>Constant Error Carousel (CEC)</strong>.</li>
+          </ul>
+          <div class="interview-alert">
+            <h4>💡 Interview Secret: The Forget Gate Bias Trick (Jozefowicz et al., 2015)</h4>
+            <p>Always initialize the forget gate bias $b_f$ to <strong>$+1.0$ or $+2.0$</strong> (instead of 0). This forces $\sigma(b_f) \approx 0.73$ to $0.88$ at initialization, ensuring the model remembers long-term history by default until it explicitly learns to forget!</p>
+          </div>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 5: GATED RECURRENT UNIT (GRU) -->
+      <section id="tab-gru" class="tab-section">
+        <h1>Gated Recurrent Unit (GRU): Architecture & Formulas</h1>
+        <p class="section-subtitle">Kyunghyun Cho et al. (2014), merging hidden and cell states, and parameter efficiency vs. LSTM.</p>
+
+        <div class="first-principles">
+          <h4>⚡ Streamlining the LSTM</h4>
+          <p>LSTMs are powerful but computationally heavy: each cell maintains 4 separate weight matrices ($W_f, W_i, W_c, W_o$) and two distinct state vectors ($h_t$ and $C_t$).</p>
+          <p>The <strong>Gated Recurrent Unit (GRU)</strong> simplifies this by merging the cell state into the hidden state $h_t$ and combining the input and forget gates into a single <strong>Update Gate</strong>.</p>
+        </div>
+
+        <h2>1. The Four Mathematical Equations of a GRU</h2>
+        <div class="math-box">
+          <ol>
+            <li><strong>Reset Gate ($r_t$):</strong> Decides how much past memory to ignore when computing candidate state:
+              $$\mathbf{r_t = \sigma(W_r [h_{t-1}, x_t] + b_r)}$$
+            </li>
+            <li><strong>Update Gate ($z_t$):</strong> Acts simultaneously as both forget gate and input gate:
+              $$\mathbf{z_t = \sigma(W_z [h_{t-1}, x_t] + b_z)}$$
+            </li>
+            <li><strong>Candidate Hidden State ($\tilde{h}_t$):</strong>
+              $$\mathbf{\tilde{h}_t = \tanh(W_h [r_t \odot h_{t-1}, x_t] + b_h)}$$
+            </li>
+            <li><strong>Hidden State Interpolation ($h_t$):</strong> <em>Linear blend between old memory and candidate state!</em>
+              $$\mathbf{h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t}$$
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. GRU vs. LSTM Comparison Table</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Dimension</th><th>LSTM</th><th>GRU</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>State Vectors</strong></td><td>Two ($h_t$ hidden state and $C_t$ cell state)</td><td>One ($h_t$ hidden state only)</td></tr>
+              <tr><td><strong>Number of Gates</strong></td><td>3 gates (Forget, Input, Output)</td><td>2 gates (Reset, Update)</td></tr>
+              <tr><td><strong>Parameter Count</strong></td><td>$4 \times (H^2 + H \cdot D + H)$</td><td>$3 \times (H^2 + H \cdot D + H)$ (<strong>25% fewer parameters</strong>)</td></tr>
+              <tr><td><strong>Training Speed</strong></td><td>Slower per epoch</td><td>Faster per epoch</td></tr>
+              <tr><td><strong>When to Prefer</strong></td><td>Very long sequences, massive datasets, complex grammar</td><td>Low-latency inference, smaller datasets, resource-constrained edge devices</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 6: BIDIRECTIONAL & DEEP STACKED RNNS -->
+      <section id="tab-bidirectional" class="tab-section">
+        <h1>Bidirectional & Stacked Recurrent Architectures</h1>
+        <p class="section-subtitle">Schuster & Paliwal (1997), future temporal context, and deep stacked RNN residual connections.</p>
+
+        <div class="first-principles">
+          <h4>🔮 Why Left-to-Right Processing Is Insufficient</h4>
+          <p>Consider Named Entity Recognition (NER) on the sentence: <em>"Teddy Roosevelt was the 26th president of the United States."</em></p>
+          <p>When an RNN reads the first word <em>"Teddy"</em>, it cannot know whether it refers to a stuffed toy bear or a US president! The disambiguating context (<em>"president"</em>) appears 5 words in the future!</p>
+          <p><strong>Bidirectional RNNs (BiRNN / BiLSTM)</strong> solve this by processing the sequence in both directions simultaneously.</p>
+        </div>
+
+        <h2>1. The Bidirectional Architecture</h2>
+        <div class="math-box">
+          <p>Run two independent recurrent networks in parallel:</p>
+          <ol>
+            <li><strong>Forward Hidden State ($\overrightarrow{h}_t$):</strong> Reads sequence from left to right: $t = 1 \to T$.</li>
+            <li><strong>Backward Hidden State ($\overleftarrow{h}_t$):</strong> Reads sequence from right to left: $t = T \to 1$.</li>
+            <li><strong>Combined Output Representation:</strong> Concatenate both vectors:
+              $$\mathbf{h_t = \left[ \overrightarrow{h}_t \,;\, \overleftarrow{h}_t \right] \in \mathbb{R}^{2H}}$$
+            </li>
+          </ol>
+          <p><em>Limitation:</em> BiRNNs require the entire sequence up-front &mdash; they <strong>cannot be used for real-time autoregressive streaming generation</strong> (where future tokens do not exist yet).</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 7: SEQ2SEQ & THE INFORMATION BOTTLENECK -->
+      <section id="tab-seq2seq" class="tab-section">
+        <h1>Seq2Seq & The Information Bottleneck Crisis</h1>
+        <p class="section-subtitle">Sutskever et al. (2014), Encoder-Decoder translation, and why fixed-vector compression broke on long sequences.</p>
+
+        <div class="first-principles">
+          <h4>📦 The Encoder-Decoder Framework</h4>
+          <p>Machine translation maps an input sequence of length $M$ (e.g. 10 French words) to an output sequence of different length $N$ (e.g. 12 English words). In 2014, Google introduced the <strong>Sequence-to-Sequence (Seq2Seq)</strong> framework:</p>
+          <ol>
+            <li><strong>Encoder RNN:</strong> Reads the input tokens $x_1, \dots, x_M$ step-by-step. The final hidden state $h_M$ acts as the <strong>Context Vector $c$</strong>.</li>
+            <li><strong>Decoder RNN:</strong> Takes context vector $c$ as initial hidden state ($s_0 = c$) and autoregressively generates output tokens $y_1, y_2, \dots, y_N$ one by one until an $\langle\text{EOS}\rangle$ token is emitted.</li>
+          </ol>
+        </div>
+
+        <h2>1. The Fatal Information Bottleneck</h2>
+        <div class="interview-alert">
+          <h4>🚨 Why Seq2Seq Degraded on Sentences > 20 Words:</h4>
+          <p>Consider compressing a complex 50-word legal sentence into a single 512-dimensional vector $c = h_M$. It is physically impossible for a fixed-size vector of 512 numbers to preserve all nuanced syntax, entities, and relations!</p>
+          <p>Bahdanau et al. (2014) showed that Seq2Seq translation quality (BLEU score) dropped off a cliff for sequences longer than 20 words. <strong>This crisis directly inspired the invention of the Attention Mechanism!</strong></p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 8: THE ATTENTION REVOLUTION -->
+      <section id="tab-attention" class="tab-section">
+        <h1>The Attention Revolution: Bahdanau & Luong Math</h1>
+        <p class="section-subtitle">Dynamic soft alignment, context vector calculus, and eliminating the static bottleneck.</p>
+
+        <div class="first-principles">
+          <h4>🔍 What is Attention? (First Principles)</h4>
+          <p>Instead of forcing the decoder to rely on a single static vector $c = h_M$, <strong>Attention allows the decoder to look back at ALL encoder hidden states $[h_1, h_2, \dots, h_M]$ at every decoding step $t$!</strong></p>
+          <p>When translating the French word <em>"pomme"</em> to <em>"apple"</em>, the decoder focuses 98% of its attention on the specific encoder state representing <em>"pomme"</em>.</p>
+        </div>
+
+        <h2>1. The 3-Step Mathematical Formulation of Attention</h2>
+        <div class="math-box">
+          <ol>
+            <li><strong>Compute Alignment Scores ($e_{t, i}$):</strong>
+              <br>Measures how relevant encoder state $h_i$ is to current decoder state $s_{t-1}$:
+              <ul>
+                <li><strong>Bahdanau Additive Attention (1994):</strong>
+                  $$\mathbf{e_{t, i} = v_a^T \tanh(W_a s_{t-1} + U_a h_i)}$$
+                </li>
+                <li><strong>Luong Multiplicative / Dot-Product Attention (2015):</strong>
+                  $$\mathbf{e_{t, i} = s_t^T W_a h_i \quad (\text{or simple dot product: } s_t^T h_i)}$$
+                </li>
+              </ul>
+            </li>
+            <br>
+            <li><strong>Softmax Normalization (Attention Weights $\alpha_{t, i}$):</strong>
+              $$\mathbf{\alpha_{t, i} = \frac{\exp(e_{t, i})}{\sum_{k=1}^M \exp(e_{t, k})}}$$
+              <em>($\sum_{i=1}^M \alpha_{t, i} = 1$, representing a valid probability distribution over input tokens).</em>
+            </li>
+            <br>
+            <li><strong>Compute Dynamic Context Vector ($c_t$):</strong>
+              $$\mathbf{c_t = \sum_{i=1}^M \alpha_{t, i} h_i}$$
+            </li>
+          </ol>
+          <p>The dynamic context vector $c_t$ is concatenated with decoder hidden state $s_t$ to predict the next word $y_t$. The static bottleneck is completely eliminated!</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 9: WORKED TOY ATTENTION NUMERICAL WALKTHROUGH -->
+      <section id="tab-numerical" class="tab-section">
+        <h1>Worked Toy Attention Walkthrough with Real Numbers</h1>
+        <p class="section-subtitle">Tracing alignment scores, softmax normalization, and context vector creation by hand.</p>
+
+        <div class="first-principles">
+          <h4>🧮 Concrete Mathematical Walkthrough</h4>
+          <p>Let's manually compute attention for an input sequence of $M = 3$ tokens with 3-dimensional encoder hidden vectors:</p>
+          <ul>
+            <li>Encoder token 1: $\mathbf{h}_1 = \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix}$ (e.g. representing <em>"The"</em>)</li>
+            <li>Encoder token 2: $\mathbf{h}_2 = \begin{bmatrix} 0 \\ 2 \\ 0 \end{bmatrix}$ (e.g. representing <em>"apple"</em>)</li>
+            <li>Encoder token 3: $\mathbf{h}_3 = \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$ (e.g. representing <em>"falls"</em>)</li>
+          </ul>
+          <p>Current decoder query state: $\mathbf{q} = \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$.</p>
+        </div>
+
+        <h2>1. Step 1: Compute Dot-Product Alignment Scores</h2>
+        <div class="deep-dive">
+          $$e_1 = \mathbf{q}^T \mathbf{h}_1 = (1 \times 1) + (1 \times 0) + (0 \times 1) = \mathbf{1.0}$$
+          $$e_2 = \mathbf{q}^T \mathbf{h}_2 = (1 \times 0) + (1 \times 2) + (0 \times 0) = \mathbf{2.0}$$
+          $$e_3 = \mathbf{q}^T \mathbf{h}_3 = (1 \times 1) + (1 \times 1) + (0 \times 0) = \mathbf{2.0}$$
+          <p>Raw unnormalized scores: $\mathbf{e} = [1.0, \; 2.0, \; 2.0]$.</p>
+        </div>
+
+        <h2>2. Step 2: Softmax Normalization (Attention Weights)</h2>
+        <div class="deep-dive">
+          <p>Exponentiate each score:</p>
+          <ul>
+            <li>$e^{1.0} \approx 2.7183$</li>
+            <li>$e^{2.0} \approx 7.3891$</li>
+            <li>$e^{2.0} \approx 7.3891$</li>
+          </ul>
+          <p>Sum of exponents $= 2.7183 + 7.3891 + 7.3891 = \mathbf{17.4965}$.</p>
+          <p><strong>Compute Attention Weights $\alpha_i = \frac{e^{e_i}}{\sum e^{e_k}}$:</strong></p>
+          $$\alpha_1 = \frac{2.7183}{17.4965} \approx \mathbf{0.1554} \quad (15.54\%)$$
+          $$\alpha_2 = \frac{7.3891}{17.4965} \approx \mathbf{0.4223} \quad (42.23\%)$$
+          $$\alpha_3 = \frac{7.3891}{17.4965} \approx \mathbf{0.4223} \quad (42.23\%)$$
+          <p><em>Verification:</em> $0.1554 + 0.4223 + 0.4223 = 1.0000$.</p>
+        </div>
+
+        <h2>3. Step 3: Compute the Dynamic Context Vector $\mathbf{c}$</h2>
+        <div class="deep-dive">
+          $$\mathbf{c} = \alpha_1 \mathbf{h}_1 + \alpha_2 \mathbf{h}_2 + \alpha_3 \mathbf{h}_3$$
+          $$\mathbf{c} = 0.1554 \begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix} + 0.4223 \begin{bmatrix} 0 \\ 2 \\ 0 \end{bmatrix} + 0.4223 \begin{bmatrix} 1 \\ 1 \\ 0 \end{bmatrix}$$
+          $$\mathbf{c} = \begin{bmatrix} 0.1554 + 0 + 0.4223 \\ 0 + 0.8446 + 0.4223 \\ 0.1554 + 0 + 0 \end{bmatrix} = \mathbf{\begin{bmatrix} 0.5777 \\ 1.2669 \\ 0.1554 \end{bmatrix}}$$
+          <p><strong>Result:</strong> The context vector $\mathbf{c}$ cleanly focuses $84.5\%$ of its mass on tokens 2 and 3, blending their information to guide the decoder's next token prediction!</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 10: PRODUCTION SEQUENCE PROCESSING & CTC LOSS -->
+      <section id="tab-production" class="tab-section">
+        <h1>Production Sequence Processing: Beam Search & CTC Loss</h1>
+        <p class="section-subtitle">Greedy vs. Beam Search decoding, Teacher Forcing dynamics, and CTC alignment-free loss.</p>
+
+        <div class="first-principles">
+          <h4>🎙️ Production Sequence Decoding & Speech Recognition</h4>
+          <p>In production NLP and Speech-to-Text pipelines, generating tokens greedily can lead to catastrophic dead ends. Specialized decoding and loss formulations govern production deployment.</p>
+        </div>
+
+        <h2>1. Greedy Decoding vs. Beam Search</h2>
+        <div class="deep-dive">
+          <h4>A. Greedy Decoding (Width $B=1$):</h4>
+          <p>Picks the single highest probability token at each step: $y_t = \arg\max P(y \mid y_{<t}, x)$.</p>
+          <p><strong>The Flaw:</strong> Myopic search! A globally optimal translation might start with a word that has slightly lower initial probability ($P=0.29$ vs $P=0.31$). Greedy search permanently discards that entire branch!</p>
+
+          <br>
+          <h4>B. Beam Search (Beam Width $B$, typically $B=4$ to $8$):</h4>
+          <p>Maintains the top $B$ most probable candidate sequence hypotheses at each step:</p>
+          <ol>
+            <li>At step $t$, expand each of the $B$ active hypotheses into all $V$ vocabulary words ($B \times V$ candidates).</li>
+            <li>Compute cumulative log-probabilities: $\text{Score} = \sum_{i=1}^t \ln P(y_i \mid y_{<i}, x)$.</li>
+            <li>Prune back down to only the <strong>top $B$ highest-scoring paths</strong>.</li>
+            <li>Apply length normalization to prevent penalizing longer sentences: $\text{Score}_{\text{norm}} = \frac{\text{Score}}{L^\alpha}$ (typically $\alpha = 0.6$ to $0.7$).</li>
+          </ol>
+        </div>
+
+        <h2>2. Connectionist Temporal Classification (CTC Loss, Graves et al., 2006)</h2>
+        <div class="math-box">
+          <h4>The Alignment Dilemma in Speech & OCR:</h4>
+          <p>In speech recognition, audio has 1,000 frames of spectrogram data, but the spoken transcript is only 15 letters: <em>"HELLO WORLD"</em>. We do not know which exact millisecond correspond to which letter!</p>
+          
+          <h4>The CTC Solution:</h4>
+          <p>CTC introduces a special <strong>Blank Token ($\epsilon$)</strong> and allows repeated characters:</p>
+          $$\text{Alignment: } [H, H, \epsilon, E, E, L, \epsilon, L, L, O] \xrightarrow{\text{Collapse}} \text{"HELLO"}$$
+          <p>CTC uses dynamic programming to sum probabilities over <strong>all possible valid alignments</strong> that collapse to the target transcript, training speech and handwriting models with zero manual time-alignment labels!</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ High-Frequency FAANG Interview Questions: Sequence Models</h1>
+        <p class="section-subtitle">Real screening and system design questions asked at Google, Apple, Amazon, and Meta.</p>
+
+        <h2>Part 1: RNNs, BPTT & Gradients</h2>
+        <details open>
+          <summary><span>Q1: Why do vanilla RNNs suffer from vanishing and exploding gradients?</span> <span class="badge badge-faang">Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Backpropagation through time computes $\frac{\partial h_T}{\partial h_t} = \prod_{k=t+1}^T \text{diag}(1 - h_k^2) W_{hh}^T$. This is a product of $T - t$ matrices. If the spectral radius $\rho(W_{hh}) < 1$, the gradient decays exponentially to zero ($O(\lambda^{T-t}) \to 0$). If $\rho(W_{hh}) > 1$, it explodes exponentially to infinity.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: How does an LSTM solve the vanishing gradient problem? What is the Constant Error Carousel?</span> <span class="badge badge-math">LSTM Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The LSTM cell state update is <strong>additive</strong>: $C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t$. The derivative is $\frac{\partial C_t}{\partial C_{t-1}} = f_t + \dots$. If the network keeps the forget gate open ($f_t \approx 1$), gradient flows back across hundreds of time steps through the uninterrupted additive identity connection without decaying.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: Why should the forget gate bias in an LSTM be initialized to +1.0 instead of 0?</span> <span class="badge badge-system">Best Practice</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Initializing $b_f = 0$ gives $\sigma(0) = 0.5$, meaning the cell forgets 50% of its memory at every single time step. Initializing $b_f = +1.0$ (or $+2.0$) forces $\sigma(b_f) \approx 0.73$ to $0.88$, ensuring the model remembers long-term context by default from the start of training.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Compare GRU and LSTM. When would you choose GRU over LSTM?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> GRU merges cell state and hidden state, using only 2 gates (Reset, Update) compared to LSTM's 3 gates. GRU has 25% fewer parameters ($3 \times$ matrices vs $4 \times$), trains faster, and requires less GPU memory. Choose GRU for smaller datasets, resource-constrained edge devices, and when low inference latency is paramount.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: How many parameters are in an LSTM layer with input size 100 and hidden size 256?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> An LSTM has 4 gates ($f, i, c, o$). Each gate has weights for input ($100 \times 256$) + recurrent weights ($256 \times 256$) + bias ($256$).</p>
+            <p>Per gate: $(100 \times 256) + (256 \times 256) + 256 = 25,600 + 65,536 + 256 = 91,392$.</p>
+            <p>Total for 4 gates: $4 \times 91,392 = \mathbf{365,568 \text{ parameters}}$.</p>
+          </div>
+        </details>
+
+        <h2>Part 2: Seq2Seq & The Attention Revolution</h2>
+        <details>
+          <summary><span>Q6: What is the Information Bottleneck in classical Seq2Seq models?</span> <span class="badge badge-faang">Seq2Seq</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The encoder forces the entire variable-length source sentence (e.g. 50 words) into a single fixed-size context vector $c = h_M$. Compressing complex semantics into a single vector causes severe information loss on sequences longer than 20 words, leading to degraded translations.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the fundamental difference between Bahdanau Attention and Luong Attention?</span> <span class="badge badge-concept">Attention</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Bahdanau (Additive):</strong> Alignment score $e_{t, i} = v_a^T \tanh(W_a s_{t-1} + U_a h_i)$ uses a feedforward hidden layer to combine decoder state $s_{t-1}$ and encoder state $h_i$. Evaluated before computing $s_t$.</li>
+              <li><strong>Luong (Multiplicative):</strong> Alignment score $e_{t, i} = s_t^T W_a h_i$ (or dot product $s_t^T h_i$). Evaluated after computing current decoder state $s_t$. Multiplicative attention is faster to compute via matrix multiplications.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is Teacher Forcing and what is Exposure Bias?</span> <span class="badge badge-system">Training</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Teacher Forcing feeds the <em>ground truth target token</em> $y_{t-1}^*$ as input to the decoder at step $t$ during training, rather than the model's own predicted token $\hat{y}_{t-1}$. Accelerates early training, but causes <strong>Exposure Bias</strong>: at inference time, ground truth is absent, and the model compounding errors on its own mistakes. Mitigated by <strong>Scheduled Sampling</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why can't Bidirectional RNNs be used for autoregressive language generation?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The backward RNN requires tokens from the end of the sentence to the beginning ($t = T \to 1$). During open-ended autoregressive generation, future tokens have not been generated yet, so the backward pass cannot physically execute.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: How does Beam Search differ from Greedy Decoding?</span> <span class="badge badge-system">Decoding</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Greedy decoding selects the single highest probability token at each step ($B=1$), which can prune optimal sequences early. Beam Search maintains the top $B$ cumulative sequence candidates at each step, pruning all others, finding globally superior sentence translations.</p>
+          </div>
+        </details>
+
+        <h2>Part 3: Production & Audio/Speech Models</h2>
+        <details>
+          <summary><span>Q11: What is Connectionist Temporal Classification (CTC) Loss and where is it used?</span> <span class="badge badge-system">Speech / OCR</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Used when input sequence length is much longer than output label length and alignment is unaligned (e.g. 1000 audio frames to 15 letters). CTC introduces blank tokens $\epsilon$ and sums probabilities over all valid collapsible paths using dynamic programming, avoiding manual frame-level alignment.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: Why are RNNs slower to train on modern GPUs compared to Transformers?</span> <span class="badge badge-faang">GPU Hardware</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> RNNs have a sequential temporal dependency: $h_t$ cannot be computed until $h_{t-1}$ finishes executing, serializing execution into $T$ sequential steps. Transformers compute attention across all $T$ tokens simultaneously via matrix multiplication ($Q K^T$), fully parallelizing across thousands of GPU CUDA cores.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: How does Truncated BPTT work?</span> <span class="badge badge-system">Engineering</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> For infinitely long sequences, full BPTT would require unbounded memory and compute. Truncated BPTT executes forward passes indefinitely, but limits the backward pass to a fixed horizon $k$ steps (e.g. $k=35$), clipping backpropagation to maintain fixed $O(k)$ memory.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: What is the purpose of Length Normalization in Beam Search?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Since cumulative score is $\sum \ln P(y_i)$ (sum of negative log probabilities), longer sentences naturally accumulate lower total scores. Length normalization divides by $L^\alpha$, preventing the model from disproportionately favoring unnaturally short translations.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: What is the Peephole Connection in LSTMs?</span> <span class="badge badge-concept">Variants</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Gers & Schmidhuber (2000) added direct connections from cell state $C_{t-1}$ to the gate controllers ($f_t, i_t, o_t$), allowing the gates to inspect the cell state directly when deciding whether to open or close.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: How do you handle vanishing gradients in multi-layer deep RNNs?</span> <span class="badge badge-architectures">Architectures</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Add residual skip connections across recurrent layers: $h_t^{[l+1]} = \text{RNN}(h_t^{[l]}) + h_t^{[l]}$, or apply Layer Normalization across the hidden units (Ba et al., 2016).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: Why is Gradient Clipping mandatory when training vanilla RNNs?</span> <span class="badge badge-system">Stability</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In recurrent loops, exploding gradients cause instantaneous parameter updates into astronomical values, causing weights to turn into <code>NaN</code>. Clipping gradient norm bounds max update step, ensuring stable trajectories around steep cliff edges.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: What is Top-k vs. Top-p (Nucleus) Sampling in decoder generation?</span> <span class="badge badge-system">Decoding</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Top-$k$ samples only from the $k$ most probable tokens. Top-$p$ (Nucleus sampling, Holtzman et al. 2019) dynamically selects the smallest set of tokens whose cumulative probability exceeds $p$ (e.g. 0.90), expanding the candidate set when probability is diffuse and narrowing it when confident.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: Can an LSTM remember information indefinitely?</span> <span class="badge badge-concept">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In theory, if $f_t = 1.0$ and $i_t = 0$, $C_t = C_{t-1}$ remains constant indefinitely. In practice, finite 32-bit floating point precision errors, slight non-zero inputs, and small gate perturbations cause memory drift over hundreds of steps.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: What is Attention Map visualization used for?</span> <span class="badge badge-concept">Interpretability</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Plotting the $M \times N$ attention matrix $\alpha_{t, i}$ as a heatmap reveals which source words the model attended to when generating each target word, providing interpretability into grammatical reordering (e.g. French noun-adjective inverted to English adjective-noun).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: Why is Tanh used as the candidate activation in LSTMs instead of ReLU?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> $\tanh$ bounds candidate values strictly to $(-1, 1)$, preventing cell state values from growing without bound when integrated additively across hundreds of time steps ($C_t = C_{t-1} + \tilde{C}_t$). ReLU is unbounded and would cause cell state values to explode.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: What is the computational complexity of the Attention mechanism with $M$ source tokens and $N$ target tokens?</span> <span class="badge badge-math">Complexity</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> For each of the $N$ target tokens, the model computes dot products with all $M$ source tokens: total alignment compute is $O(M \cdot N \cdot H)$, which scales quadratically with sequence length.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: How does Self-Attention differ from Cross-Attention?</span> <span class="badge badge-concept">Attention</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In Cross-Attention, queries come from the decoder while keys and values come from the encoder. In Self-Attention, queries, keys, and values all come from the same sequence, allowing tokens to attend to other tokens within the same sentence.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: What is Repetition Penalty in sequence generation?</span> <span class="badge badge-system">Decoding</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Decoders often get trapped in repetitive loops (*"and then and then and then"*). Repetition penalty discounts the logits of tokens that have already appeared in the generated prefix by dividing positive logits by $\theta > 1$ or multiplying negative logits by $\theta$, penalizing repeated text.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: Why did the Transformer completely replace recurrent networks in NLP?</span> <span class="badge badge-faang">Evolution</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Transformers discarded the recurrent temporal loop entirely, computing self-attention across all tokens simultaneously. This allows massive GPU parallelization across millions of tokens, eliminating BPTT serial bottlenecks and allowing models to scale to billions of parameters.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q26: What is Teacher Forcing and what is the Exposure Bias crisis?</span> <span class="badge badge-system">Training</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In standard Seq2Seq training with <strong>Teacher Forcing</strong>, the ground-truth token $y_{t-1}^*$ is fed as input to the decoder at step $t$ rather than the model's own predicted token $\hat{y}_{t-1}$. This stabilizes early gradient flow. However, it creates <strong>Exposure Bias</strong>: at inference time, the model is exposed only to its own generated tokens. If it generates a single suboptimal token early on, the model encounters a state space it never saw during training, causing catastrophic error compounding. Bengio's <em>Scheduled Sampling</em> mitigates this by gradually annealing the probability of using ground truth tokens from $1.0$ down to $0.0$ as training progresses.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q27: How does PackedSequence optimize RNN training throughput in PyTorch?</span> <span class="badge badge-system">Performance</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Padding variable-length sentences with `<pad>` tokens wastes memory and FLOPs processing dummy tokens across the entire batch length $L_{\max}$. PyTorch's <code>pack_padded_sequence</code> sorts sentences in descending order of length, strips padding tokens, and flattens active tokens into contiguous memory blocks indexed by batch sizes per timestep. CuDNN's fused CUDA kernels process only the active tokens at each unroll step, reducing VRAM usage and boosting GPU tensor core utilization by $2\times - 4\times$.</p>
+          </div>
+        </details>
+      </section>
+    
+
+
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>DL Module 4 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your sequence modeling and attention mastery with instant feedback.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. What architectural feature in an LSTM creates the Constant Error Carousel to prevent vanishing gradients?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) The tanh activation on the output gate.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) The additive Cell State update $C_t = f_t \odot C_{t-1} + i_t \odot \tilde{C}_t$, whose derivative contains an unattenuated identity path $\prod f_k$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) The use of double precision floats.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) Truncated backpropagation.</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> The additive update eliminates repeated matrix multiplications by $W_{hh}$, allowing error gradients to propagate without decay when $f_t \approx 1$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Why is the forget gate bias in an LSTM typically initialized to +1.0 or +2.0?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) To make training run faster on GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) To force $\sigma(b_f) \approx 1$, ensuring the network remembers long-term context by default from the start of training.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) To prevent division by zero in Softmax.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Because negative biases crash CUDA.</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> With $b_f = 0$, $\sigma(0) = 0.5$ (erasing 50% of memory per step). Setting $b_f = 1$ ensures long-term memory retention by default.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. How many trainable parameters does an LSTM layer with input dimension 100 and hidden dimension 256 have?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) 91,392</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) 365,568 (4 gates x (100x256 + 256x256 + 256))</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) 182,784</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) 25,600</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> Each gate has $(100 \times 256) + (256 \times 256) + 256 = 91,392$ parameters. For 4 gates ($f, i, c, o$), total is $4 \times 91,392 = 365,568$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. What is the fundamental difference between GRU and LSTM?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">A) GRU merges cell state into hidden state, uses only 2 gates (Reset, Update), and has 25% fewer parameters than LSTM.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">B) GRU cannot process sequential data.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) GRU uses 5 gates instead of 3.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) GRU cannot be trained with backprop.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> GRU has no separate cell state and uses 2 gates instead of 3, resulting in 25% fewer parameters and faster training.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. What was the Information Bottleneck crisis in early Seq2Seq models?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) GPU bandwidth was too slow to transfer tensors.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) Compressing an entire variable-length source sentence into a single static context vector $c = h_M$ caused severe performance loss on long sentences.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) Training loss was non-convex.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) Vocabulary size was limited to 100 words.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> Forcing long sentences into a single vector caused severe information loss, directly motivating the invention of the Attention mechanism.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. How does Luong Multiplicative Attention compute alignment scores compared to Bahdanau Additive Attention?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">A) Luong uses dot products or matrix bilinear forms ($s_t^T W_a h_i$), whereas Bahdanau uses a feedforward network with tanh ($v_a^T \tanh(W s + U h)$).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">B) Luong uses random sampling.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) Bahdanau uses convolution.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) Luong has zero parameters.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> Luong attention uses efficient matrix multiplication dot products ($s_t^T W h_i$), which is faster and easier to parallelize than Bahdanau's additive network.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why can't a Bidirectional RNN be used for real-time speech translation streaming?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) Because it only runs in FP64.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) Because the backward pass requires tokens from the end of the sentence to the beginning, which have not been spoken yet in real time.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) Because it has double the parameters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) Because it causes dead ReLUs.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> Future context is unavailable during real-time streaming, preventing the backward pass from executing.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the purpose of Length Normalization in Beam Search decoding?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">A) To divide cumulative log-probabilities by $L^\alpha$, preventing the search from disproportionately favoring unnaturally short sentences.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">B) To truncate sentences at 10 tokens.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) To normalize weights to zero mean.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) To speed up beam search on GPUs.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> Adding negative log-probabilities penalizes longer sentences. Length normalization balances scores across sequence lengths.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. What special token does CTC (Connectionist Temporal Classification) introduce to handle unaligned speech sequences?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) $\langle\text{UNK}\rangle$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) The Blank token ($\epsilon$)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) $\langle\text{CLS}\rangle$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) $\langle\text{MASK}\rangle$</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> The blank token ($\epsilon$) allows distinguishing between repeated letters (e.g. $[L, \epsilon, L] \to \text{"LL"}$ vs $[L, L] \to \text{"L"}$).
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. Why are RNNs fundamentally slower to train than Transformers on modern hardware?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Because RNNs have more parameters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) Because RNNs have sequential temporal dependencies that serialize execution, whereas Transformers parallelize all token attention simultaneously via matrix multiplication.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Because RNNs cannot use GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Because RNNs only support batch size 1.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> $h_t$ strictly requires $h_{t-1}$, serializing computation. Transformers compute attention for all tokens simultaneously in parallel.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

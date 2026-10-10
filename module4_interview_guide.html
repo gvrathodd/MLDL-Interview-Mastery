@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 4: Decision Trees, Ensembles & Modern Boosting Mastery</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --sky: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Bar */
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+      z-index: 100;
+    }
+    .sidebar-title {
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+    /* Main Content Area */
+    #main-content {
+      flex-grow: 1;
+      padding: 2.2rem 3.5rem;
+      max-width: 1100px;
+      overflow-x: hidden;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Typography & Structural Elements */
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.4rem; letter-spacing: -0.5px; }
+    .section-subtitle { font-size: 1.02rem; color: var(--text-muted); margin-bottom: 1.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+    h2 { font-size: 1.45rem; margin: 2rem 0 0.8rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.3rem 0 0.6rem 0; color: #e2e8f0; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.4rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    /* Specialized Callout Cards */
+    .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .interview-alert { background: rgba(251, 191, 36, 0.08); border-left: 4px solid var(--warning); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .interview-alert h4 { color: var(--warning); margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .math-box { background: rgba(192, 132, 252, 0.08); border-left: 4px solid var(--purple); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; overflow-x: auto; }
+    .math-box h4 { color: var(--purple); margin-bottom: 0.4rem; font-size: 1rem; }
+    .missing-box { background: rgba(52, 211, 153, 0.08); border-left: 4px solid var(--success); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .missing-box h4 { color: var(--success); margin-bottom: 0.4rem; font-size: 1rem; }
+    .first-principles { background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--sky); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .first-principles h4 { color: var(--sky); margin-bottom: 0.4rem; font-size: 1rem; }
+    .deep-dive { background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--accent); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .deep-dive h4 { color: var(--accent); margin-bottom: 0.4rem; font-size: 1rem; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border: 1px solid var(--border); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #162238; color: var(--accent); font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Code & Syntax */
+    pre { background: var(--code-bg); border: 1px solid #1a273f; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.1rem 0 1.5rem 0; font-family: 'Consolas', 'Fira Code', monospace; font-size: 0.88rem; color: #e2e8f0; line-height: 1.55; }
+    code { font-family: 'Consolas', 'Fira Code', monospace; background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.88em; color: var(--accent); }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    /* Collapsible Details / Accordions */
+    details { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; transition: border-color 0.2s; }
+    details[open] { border-color: var(--accent); }
+    summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { padding: 0 1.25rem 1.25rem 1.25rem; border-top: 1px solid var(--border); padding-top: 0.9rem; font-size: 0.94rem; color: #cbd5e1; }
+
+    /* Quiz Widget */
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.9rem; color: #fff; font-size: 1rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { background: var(--bg-primary); border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.91rem; transition: all 0.2s; color: #cbd5e1; }
+    .quiz-option:hover { border-color: var(--accent); color: #fff; }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #16243d; border-left: 3px solid var(--accent); font-size: 0.9rem; margin-top: 0.7rem; color: #e2e8f0; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-missing { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+    .badge-core { background: rgba(56, 189, 248, 0.2); color: var(--sky); }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { position: fixed; left: -330px; top: 49px; bottom: 0; z-index: 150; transition: left 0.25s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">ML<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="module1_interview_guide.html" class="mod-link">M1: Foundations</a>
+      <a href="module2_interview_guide.html" class="mod-link">M2: Pipelines</a>
+      <a href="module3_interview_guide.html" class="mod-link">M3: Regression</a>
+      <a href="module4_interview_guide.html" class="mod-link active">M4: Trees/Ensembles</a>
+      <a href="module5_interview_guide.html" class="mod-link">M5: Bayesian</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">Module 4 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-trees')"><span>🌲</span> 1. Decision Trees 101</li>
+        <li class="nav-item" onclick="switchTab('tab-criteria')"><span>🎯</span> 2. Splitting Criteria & Concavity</li>
+        <li class="nav-item" onclick="switchTab('tab-id3')"><span>🧮</span> 3. ID3, C4.5 & CART Walkthrough</li>
+        <li class="nav-item" onclick="switchTab('tab-pruning')"><span>✂️</span> 4. Tree Pruning & Cost-Complexity</li>
+        <li class="nav-item" onclick="switchTab('tab-bv')"><span>🎯</span> 5. Bias-Variance & Bagging Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-rf')"><span>🌳</span> 6. Random Forests & Proximity</li>
+        <li class="nav-item" onclick="switchTab('tab-boosting')"><span>🚀</span> 7. AdaBoost & Gradient Boosting</li>
+        <li class="nav-item" onclick="switchTab('tab-xgboost')"><span>⚡</span> 8. XGBoost In-Depth & Taylor Math</li>
+        <li class="nav-item" onclick="switchTab('tab-sota2')"><span>🏎️</span> 9. LightGBM & CatBoost SOTA</li>
+        <li class="nav-item" onclick="switchTab('tab-production')"><span>🛡️</span> 10. Stacking, SHAP & Production</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: DECISION TREES 101 -->
+      <section id="tab-trees" class="tab-section active">
+        <h1>Decision Trees 101: Anatomy & Recursive Splitting</h1>
+        <p class="section-subtitle">First-principles intuition, flowchart anatomy, space partitioning geometry, and the greedy CART algorithm.</p>
+
+        <div class="first-principles">
+          <h4>🌲 What is a Decision Tree? (From First Principles)</h4>
+          <p>Imagine a doctor diagnosing an emergency room patient. The doctor doesn't evaluate a complex polynomial equation in their head. Instead, they ask a sequence of rapid, logical binary questions:</p>
+          <ol>
+            <li><em>"Is body temperature &ge; 100.4&deg;F?"</em> &rarr; <strong>Yes</strong> (Fever detected).</li>
+            <li><em>"Is heart rate &ge; 100 bpm?"</em> &rarr; <strong>Yes</strong> (Tachycardia).</li>
+            <li><em>"Is blood pressure &le; 90 mmHg?"</em> &rarr; <strong>Yes</strong> &rarr; <strong>Diagnosis: Sepsis Alert!</strong></li>
+          </ol>
+          <p>A <strong>Decision Tree</strong> is the algorithmic automation of this intuitive decision-making process. It is a non-parametric supervised learning model that recursively breaks down complex, multi-dimensional feature spaces into simple, sequential, human-interpretable <em>if-then-else</em> decision rules.</p>
+        </div>
+
+        <h2>1. The 4 Core Architectural Components</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Physical Role</th>
+                <th>Mathematical Representation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Root Node</strong></td>
+                <td>The very top of the inverted tree containing 100% of the training dataset.</td>
+                <td>Makes the single most informative initial split across the entire input space $\mathcal{X}$.</td>
+              </tr>
+              <tr>
+                <td><strong>Internal / Decision Nodes</strong></td>
+                <td>Intermediate branching points that test a single feature condition.</td>
+                <td>Evaluates whether $x_j \le s$ (for continuous features) or $x_j \in \mathcal{C}$ (for categoricals).</td>
+              </tr>
+              <tr>
+                <td><strong>Branches</strong></td>
+                <td>The directional edges connecting a parent node to child nodes.</td>
+                <td>Represents the binary outcome of the test condition: $\text{True}$ (Left) vs. $\text{False}$ (Right).</td>
+              </tr>
+              <tr>
+                <td><strong>Leaf (Terminal) Nodes</strong></td>
+                <td>The final endpoints of the tree where no further splits occur.</td>
+                <td>Contains the final prediction: majority class mode for classification, or sample mean $\bar{y}$ for regression.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Geometric Space Partitioning: Hyper-Rectangles</h2>
+        <p>While linear models draw a single flat hyperplane across the entire space, a Decision Tree recursively slices the $D$-dimensional continuous space $\mathbb{R}^D$ into a collection of non-overlapping, axis-aligned rectangular boxes (hyper-rectangles) $R_1, R_2, \dots, R_J$:</p>
+
+        <div class="math-box">
+          <h4>The Piecewise Constant Prediction Function:</h4>
+          $$\hat{f}(\mathbf{x}) = \sum_{j=1}^J c_j \cdot \mathbb{I}(\mathbf{x} \in R_j)$$
+          <ul>
+            <li>$\mathbb{I}(\mathbf{x} \in R_j)$: Indicator function, which equals $1$ if query point $\mathbf{x}$ lands inside region $R_j$, and $0$ otherwise.</li>
+            <li><strong>Classification Output:</strong> $c_j = \arg\max_k p_{jk}$ (the most frequent class label among training instances falling in box $R_j$).</li>
+            <li><strong>Regression Output:</strong> $c_j = \frac{1}{N_j} \sum_{\mathbf{x}_i \in R_j} y_i$ (the arithmetic sample mean of target values in box $R_j$).</li>
+          </ul>
+        </div>
+
+        <h2>3. Why Do Decision Trees Dominate Tabular Machine Learning?</h2>
+        <div class="card">
+          <ul>
+            <li><strong>White-Box Explainability:</strong> Unlike deep neural networks, every tree prediction can be explained to non-technical stakeholders, auditors, or regulators via a readable chain of <em>if-then</em> logic.</li>
+            <li><strong>Zero Feature Scaling Required:</strong> Decision trees evaluate splits of the form $x_j \le s$ by ranking feature values. Monotonic transformations (MinMax, Standard, Log) leave rank order completely unchanged. Features on scale $[0, 1]$ and $[0, 10^7]$ compete on a 100% equal footing!</li>
+            <li><strong>Natural Non-Linear & Interaction Modeling:</strong> If Feature $A$ interacts with Feature $B$ (e.g., "High income matters only if Credit Score &gt; 700"), a tree models it automatically by splitting on $A$ after $B$.</li>
+            <li><strong>Main Weakness (High Variance & Instability):</strong> A single data point change can flip the root split, changing the entire downstream tree. (This instability is brilliantly transformed into an advantage by Random Forests!).</li>
+          </ul>
+        </div>
+
+        <h2>4. The Greedy CART Algorithm</h2>
+        <p>Finding the globally optimal decision tree with minimum leaves is an <strong>NP-complete</strong> problem ($O(2^D)$ combinatorial explosion). Therefore, the <strong>CART</strong> (Classification and Regression Trees) algorithm uses a <strong>greedy top-down recursive binary splitting heuristic</strong>:</p>
+
+        <ol>
+          <li>At current node $m$, iterate through every feature $j \in \{1, \dots, D\}$.</li>
+          <li>For continuous features, sort all unique values and test every midpoint $s$ between adjacent values as a candidate threshold.</li>
+          <li>Select the feature-threshold pair $(j, s)$ that produces the <strong>maximum impurity reduction (Information Gain)</strong>:
+            $$\Delta I(m, j, s) = I(m) - \left( \frac{N_{\text{left}}}{N_m} I(\text{left}) + \frac{N_{\text{right}}}{N_m} I(\text{right}) \right)$$
+          </li>
+          <li>Partition the dataset into $R_{\text{left}} = \{\mathbf{x} \mid x_j \le s\}$ and $R_{\text{right}} = \{\mathbf{x} \mid x_j > s\}$.</li>
+          <li>Recursively apply this process to both child nodes until stopping criteria are reached.</li>
+        </ol>
+      </section>
+
+      <!-- TAB 2: SPLITTING CRITERIA -->
+      <section id="tab-criteria" class="tab-section">
+        <h1>Splitting Criteria: Gini vs. Entropy vs. Misclassification</h1>
+        <p class="section-subtitle">Mathematical formulations, the blindfolded ball game intuition, strict concavity proof, and regression impurity.</p>
+
+        <div class="first-principles">
+          <h4>🎯 The "Blindfolded Drawing Game" Intuition:</h4>
+          <p>Imagine you have a jar containing 100 colored marbles (e.g. Red and Blue). You pull a marble out blindfolded and must guess its color:</p>
+          <ul>
+            <li><strong>Gini Impurity ($G$):</strong> <em>"What is the probability that I guess the wrong color if I guess randomly according to current percentages in the jar?"</em>
+              $$G = 1 - \sum_{k=1}^K p_k^2$$
+            </li>
+            <li><strong>Entropy ($H$):</strong> <em>"How many Yes/No questions (bits of information) do I need on average to identify the marble drawn?"</em>
+              $$H = -\sum_{k=1}^K p_k \log_2(p_k)$$
+            </li>
+          </ul>
+        </div>
+
+        <h2>1. Step-by-Step Numerical Walkthrough: Pure vs. Impure Nodes</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Jar Composition</th>
+                <th>Class Proportions</th>
+                <th>Gini Calculation</th>
+                <th>Entropy Calculation</th>
+                <th>Intuitive Meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pure Jar</strong><br>(100 Red, 0 Blue)</td>
+                <td>$$p_{\text{Red}} = 1.0$$<br>$$p_{\text{Blue}} = 0.0$$</td>
+                <td>$$1 - (1.0^2 + 0.0^2) = \mathbf{0.0}$$</td>
+                <td>$$-(1.0 \log_2 1.0 + 0) = \mathbf{0.0} \text{ bits}$$</td>
+                <td><strong style="color:var(--success);">Zero Impurity!</strong> 0% error probability; you need 0 questions because you already know it's Red.</td>
+              </tr>
+              <tr>
+                <td><strong>Moderately Mixed</strong><br>(80 Red, 20 Blue)</td>
+                <td>$$p_{\text{Red}} = 0.8$$<br>$$p_{\text{Blue}} = 0.2$$</td>
+                <td>$$1 - (0.8^2 + 0.2^2) = 1 - 0.68 = \mathbf{0.32}$$</td>
+                <td>$$-(0.8 \log_2 0.8 + 0.2 \log_2 0.2) \approx \mathbf{0.72} \text{ bits}$$</td>
+                <td>Notice that Gini is roughly half of Entropy: $G \approx 0.5 H$.</td>
+              </tr>
+              <tr>
+                <td><strong>Worst-Case Coin Flip</strong><br>(50 Red, 50 Blue)</td>
+                <td>$$p_{\text{Red}} = 0.5$$<br>$$p_{\text{Blue}} = 0.5$$</td>
+                <td>$$1 - (0.5^2 + 0.5^2) = 1 - 0.50 = \mathbf{0.50}$$</td>
+                <td>$$-(0.5 \log_2 0.5 + 0.5 \log_2 0.5) = \mathbf{1.00} \text{ bit}$$</td>
+                <td><strong style="color:var(--danger);">Maximum Impurity!</strong> 50% chance of guessing wrong; exactly 1 bit of information required.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Why NEVER Use "Misclassification Error" ($1 - \max p_k$) to Split?</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Crucial FAANG Concavity Interview Proof:</h4>
+          <p>A naive engineer might suggest: <em>"Why compute squares or logarithms? Why not just use Misclassification Error $E = 1 - \max_k p_k$ as the node impurity?"</em></p>
+          <p><strong>The Fatal Flaw:</strong> Misclassification error is <strong>piecewise linear and lacks strict concavity</strong>. As a result, it is completely <em>blind to purity progress</em>!</p>
+          
+          <div style="background:var(--bg-primary); padding:1rem; border-radius:6px; margin:0.8rem 0;">
+            <p><strong>The Concrete 800-Sample Proof:</strong></p>
+            <p>Suppose a parent node has 400 Class A and 400 Class B instances ($N = 800$, Error $= 1 - 0.5 = 0.50$). Compare two candidate splits:</p>
+            <ul>
+              <li><strong>Split 1:</strong> Splits into Node 1 (300 A, 100 B) and Node 2 (100 A, 300 B).
+                <br>Weighted Misclassification Error = $\frac{400}{800}(1 - \frac{300}{400}) + \frac{400}{800}(1 - \frac{300}{400}) = 0.5(0.25) + 0.5(0.25) = \mathbf{0.25}$.
+              </li>
+              <li><strong>Split 2:</strong> Splits into Node 1 (400 A, 200 B) and Node 2 (0 A, 200 B). <em>(Notice Node 2 is 100% pure B!)</em>
+                <br>Weighted Misclassification Error = $\frac{600}{800}(1 - \frac{400}{600}) + \frac{200}{800}(1 - \frac{200}{200}) = \frac{3}{4}(\frac{1}{3}) + \frac{1}{4}(0) = \mathbf{0.25}$.
+              </li>
+            </ul>
+            <p><strong>The Disaster:</strong> Misclassification error gives both splits the <strong>exact same score of 0.25</strong>! It cannot recognize that Split 2 achieved a perfectly pure leaf containing 200 samples.</p>
+            <p>Now evaluate the same splits using <strong>Gini Impurity</strong>:</p>
+            <ul>
+              <li><strong>Split 1 Gini:</strong> $\frac{400}{800}[1 - (0.75^2 + 0.25^2)] + \frac{400}{800}[1 - (0.25^2 + 0.75^2)] = 0.5(0.375) + 0.5(0.375) = \mathbf{0.375}$.</li>
+              <li><strong>Split 2 Gini:</strong> $\frac{600}{800}[1 - ((\frac{2}{3})^2 + (\frac{1}{3})^2)] + \frac{200}{800}[1 - (0^2 + 1^2)] = \frac{3}{4}(\frac{4}{9}) + 0 = \frac{1}{3} \approx \mathbf{0.333}$.</li>
+            </ul>
+            <p><strong>Result:</strong> Gini assigns a substantially lower impurity to Split 2 ($0.333 < 0.375$), correctly crowning Split 2 as the winner! <strong>Strict concavity ensures pure leaves are always strongly favored.</strong></p>
+          </div>
+        </div>
+
+        <h2>3. Gini vs. Entropy: The Verbal Interview Answer</h2>
+        <div class="card">
+          <p><strong>Interviewer:</strong> <em>"In practice, when should I use Gini vs. Entropy?"</em></p>
+          <p><strong>Your Model Answer:</strong></p>
+          <p><em>"In over 98% of real-world datasets, Gini and Entropy produce identical tree structures because both are smooth, symmetric, strictly concave functions with peaks at $0.5$. The critical difference is computational cost: Entropy evaluates logarithms ($\log_2 p$), which requires expensive floating-point CPU instructions, whereas Gini relies purely on addition and multiplication ($1 - \sum p_k^2$). Gini trains roughly 2–3x faster at scale, making it the industry default."</em></p>
+        </div>
+
+        <h2>4. Regression Tree Splitting Criteria</h2>
+        <p>For regression trees where the target $y$ is continuous, impurity is measured by <strong>Mean Squared Error (MSE / Variance Reduction)</strong>:</p>
+        $$I_{\text{MSE}}(m) = \frac{1}{N_m} \sum_{i \in R_m} (y_i - \bar{y}_m)^2 = \text{Var}(y \mid \mathbf{x} \in R_m)$$
+        <p>CART selects the split $(j, s)$ that minimizes the weighted sum of variances in the left and right child nodes:</p>
+        $$J(j, s) = \frac{N_{\text{left}}}{N_m} \text{MSE}(\text{left}) + \frac{N_{\text{right}}}{N_m} \text{MSE}(\text{right})$$
+        <p><em>(Alternatively, Mean Absolute Error / MAE can be minimized, in which case the leaf prediction becomes the <strong>sample median</strong>, making the regression tree robust to outliers!).</em></p>
+      </section>
+
+      <!-- TAB 3: ID3, C4.5 & CART NUMERICAL -->
+      <section id="tab-id3" class="tab-section">
+        <h1>ID3, C4.5 & CART Compared: Full Numerical Walkthrough</h1>
+        <p class="section-subtitle">Algorithmic evolution across 40 years, Information Gain calculation on the 14-row PlayTennis dataset, and Gain Ratio.</p>
+
+        <h2>1. Algorithmic Evolution: ID3 vs. C4.5 vs. CART</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>ID3 (Quinlan, 1986)</th>
+                <th>C4.5 (Quinlan, 1993)</th>
+                <th>CART (Breiman et al., 1984)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Splitting Criterion</strong></td>
+                <td>Information Gain ($H$)</td>
+                <td><strong>Gain Ratio</strong> (penalizes high cardinality)</td>
+                <td>Gini Impurity (classification) / MSE (regression)</td>
+              </tr>
+              <tr>
+                <td><strong>Split Multiplicity</strong></td>
+                <td>Multi-way (one branch per category)</td>
+                <td>Multi-way (categoricals) / Binary (continuous)</td>
+                <td><strong>Strictly Binary Splits</strong> ($x_j \le s$)</td>
+              </tr>
+              <tr>
+                <td><strong>Continuous Attributes</strong></td>
+                <td>Cannot handle! (Categorical only)</td>
+                <td>Yes (sorts values, tests midpoints)</td>
+                <td>Yes (sorts values, tests midpoints)</td>
+              </tr>
+              <tr>
+                <td><strong>Missing Data Handling</strong></td>
+                <td>None (crashes or requires pre-imputation)</td>
+                <td>Fractional sample distribution across branches</td>
+                <td><strong>Surrogate Splits</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Pruning Strategy</strong></td>
+                <td>No pruning (grows until pure)</td>
+                <td>Rule Post-Pruning</td>
+                <td><strong>Cost-Complexity Pruning ($CCP_\alpha$)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Regression Support</strong></td>
+                <td>No</td>
+                <td>No</td>
+                <td><strong>Yes (Regression Trees)</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Complete Step-by-Step Toy Walkthrough: PlayTennis (14 Instances)</h2>
+        <p>Let's manually compute Information Gain on the classic machine learning benchmark dataset:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Day</th><th>Outlook</th><th>Temperature</th><th>Humidity</th><th>Wind</th><th>Play Tennis? ($y$)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>D1</td><td>Sunny</td><td>Hot</td><td>High</td><td>Weak</td><td>No</td></tr>
+              <tr><td>D2</td><td>Sunny</td><td>Hot</td><td>High</td><td>Strong</td><td>No</td></tr>
+              <tr><td>D3</td><td>Overcast</td><td>Hot</td><td>High</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D4</td><td>Rain</td><td>Mild</td><td>High</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D5</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D6</td><td>Rain</td><td>Cool</td><td>Normal</td><td>Strong</td><td>No</td></tr>
+              <tr><td>D7</td><td>Overcast</td><td>Cool</td><td>Normal</td><td>Strong</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D8</td><td>Sunny</td><td>Mild</td><td>High</td><td>Weak</td><td>No</td></tr>
+              <tr><td>D9</td><td>Sunny</td><td>Cool</td><td>Normal</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D10</td><td>Rain</td><td>Mild</td><td>Normal</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D11</td><td>Sunny</td><td>Mild</td><td>Normal</td><td>Strong</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D12</td><td>Overcast</td><td>Mild</td><td>High</td><td>Strong</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D13</td><td>Overcast</td><td>Hot</td><td>Normal</td><td>Weak</td><td><strong>Yes</strong></td></tr>
+              <tr><td>D14</td><td>Rain</td><td>Mild</td><td>High</td><td>Strong</td><td>No</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Step 1: Compute Parent Node Entropy $H(S)$</h3>
+          <p>Total instances $N = 14$. Target counts: $9 \text{ Yes}, 5 \text{ No}$.</p>
+          $$p_{\text{Yes}} = \frac{9}{14} \approx 0.643, \quad p_{\text{No}} = \frac{5}{14} \approx 0.357$$
+          $$H(S) = -\left( \frac{9}{14} \log_2 \frac{9}{14} + \frac{5}{14} \log_2 \frac{5}{14} \right) = - (0.643 \times (-0.637) + 0.357 \times (-1.485)) = \mathbf{0.940 \text{ bits}}$$
+
+          <h3>Step 2: Evaluate Feature "Outlook"</h3>
+          <p>Outlook takes 3 distinct values:</p>
+          <ul>
+            <li><strong>Sunny (5 samples: 2 Yes, 3 No):</strong>
+              $$H(\text{Sunny}) = -\left( \frac{2}{5} \log_2 \frac{2}{5} + \frac{3}{5} \log_2 \frac{3}{5} \right) = \mathbf{0.971 \text{ bits}}$$
+            </li>
+            <li><strong>Overcast (4 samples: 4 Yes, 0 No):</strong>
+              $$H(\text{Overcast}) = -(1.0 \log_2 1.0 + 0) = \mathbf{0.000 \text{ bits}} \quad (\text{100% Pure!})$$
+            </li>
+            <li><strong>Rain (5 samples: 3 Yes, 2 No):</strong>
+              $$H(\text{Rain}) = -\left( \frac{3}{5} \log_2 \frac{3}{5} + \frac{2}{5} \log_2 \frac{2}{5} \right) = \mathbf{0.971 \text{ bits}}$$
+            </li>
+          </ul>
+          <p>Now calculate the weighted expected entropy after splitting on Outlook:</p>
+          $$H(S \mid \text{Outlook}) = \frac{5}{14}(0.971) + \frac{4}{14}(0.0) + \frac{5}{14}(0.971) = 0.347 + 0 + 0.347 = \mathbf{0.694 \text{ bits}}$$
+          <p>Calculate <strong>Information Gain</strong>:</p>
+          $$\text{Gain}(S, \text{Outlook}) = H(S) - H(S \mid \text{Outlook}) = 0.940 - 0.694 = \mathbf{0.246 \text{ bits}}$$
+
+          <h3>Step 3: Evaluate Feature "Wind"</h3>
+          <ul>
+            <li><strong>Weak (8 samples: 6 Yes, 2 No):</strong> $H(\text{Weak}) = -\left( \frac{6}{8}\log_2 \frac{6}{8} + \frac{2}{8}\log_2 \frac{2}{8} \right) = \mathbf{0.811 \text{ bits}}$.</li>
+            <li><strong>Strong (6 samples: 3 Yes, 3 No):</strong> $H(\text{Strong}) = -(0.5\log_2 0.5 + 0.5\log_2 0.5) = \mathbf{1.000 \text{ bit}}$.</li>
+          </ul>
+          $$H(S \mid \text{Wind}) = \frac{8}{14}(0.811) + \frac{6}{14}(1.000) = 0.463 + 0.429 = \mathbf{0.892 \text{ bits}}$$
+          $$\text{Gain}(S, \text{Wind}) = 0.940 - 0.892 = \mathbf{0.048 \text{ bits}}$$
+
+          <p><strong>Conclusion:</strong> Since $\text{Gain}(S, \text{Outlook}) = 0.246 > \text{Gain}(S, \text{Wind}) = 0.048$, the algorithm crowns <strong>Outlook</strong> as the winning root node!</p>
+        </div>
+
+        <h2>3. The High-Cardinality Trap & C4.5's Gain Ratio</h2>
+        <div class="interview-alert">
+          <h4>🚨 The "Customer ID" Bug in Information Gain:</h4>
+          <p>Suppose you include a feature <code>Transaction_ID</code> where every row has a unique identifier ($1, 2, \dots, 14$).</p>
+          <p>If ID3 splits on <code>Transaction_ID</code>, it creates 14 child leaves, each containing exactly 1 customer. Each leaf is 100% pure ($H = 0$), so the conditional entropy is $0$. Therefore:</p>
+          $$\text{Gain}(S, \text{Transaction\_ID}) = 0.940 - 0 = \mathbf{0.940 \text{ bits}} \quad (\text{Maximum possible!})$$
+          <p>ID3 will greedily pick <code>Transaction_ID</code> at the root, building a completely useless, zero-generalization tree!</p>
+          <p><strong>C4.5's Mathematical Solution: Gain Ratio</strong></p>
+          <p>Ross Quinlan fixed this by penalizing features that create too many fragmented child splits using <strong>Split Information</strong>:</p>
+          $$\text{SplitInfo}(S, A) = -\sum_{i=1}^K \frac{|S_i|}{|S|} \log_2 \frac{|S_i|}{|S|}$$
+          $$\mathbf{\text{GainRatio}(S, A) = \frac{\text{Gain}(S, A)}{\text{SplitInfo}(S, A)}}$$
+          <p>For <code>Transaction_ID</code>, $\text{SplitInfo} = \log_2(14) \approx 3.807$. Dividing by this huge penalty shrinks its Gain Ratio to near zero, stopping ID3's flaw completely!</p>
+        </div>
+      </section>
+
+      <!-- TAB 4: PRUNING & REGULARIZATION -->
+      <section id="tab-pruning" class="tab-section">
+        <h1>Tree Pruning & Regularization: Pre vs. Post Pruning</h1>
+        <p class="section-subtitle">Hyperparameter constraints, Minimal Cost-Complexity Pruning ($CCP_\alpha$), weakest link collapse, and Scikit-Learn code.</p>
+
+        <h2>1. Why Do Unpruned Decision Trees Always Overfit?</h2>
+        <div class="first-principles">
+          <h4>🌲 The Memorization Trap:</h4>
+          <p>A decision tree has essentially infinite capacity (high variance). If you allow it to grow without constraint, it will continue splitting until <strong>every single training instance occupies its own private leaf node</strong>. It achieves 100% training accuracy ($0\text{ error}$), but memorizes noise, outliers, and measurement errors, resulting in catastrophic generalization errors on unseen test data.</p>
+        </div>
+
+        <h2>2. Pre-Pruning (Early Stopping Hyperparameters)</h2>
+        <p>Pre-pruning halts the growth of the tree early during the recursive building phase whenever a pre-set hyperparameter threshold is hit:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Scikit-Learn Hyperparameter</th>
+                <th>Physical Mechanism</th>
+                <th>How to Tune</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>max_depth</code></td>
+                <td>Hard cap on the maximum vertical depth of the tree from root to leaf.</td>
+                <td>Reduce ($3 \le \text{depth} \le 10$) to restrict complexity and force general rules.</td>
+              </tr>
+              <tr>
+                <td><code>min_samples_split</code></td>
+                <td>The minimum number of samples a node must contain before it is allowed to split.</td>
+                <td>Increase ($10 - 50$) to prevent splits on tiny isolated clusters.</td>
+              </tr>
+              <tr>
+                <td><code>min_samples_leaf</code></td>
+                <td>The minimum number of samples that any terminal leaf node is allowed to hold.</td>
+                <td>Increase ($5 - 20$) to smooth out leaf predictions and eliminate single-sample outlier leaves.</td>
+              </tr>
+              <tr>
+                <td><code>max_leaf_nodes</code></td>
+                <td>Hard upper bound on the total number of terminal leaves in the entire tree.</td>
+                <td>Caps global tree complexity in best-first growth.</td>
+              </tr>
+              <tr>
+                <td><code>min_impurity_decrease</code></td>
+                <td>A split is executed only if the information gain $\Delta I$ exceeds this threshold.</td>
+                <td>Filters out negligible splits that provide marginal predictive improvement.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. Post-Pruning: Minimal Cost-Complexity Pruning ($CCP_\alpha$)</h2>
+        <p>While pre-pruning is fast, it suffers from <strong>myopic horizon blindness</strong>: it might discard a split that appears uninformative on its own, but which would have unlocked a brilliant split at the next level!</p>
+        <p><strong>Post-pruning</strong> solves this by growing the full unconstrained tree $T_{\text{max}}$ first, and then pruning back useless branches backwards using the <strong>Cost-Complexity Criterion</strong> (Breiman et al.):</p>
+
+        <div class="math-box">
+          <h4>The Cost-Complexity Function:</h4>
+          $$R_\alpha(T) = R(T) + \alpha |T|$$
+          <ul>
+            <li>$R(T) = \sum_{m=1}^{|T|} N_m Q_m(T)$: Total training impurity / error across all terminal leaves.</li>
+            <li>$|T|$: Total number of leaf nodes in subtree $T$ (the complexity penalty).</li>
+            <li>$\alpha \ge 0$: Complexity tuning parameter (<code>ccp_alpha</code> in Scikit-Learn).
+              <br>• If $\alpha = 0$: $R_0(T) = R(T)$, selecting the unpruned full tree $T_{\text{max}}$.
+              <br>• As $\alpha \to \infty$: The penalty dominates, collapsing the tree down to a single root node.
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. The Weakest Link Pruning Algorithm</h2>
+        <div class="card">
+          <ol>
+            <li>For every internal node $t$, consider collapsing its entire sub-branch $T_t$ into a single leaf.</li>
+            <li>Calculate the <strong>effective alpha threshold</strong> $\alpha_{\text{eff}}(t)$:
+              $$\alpha_{\text{eff}}(t) = \frac{R(t) - R(T_t)}{|T_t| - 1}$$
+              <em>(This represents the cost increase per leaf node saved by pruning branch $T_t$).</em>
+            </li>
+            <li>Find the node with the minimum $\alpha_{\text{eff}}$ (the "weakest link") and prune it away.</li>
+            <li>Repeat recursively to generate a nested sequence of pruned subtrees:
+              $$T_{\text{max}} = T_0 \supset T_1 \supset T_2 \supset \dots \supset T_{\text{root}}$$
+            </li>
+            <li>Use Cross-Validation on held-out validation folds to select the optimal $\alpha^*$!</li>
+          </ol>
+        </div>
+
+        <pre><code>from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
+# Step 1: Compute the cost-complexity pruning path
+clf = DecisionTreeClassifier(random_state=42)
+path = clf.cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas = path.ccp_alphas[:-1]  # Exclude the trivial single-root tree
+
+# Step 2: Cross-validate ccp_alpha across all candidate subtrees
+alpha_scores = []
+for alpha in ccp_alphas:
+    tree = DecisionTreeClassifier(random_state=42, ccp_alpha=alpha)
+    scores = cross_val_score(tree, X_train, y_train, cv=5)
+    alpha_scores.append(scores.mean())
+
+# Step 3: Train champion tree with the optimal alpha
+best_alpha = ccp_alphas[np.argmax(alpha_scores)]
+champion_tree = DecisionTreeClassifier(random_state=42, ccp_alpha=best_alpha)
+champion_tree.fit(X_train, y_train)</code></pre>
+      </section>
+
+      <!-- TAB 5: BIAS-VARIANCE & BAGGING PROOF -->
+      <section id="tab-bv" class="tab-section">
+        <h1>Bias-Variance Decomposition & Bagging Mathematical Proof</h1>
+        <p class="section-subtitle">Target shooting analogy, variance reduction proof for correlated estimators, and Out-of-Bag (OOB) mathematical expectation.</p>
+
+        <h2>1. The Bias-Variance Tradeoff: Plain English & Geometry</h2>
+        <div class="first-principles">
+          <h4>🎯 The "Target Shooting" Intuition:</h4>
+          <p>Imagine a rifle marksman shooting at a target bullseye:</p>
+          <ul>
+            <li><strong>Bias (Off-Target Sight Alignment):</strong> How far your shots land on average from the true center of the bullseye. High bias = your rifle scope is miscalibrated (underfitting; the model is too simple to capture reality).</li>
+            <li><strong>Variance (Shaky Hands / Scatter):</strong> How widely your shots spread around their own average landing spot. High variance = your hands tremble, so shots scatter all over the target (overfitting; the model is overly sensitive to training noise).</li>
+            <li><strong>Irreducible Error ($\sigma^2$):</strong> Sudden wind gusts you can never predict or eliminate.</li>
+          </ul>
+          <p><strong>The Mathematical Decomposition:</strong> Any model's expected test error decomposes into:</p>
+          $$\mathbb{E}\left[ (y - \hat{f}(\mathbf{x}))^2 \right] = \underbrace{\text{Bias}^2(\hat{f}(\mathbf{x}))}_{\text{Sight Misalignment}} + \underbrace{\text{Var}(\hat{f}(\mathbf{x}))}_{\text{Hand Tremble / Scatter}} + \underbrace{\sigma^2}_{\text{Wind / Inherent Noise}}$$
+        </div>
+
+        <h2>2. Mathematical Proof: Why Bagging Cuts Variance</h2>
+        <div class="deep-dive">
+          <h4>💡 The "Committee of Analysts" Analogy:</h4>
+          <p>Imagine you ask a committee of $B = 100$ financial analysts to predict a company's stock price. Each individual analyst has an error variance of $\sigma_T^2 = 100$:</p>
+          <ul>
+            <li><strong>Case 1: Independent Thinkers ($\rho = 0$):</strong> If all 100 analysts conduct completely independent research, averaging their 100 predictions slashes the total variance from $100$ down to $\frac{100}{100} = \mathbf{1.0}$! The noise virtually disappears.</li>
+            <li><strong>Case 2: Complete Groupthink ($\rho = 1.0$):</strong> If all 100 analysts read the exact same newsletter and make the identical error, averaging their predictions yields a variance of $1.0 \times 100 = \mathbf{100}$. Averaging does <strong>zero good</strong>!</li>
+          </ul>
+
+          <h4>The Master Formula for $B$ Estimators with Correlation $\rho$:</h4>
+          $$\mathbf{\text{Var}(\text{Ensemble}) = \rho \sigma_T^2 + \frac{1 - \rho}{B} \sigma_T^2}$$
+
+          <p><strong>Step-by-Step Mathematical Derivation:</strong></p>
+          <ol>
+            <li>The ensemble prediction is the arithmetic average of $B$ base estimators: $\bar{f}(\mathbf{x}) = \frac{1}{B} \sum_{b=1}^B f_b(\mathbf{x})$.</li>
+            <li>Recall the variance of a linear combination of random variables:
+              $$\text{Var}(\bar{f}) = \text{Var}\left( \frac{1}{B} \sum_{b=1}^B f_b \right) = \frac{1}{B^2} \left[ \sum_{b=1}^B \text{Var}(f_b) + \sum_{b \ne j} \text{Cov}(f_b, f_j) \right]$$
+            </li>
+            <li>Assume each individual tree has variance $\text{Var}(f_b) = \sigma_T^2$ and any pair of trees has correlation $\text{Corr}(f_b, f_j) = \rho$, meaning $\text{Cov}(f_b, f_j) = \rho \sigma_T^2$.</li>
+            <li>There are $B$ variance terms and $B(B - 1)$ pairwise covariance terms:
+              $$\text{Var}(\bar{f}) = \frac{1}{B^2} \left[ B \sigma_T^2 + B(B - 1) \rho \sigma_T^2 \right] = \frac{\sigma_T^2}{B} + \frac{B - 1}{B} \rho \sigma_T^2$$
+            </li>
+            <li>Rewrite $\frac{B - 1}{B}$ as $1 - \frac{1}{B}$:
+              $$\text{Var}(\bar{f}) = \frac{\sigma_T^2}{B} + \left( 1 - \frac{1}{B} \right) \rho \sigma_T^2 = \rho \sigma_T^2 + \frac{1 - \rho}{B} \sigma_T^2 \quad \blacksquare$$
+            </li>
+          </ol>
+        </div>
+
+        <div class="interview-alert">
+          <h4>🎯 The Crucial FAANG Takeaway: "Why Bagging Is Not Enough"</h4>
+          <p>Look at what happens as we add thousands of bagged trees ($B \to \infty$):</p>
+          $$\lim_{B \to \infty} \text{Var}(\text{Ensemble}) = \mathbf{\rho \sigma_T^2}$$
+          <p>The second term $\frac{1 - \rho}{B} \sigma_T^2 \to 0$, but the ensemble hits a <strong>hard correlation floor $\rho \sigma_T^2$</strong>! In simple Bagging, all trees are trained on the same feature set, so they all pick the single strongest predictor at the root. Their correlation $\rho$ is high (~0.7–0.8), preventing further variance reduction.</p>
+          <p><strong>Leo Breiman's Genius Solution (Random Forests):</strong> Randomly subsample features at every node split to force trees to explore diverse features, driving $\rho \to 0$!</p>
+        </div>
+
+        <h2>3. Out-Of-Bag (OOB) Mathematical Expectation</h2>
+        <div class="math-box">
+          <h4>The 36.8% Derivation:</h4>
+          <p>Given a training dataset of $N$ instances, a bootstrap sample draws $N$ instances <strong>with replacement</strong>.</p>
+          <ul>
+            <li>In a single random draw, the probability that a specific instance $i$ is <strong>NOT</strong> picked is:
+              $$P(\text{not picked in 1 draw}) = 1 - \frac{1}{N}$$
+            </li>
+            <li>Across $N$ independent draws, the probability that instance $i$ is never picked at all is:
+              $$P(\text{never picked in } N \text{ draws}) = \left( 1 - \frac{1}{N} \right)^N$$
+            </li>
+            <li>Taking the limit as dataset size $N \to \infty$:
+              $$\lim_{N \to \infty} \left( 1 - \frac{1}{N} \right)^N = \frac{1}{e} \approx 0.367879 \dots \approx \mathbf{36.8\%}$$
+            </li>
+          </ul>
+          <p><strong>Conclusion:</strong> Every tree in a Random Forest is trained on roughly <strong>63.2%</strong> of the dataset and leaves <strong>36.8%</strong> completely untouched (the Out-Of-Bag set). Evaluating each sample on only the trees where it was OOB provides a <strong>free, unbiased estimate of generalization error</strong> equivalent to Leave-One-Out Cross-Validation!</p>
+        </div>
+      </section>
+
+      <!-- TAB 6: RANDOM FORESTS & ADVANCED -->
+      <section id="tab-rf" class="tab-section">
+        <h1>Random Forests, Extra-Trees & Proximity Matrices</h1>
+        <p class="section-subtitle">Random subspace feature decorrelation, Extremely Randomized Trees, the Proximity Matrix, and Isolation Forests.</p>
+
+        <h2>1. What is a Random Forest? (Breiman, 2001)</h2>
+        <div class="card">
+          <p>A <strong>Random Forest</strong> is an ensemble of deep, unpruned decision trees combined via bootstrap aggregation and the <strong>Random Subspace Method (Attribute Bagging)</strong>.</p>
+          
+          <h3>The Double Layer of Randomization:</h3>
+          <ol>
+            <li><strong>Row Subsampling (Bootstrap):</strong> Each tree trains on an independently drawn bootstrap sample of size $N$ (with replacement).</li>
+            <li><strong>Column Subsampling (Random Subspace):</strong> At <em>every individual node split</em>, the algorithm randomly samples $m$ candidate features out of the total $D$ features, and searches for the optimal split <strong>strictly within that random subset</strong>:
+              <ul>
+                <li><strong>Classification Default:</strong> $m = \lfloor \sqrt{D} \rfloor$</li>
+                <li><strong>Regression Default:</strong> $m = \lfloor D / 3 \rfloor$</li>
+              </ul>
+            </li>
+          </ol>
+          <p>By preventing strong features from dominating every tree, trees become <strong>decorrelated</strong> ($\rho \downarrow$), driving the ensemble variance floor $\rho \sigma_T^2$ near zero!</p>
+        </div>
+
+        <h2>2. Extra-Trees (Extremely Randomized Trees — Geurts et al., 2006)</h2>
+        <p>While Random Forests search for the best split threshold among the $m$ random features, <strong>Extra-Trees</strong> introduces a third layer of extreme randomness:</p>
+        <ul>
+          <li>For each of the $m$ selected features, it picks a <strong>completely random threshold</strong> drawn uniformly between the feature's minimum and maximum values!</li>
+          <li>It then selects the best split among these randomly generated thresholds.</li>
+        </ul>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Standard Random Forest</th>
+                <th>Extra-Trees (Extremely Randomized)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Threshold Selection</strong></td>
+                <td>Optimized ($O(N \log N)$ threshold sorting)</td>
+                <td><strong>Completely random draw</strong> (zero sorting needed!)</td>
+              </tr>
+              <tr>
+                <td><strong>Training Speed</strong></td>
+                <td>Standard</td>
+                <td><strong>Substantially faster</strong> (eliminates CPU sorting bottlenecks)</td>
+              </tr>
+              <tr>
+                <td><strong>Bias vs. Variance</strong></td>
+                <td>Lower individual tree bias</td>
+                <td>Slightly higher bias, but <strong>lower correlation $\rho$</strong>; often beats RF on smooth continuous datasets.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. The Random Forest Proximity Matrix <span class="badge badge-missing">Missing in PDF</span></h2>
+        <div class="deep-dive">
+          <h4>🔍 Unsupervised Insights from Supervised Trees:</h4>
+          <p>After training a Random Forest of $B$ trees, feed all training instances through all trees. For any pair of instances $(\mathbf{x}_i, \mathbf{x}_j)$, define their <strong>proximity</strong> as the fraction of trees where they land in the <strong>exact same leaf node</strong>:</p>
+          $$\text{Prox}(i, j) = \frac{1}{B} \sum_{b=1}^B \mathbb{I}(\mathbf{x}_i \text{ and } \mathbf{x}_j \text{ terminate in the same leaf in tree } b)$$
+          <p><strong>Three Powerful Applications:</strong></p>
+          <ol>
+            <li><strong>Outlier Detection:</strong> An observation whose average proximity to all other points is very low is an isolated outlier!</li>
+            <li><strong>Unsupervised Clustering / Manifold Learning:</strong> Pass the distance matrix $D_{ij} = \sqrt{1 - \text{Prox}(i, j)}$ into MDS (Multi-Dimensional Scaling) or t-SNE to visualize complex clusters without labels.</li>
+            <li><strong>Missing Value Imputation:</strong> Impute missing values in $\mathbf{x}_i$ using the weighted average of observed values from other instances, weighted by $\text{Prox}(i, j)$.</li>
+          </ol>
+        </div>
+
+        <h2>4. Isolation Forest for Anomaly Detection <span class="badge badge-missing">Missing in PDF</span></h2>
+        <p>Created by Fei Tony Liu, Kai Ming Ting, and Zhi-Hua Zhou (2008). Traditional anomaly detection models compute densities or distances, which scale poorly. <strong>Isolation Forest</strong> isolates anomalies using random trees:</p>
+
+        <div class="math-box">
+          <h4>The Core Anomaly Intuition:</h4>
+          <p>Anomalies are "few and different"—they lie far from high-density normal data clusters. Therefore, under random recursive partitioning, <strong>anomalies are isolated in very few splits (short tree depth)</strong>, while normal instances require many splits!</p>
+          $$\text{Anomaly Score: } s(\mathbf{x}, n) = 2^{-\frac{\mathbb{E}[h(\mathbf{x})]}{c(n)}}$$
+          <ul>
+            <li>$h(\mathbf{x})$: Path length (number of splits) from root to the leaf isolating sample $\mathbf{x}$.</li>
+            <li>$c(n) = 2 \ln(n - 1) + 0.5772156649 - \frac{2(n - 1)}{n}$: Average path length of an unsuccessful search in a Binary Search Tree (BST).</li>
+            <li>If $s \to 1$: Average path length is very short $\implies$ <strong>Definite anomaly!</strong></li>
+            <li>If $s < 0.5$: Average path length is long $\implies$ <strong>Normal inlier.</strong></li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 7: BOOSTING FOUNDATIONS -->
+      <section id="tab-boosting" class="tab-section">
+        <h1>Boosting Foundations: AdaBoost & Gradient Boosting Math</h1>
+        <p class="section-subtitle">Weak vs. strong learners, AdaBoost sample weight updates, Friedman's functional gradient descent, and the golf putting analogy.</p>
+
+        <h2>1. The Boosting Paradigm: Transforming Weak into Strong</h2>
+        <div class="first-principles">
+          <h4>💡 Bagging vs. Boosting (The Core Distinction):</h4>
+          <ul>
+            <li><strong>Bagging (Parallel Variance Reduction):</strong> Builds diverse models <em>independently in parallel</em> on random bootstrap subsets of data, then averages their predictions. Primary goal: <strong>slashes variance</strong>.</li>
+            <li><strong>Boosting (Sequential Bias Reduction):</strong> Builds models in a <em>strictly sequential chain</em>. Each new model is trained explicitly to correct the residual errors made by the combination of all previous models. Primary goal: <strong>slashes bias</strong>.</li>
+          </ul>
+        </div>
+
+        <h2>2. AdaBoost (Adaptive Boosting — Freund & Schapire, 1996)</h2>
+        <p>AdaBoost trains a sequence of weak base learners (typically <strong>decision stumps</strong>: trees with <code>max_depth=1</code>). After each round, instances misclassified by the current stump have their sample weights inflated, forcing the next stump to focus on the hardest examples.</p>
+
+        <div class="card">
+          <h3>The Full AdaBoost Algorithm Step-by-Step:</h3>
+          <ol>
+            <li>Initialize all sample weights equally: $w_i^{(1)} = \frac{1}{N}$ for $i = 1, \dots, N$.</li>
+            <li>For round $m = 1$ to $M$:
+              <ul>
+                <li>Train a weak classifier $h_m(\mathbf{x})$ using current sample weights $\mathbf{w}^{(m)}$.</li>
+                <li>Compute its weighted error rate $r_m$:
+                  $$r_m = \frac{\sum_{i: h_m(\mathbf{x}_i) \ne y_i} w_i^{(m)}}{\sum_{i=1}^N w_i^{(m)}}$$
+                </li>
+                <li>Compute the voting power (say) $\alpha_m$ of stump $m$:
+                  $$\mathbf{\alpha_m = \frac{1}{2} \ln \left( \frac{1 - r_m}{r_m} \right)}$$
+                </li>
+                <li>Update sample weights for the next round:
+                  $$w_i^{(m+1)} = w_i^{(m)} \cdot \exp\left( -\alpha_m y_i h_m(\mathbf{x}_i) \right) = \begin{cases} w_i^{(m)} \cdot e^{-\alpha_m} & \text{if correctly classified} \\ w_i^{(m)} \cdot e^{+\alpha_m} & \text{if misclassified} \end{cases}$$
+                </li>
+                <li>Normalize weights so they sum to 1: $w_i^{(m+1)} \leftarrow \frac{w_i^{(m+1)}}{\sum_j w_j^{(m+1)}}$.</li>
+              </ul>
+            </li>
+            <li>Final ensemble prediction is a weighted majority vote:
+              $$\hat{y}(\mathbf{x}) = \text{sign}\left( \sum_{m=1}^M \alpha_m h_m(\mathbf{x}) \right)$$
+            </li>
+          </ol>
+        </div>
+
+        <div class="math-box">
+          <h4>Intuitive Numbers: What Does Stump Weight $\alpha_m$ Mean?</h4>
+          <ul>
+            <li><strong>Accurate Stump (only 10% error, $r = 0.10$):</strong>
+              $$\alpha = \frac{1}{2} \ln\left( \frac{0.90}{0.10} \right) = \frac{1}{2} \ln(9) \approx \mathbf{+1.10} \quad (\text{Massive positive vote!})$$
+            </li>
+            <li><strong>Random Guess Stump (50% error, $r = 0.50$):</strong>
+              $$\alpha = \frac{1}{2} \ln\left( \frac{0.50}{0.50} \right) = \frac{1}{2} \ln(1) = \mathbf{0.00} \quad (\text{Vote completely silenced!})$$
+            </li>
+            <li><strong>Terrible Stump (80% error, $r = 0.80$):</strong>
+              $$\alpha = \frac{1}{2} \ln\left( \frac{0.20}{0.80} \right) = \frac{1}{2} \ln(0.25) \approx \mathbf{-0.69} \quad (\text{Negative weight automatically flips wrong votes into right ones!})$$
+            </li>
+          </ul>
+        </div>
+
+        <h2>3. Jerome Friedman's Gradient Boosting Machine (GBM, 1999–2001)</h2>
+        <p>While AdaBoost reweights data points to minimize exponential loss, Jerome Friedman realized boosting could be formulated as <strong>Gradient Descent in Function Space</strong> for <em>any differentiable loss function</em> (MSE, MAE, Log-Loss, Huber loss):</p>
+
+        <div class="first-principles">
+          <h4>⛳ The Golf Putting Analogy:</h4>
+          <p>Imagine putting a golf ball toward a hole 100 meters away ($y = 100$):</p>
+          <ol>
+            <li><strong>Base Shot ($F_0$):</strong> You hit a baseline drive. It lands at 70 meters ($\hat{y}_0 = 70$).
+              <br>The leftover error (residual) is: $100 - 70 = \mathbf{+30 \text{ meters}}$.
+            </li>
+            <li><strong>Tree 1 ($h_1$):</strong> You <em>don't</em> go back to the tee! You stand at the 70m mark, look at the +30m gap, and train Tree 1 specifically to predict that +30m residual!
+              <br>Tree 1 predicts +25m. Scaled by learning rate $\eta = 0.8$, your new position is $70 + (0.8 \times 25) = \mathbf{90 \text{ meters}}$.
+              <br>Remaining residual: $100 - 90 = \mathbf{+10 \text{ meters}}$.
+            </li>
+            <li><strong>Tree 2 ($h_2$):</strong> You train Tree 2 specifically on the remaining +10m residual!</li>
+          </ol>
+          <p><strong>The Core Rule of GBM:</strong> Each new tree does not predict the ground-truth target $y$; it fits the <strong>negative gradient of the loss function (pseudo-residuals)</strong> left behind by all preceding trees!</p>
+        </div>
+
+        <div class="math-box">
+          <h4>Why "Negative Gradient" Instead of "Residual"?</h4>
+          <ul>
+            <li><strong>Under Squared Error ($L = \frac{1}{2}(y - \hat{y})^2$):</strong>
+              $$-\frac{\partial L}{\partial \hat{y}} = \mathbf{y - \hat{y}} \quad (\text{The negative gradient is literally the residual!})$$
+            </li>
+            <li><strong>Under Binary Log-Loss ($L = -[y \ln p + (1 - y) \ln(1 - p)]$ where $p = \sigma(F(\mathbf{x}))$):</strong>
+              $$r_i = -\frac{\partial L}{\partial F(\mathbf{x}_i)} = \mathbf{y_i - p_i}$$
+              <em>(The difference between the true 0/1 label and the model's predicted probability $p_i$!).</em>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 8: SOTA: XGBOOST IN-DEPTH -->
+      <section id="tab-xgboost" class="tab-section">
+        <h1>Modern SOTA: XGBoost In-Depth (Taylor Series & Exact Math)</h1>
+        <p class="section-subtitle">Tianqi Chen's 2014 breakthroughs, 2nd-order Taylor expansions, similarity scores, exact 3-row toy calculations, and sparsity awareness.</p>
+
+        <h2>1. What is XGBoost? (The Complete Identity)</h2>
+        <div class="card">
+          <p><strong>XGBoost</strong> stands for <strong>Extreme Gradient Boosting</strong>. Created in 2014 by Tianqi Chen (University of Washington) and published in 2016 (Chen & Guestrin), it revolutionized structured tabular machine learning, winning over 80% of all Kaggle competitive challenges between 2015 and 2019.</p>
+        </div>
+
+        <h2>2. Why Was XGBoost Created? (5 Fatal Flaws of Vanilla GBM Solved)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Vanilla GBM (Friedman / Sklearn)</th>
+                <th>How XGBoost Solved It (The "Extreme" Upgrades)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Slow 1st-Order Optimization:</strong> Uses only first derivatives ($g_i$), taking uniform steps without knowing curvature.</td>
+                <td><strong>2nd-Order Taylor Approximation:</strong> Computes both first ($g_i$) and second ($h_i$, Hessian) derivatives to determine exact curvature and optimal step sizes.</td>
+              </tr>
+              <tr>
+                <td><strong>2. Prone to Overfitting:</strong> No direct penalty on leaf weights; relies strictly on heuristic depth stopping.</td>
+                <td><strong>Explicit Mathematical Regularization ($\Omega$):</strong> Adds $L_1$ ($\alpha$), $L_2$ ($\lambda$) on leaf weights, and pruning parameter $\gamma$ (minimum split gain).</td>
+              </tr>
+              <tr>
+                <td><strong>3. Crashes on Missing Values:</strong> Cannot handle <code>NaN</code> without pre-imputation.</td>
+                <td><strong>Sparsity-Aware Split Finding:</strong> Learns the optimal <strong>default direction</strong> for missing values automatically during training.</td>
+              </tr>
+              <tr>
+                <td><strong>4. Inefficient CPU Memory Access:</strong> Re-sorts continuous values at every node, causing CPU cache misses.</td>
+                <td><strong>Column Block Structure & Cache-Aware Access:</strong> Pre-sorts features once and stores them in compressed in-memory blocks with pre-fetching.</td>
+              </tr>
+              <tr>
+                <td><strong>5. Inability to Scale to Big Data:</strong> Out-of-memory crashes on big datasets.</td>
+                <td><strong>Out-Of-Core Computing & Distributed Sharding:</strong> Block compression and parallel execution across CPU threads, GPUs, and clusters (Spark/Dask).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. The Mathematical Derivation: 2nd-Order Taylor Series</h2>
+        <div class="math-box">
+          <h4>Deriving the Objective Function:</h4>
+          <p>At step $t$, we want to find tree $f_t$ that minimizes total regularized loss:</p>
+          $$\mathcal{L}^{(t)} = \sum_{i=1}^N l\left( y_i, \hat{y}_i^{(t-1)} + f_t(\mathbf{x}_i) \right) + \Omega(f_t)$$
+          <p>Where tree complexity regularization is $\Omega(f_t) = \gamma T + \frac{1}{2} \lambda \sum_{j=1}^T w_j^2$ ($T$ is leaf count, $w_j$ are leaf output weights).</p>
+          <p>Take the 2nd-order Taylor expansion around $\hat{y}_i^{(t-1)}$:</p>
+          $$\mathcal{L}^{(t)} \approx \sum_{i=1}^N \left[ l(y_i, \hat{y}_i^{(t-1)}) + g_i f_t(\mathbf{x}_i) + \frac{1}{2} h_i f_t^2(\mathbf{x}_i) \right] + \gamma T + \frac{1}{2}\lambda \sum_{j=1}^T w_j^2$$
+          <p>Where $g_i = \frac{\partial l}{\partial \hat{y}}$ (gradient) and $h_i = \frac{\partial^2 l}{\partial \hat{y}^2}$ (Hessian). Drop the constant $l(y_i, \hat{y}_i^{(t-1)})$ and group instances by leaf $j$ (where $f_t(\mathbf{x}_i) = w_j$):</p>
+          $$\tilde{\mathcal{L}}^{(t)} = \sum_{j=1}^T \left[ \left(\sum_{i \in I_j} g_i\right) w_j + \frac{1}{2} \left( \sum_{i \in I_j} h_i + \lambda \right) w_j^2 \right] + \gamma T$$
+          <p>For each leaf $j$, this is a simple quadratic equation $A w_j^2 + B w_j$. Its minimum occurs at $w_j^* = -\frac{B}{2A}$:</p>
+          $$\mathbf{w_j^* = -\frac{\sum_{i \in I_j} g_i}{\sum_{i \in I_j} h_i + \lambda} = -\frac{G_j}{H_j + \lambda}}$$
+          <p>Substitute $w_j^*$ back into the objective function to get the <strong>Optimal Profile Log-Likelihood (Similarity Score)</strong>:</p>
+          $$\mathbf{\text{Similarity Score} = \frac{G_j^2}{H_j + \lambda} = \frac{(\sum g_i)^2}{\sum h_i + \lambda}}$$
+          $$\mathbf{\text{Split Gain} = \frac{1}{2} \left[ \text{Similarity}_{\text{Left}} + \text{Similarity}_{\text{Right}} - \text{Similarity}_{\text{Parent}} \right] - \gamma}$$
+        </div>
+
+        <h2>4. Concrete Toy Numerical Walkthrough (Exact Numbers)</h2>
+        <div class="card">
+          <h4>Worked Example: Training 1 XGBoost Tree on 3 Regression Targets</h4>
+          <p>Target values: $y = [1.5, 2.0, 3.5]$. Initial base prediction: $\hat{y}_0 = 0.5$ for all samples.</p>
+          <p>Loss is MSE: $l(y, \hat{y}) = \frac{1}{2}(y - \hat{y})^2$. Hyperparameters: $\lambda = 1.0$, $\gamma = 1.0$, $\eta = 0.3$.</p>
+          
+          <p><strong>1. Compute Gradients $g_i$ and Hessians $h_i$:</strong></p>
+          <ul>
+            <li>$g_i = \hat{y} - y_i \implies g_1 = 0.5 - 1.5 = \mathbf{-1.0}$, $g_2 = 0.5 - 2.0 = \mathbf{-1.5}$, $g_3 = 0.5 - 3.5 = \mathbf{-3.0}$.
+              <br>Sum of gradients $G = (-1.0) + (-1.5) + (-3.0) = \mathbf{-5.5}$.
+            </li>
+            <li>$h_i = \frac{\partial^2}{\partial \hat{y}^2} = 1.0$ for all instances.
+              <br>Sum of Hessians $H = 1 + 1 + 1 = \mathbf{3.0}$.
+            </li>
+          </ul>
+
+          <p><strong>2. Root Node Similarity Score:</strong></p>
+          $$\text{Similarity}_{\text{Root}} = \frac{G^2}{H + \lambda} = \frac{(-5.5)^2}{3.0 + 1.0} = \frac{30.25}{4} = \mathbf{7.5625}$$
+
+          <p><strong>3. Evaluate Candidate Split:</strong> (Left = Samples 1 & 2; Right = Sample 3):</p>
+          <ul>
+            <li><strong>Left Child:</strong> $G_L = -1.0 + (-1.5) = -2.5, H_L = 2$.
+              $$\text{Similarity}_L = \frac{(-2.5)^2}{2 + 1.0} = \frac{6.25}{3} = \mathbf{2.0833}$$
+            </li>
+            <li><strong>Right Child:</strong> $G_R = -3.0, H_R = 1$.
+              $$\text{Similarity}_R = \frac{(-3.0)^2}{1 + 1.0} = \frac{9.0}{2} = \mathbf{4.5000}$$
+            </li>
+          </ul>
+
+          <p><strong>4. Compute Split Gain:</strong></p>
+          $$\text{Gain} = \frac{1}{2} [ 2.0833 + 4.5000 - 7.5625 ] - 1.0 = \frac{1}{2} [-0.9792] - 1.0 = \mathbf{-1.4896}$$
+          <p><strong>5. Backward Pruning Decision:</strong> Since $\text{Gain} = -1.4896 < 0$, <strong>the split is PRUNED</strong>! The node remains an unsplit root leaf because the split cannot overcome the penalty $\gamma = 1.0$.</p>
+
+          <p><strong>6. Optimal Leaf Output Weight ($w^*$):</strong></p>
+          $$w^* = -\frac{G}{H + \lambda} = -\frac{-5.5}{3.0 + 1.0} = \frac{5.5}{4} = \mathbf{+1.375}$$
+
+          <p><strong>7. Update Prediction with Shrinkage ($\eta = 0.3$):</strong></p>
+          $$\hat{y}_1 = \hat{y}_0 + \eta \cdot w^* = 0.5 + (0.3 \times 1.375) = 0.5 + 0.4125 = \mathbf{0.9125}$$
+          <p>The prediction increased from 0.5 to 0.9125, stepping smoothly toward the true values $[1.5, 2.0, 3.5]$!</p>
+        </div>
+      </section>
+
+      <!-- TAB 9: LIGHTGBM & CATBOOST -->
+      <section id="tab-sota2" class="tab-section">
+        <h1>LightGBM & CatBoost: Architectural Innovations</h1>
+        <p class="section-subtitle">Histogram binning, GOSS, EFB, Ordered Target Statistics, Oblivious Trees, and the comprehensive GBDT shootout.</p>
+
+        <h2>1. What is LightGBM? (Microsoft Research, 2017)</h2>
+        <div class="card">
+          <p>While XGBoost delivered state-of-the-art accuracy, its $O(N \log N)$ feature sorting bottleneck caused training to crawl on enterprise datasets with tens of millions of rows. <strong>LightGBM</strong> introduced 4 core algorithmic innovations that made GBDT training up to <strong>15–20x faster with 8x lower RAM consumption</strong>:</p>
+        </div>
+
+        <div class="deep-dive">
+          <h4>LightGBM's 4 Core Innovations:</h4>
+          <ol>
+            <li><strong>Histogram-Based Feature Binning:</strong>
+              <br>Instead of sorting continuous values, continuous features are discretized into <strong>256 integer bins (8-bit <code>uint8</code>)</strong>.
+              <br>• Reduces memory consumption by up to <strong>8x</strong>.
+              <br>• Finding splits takes $O(\text{num\_bins})$ time instead of $O(N \log N)$.
+              <br>• <strong>Histogram Subtraction Trick:</strong> Once the histograms of the parent node and left child are computed, the right child's histogram is calculated for free via simple subtraction:
+              $$\mathbf{\text{Hist}_{\text{Right}} = \text{Hist}_{\text{Parent}} - \text{Hist}_{\text{Left}}}$$
+            </li>
+            <li><strong>GOSS (Gradient-based One-Side Sampling):</strong>
+              <br>Instances with small gradients have already been trained well (small error). GOSS keeps <strong>100% of samples with large gradients</strong> (top $a$ fraction), and randomly samples a small fraction $b$ (e.g. 10%) of samples with small gradients, multiplying their weights by $\frac{1 - a}{b}$ to preserve an unbiased gradient expectation.
+            </li>
+            <li><strong>EFB (Exclusive Feature Bundling):</strong>
+              <br>High-dimensional sparse features (like one-hot columns) rarely take non-zero values simultaneously. EFB bundles mutually exclusive features into a single dense feature using a graph-coloring algorithm, dramatically shrinking feature dimensions with near-zero loss of accuracy.
+            </li>
+            <li><strong>Leaf-Wise (Best-First) Tree Growth:</strong>
+              <br>Traditional trees grow level-by-level (all depth-1 nodes, then depth-2). LightGBM splits the <strong>single leaf that delivers the highest loss reduction across the entire tree</strong>. This achieves lower loss with fewer total splits, but requires capping <code>max_depth</code> to prevent overfitting on small datasets.
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. What is CatBoost? (Yandex, 2017)</h2>
+        <div class="card">
+          <p><strong>CatBoost</strong> (Categorical Boosting) was designed by Russian search giant Yandex to solve two major weaknesses in gradient boosting: <strong>target leakage in categorical encoding</strong> and <strong>prediction shift</strong>.</p>
+        </div>
+
+        <div class="deep-dive">
+          <h4>CatBoost's 2 Core Innovations:</h4>
+          <ol>
+            <li><strong>Ordered Target Statistics (Leakage-Free Categorical Encoding):</strong>
+              <br>Standard Target Encoding replaces a category with the mean of the target variable for that category: $\hat{x}_k = \frac{\sum y_i}{N}$. But this introduces <strong>target leakage</strong> because sample $i$'s own target is included in its own feature!
+              <br>CatBoost generates random permutations of the dataset and encodes sample $i$ using <em>strictly the instances that appear before it in the permutation</em>:
+              $$\hat{x}_i = \frac{\sum_{j < i, x_j = x_i} y_j + a \cdot P}{\sum_{j < i, x_j = x_i} 1 + a}$$
+              This mathematically eliminates target leakage without discarding data!
+            </li>
+            <li><strong>Oblivious (Symmetric) Trees:</strong>
+              <br>Every node at depth $d$ shares the <strong>exact same feature and threshold split</strong> across the entire level.
+              <br>• Prevents overfitting through extreme structural symmetry.
+              <br>• The entire tree evaluates in hardware as a direct bitwise numerical lookup index:
+              $$\text{Leaf Index} = \sum_{d=0}^{D-1} 2^d \cdot \mathbb{I}(x_{j_d} > s_d)$$
+              Delivering <strong>up to 10x faster production inference</strong>!
+            </li>
+          </ol>
+        </div>
+
+        <h2>3. The Comprehensive SOTA GBDT Shootout</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>XGBoost</th>
+                <th>LightGBM</th>
+                <th>CatBoost</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Creator & Year</strong></td>
+                <td>Tianqi Chen (2014)</td>
+                <td>Microsoft Research (2017)</td>
+                <td>Yandex (2017)</td>
+              </tr>
+              <tr>
+                <td><strong>Tree Growth Strategy</strong></td>
+                <td>Level-wise (Depth-First)</td>
+                <td><strong>Leaf-wise (Best-First)</strong></td>
+                <td><strong>Symmetric (Oblivious Trees)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Categorical Features</strong></td>
+                <td>Requires One-Hot or Target Encoding</td>
+                <td>Integer histogram bin sorting</td>
+                <td><strong>State-of-the-Art Ordered Target Encoding</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Missing Data Handling</strong></td>
+                <td>Learns optimal default direction</td>
+                <td>Dedicated NaN histogram bin</td>
+                <td>Min/Max value imputation</td>
+              </tr>
+              <tr>
+                <td><strong>Training Speed & Memory</strong></td>
+                <td>Moderate speed & RAM</td>
+                <td><strong style="color:var(--success);">Fastest training, lowest RAM</strong></td>
+                <td>Slower training, moderate RAM</td>
+              </tr>
+              <tr>
+                <td><strong>Inference Latency</strong></td>
+                <td>Fast</td>
+                <td>Fast</td>
+                <td><strong style="color:var(--success);">Fastest (Bitwise lookup)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Out-Of-The-Box Defaults</strong></td>
+                <td>Requires careful tuning</td>
+                <td>Prone to overfit if untuned</td>
+                <td><strong style="color:var(--success);">Best default parameters</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 10: STACKING, INTERPRETABILITY & PRODUCTION -->
+      <section id="tab-production" class="tab-section">
+        <h1>Stacking, Interpretability & Production Traps</h1>
+        <p class="section-subtitle">Out-of-Fold (OOF) stacking protocols, MDI vs. Permutation vs. SHAP, the tree extrapolation trap, and compiling trees to C.</p>
+
+        <h2>1. The K-Fold Out-of-Fold (OOF) Stacking Pipeline</h2>
+        <p>Stacking combines diverse model families (e.g., Random Forest + XGBoost + Logistic Regression + Neural Network). The cardinal rule of stacking is: <strong>The Level-1 meta-model must never see predictions made on data that Level-0 models trained on!</strong></p>
+
+        <div class="deep-dive">
+          <h4>The Honest OOF Generation Protocol:</h4>
+          <ol>
+            <li>Split the training dataset $\mathcal{D}_{\text{train}}$ into $K$ disjoint folds (e.g. 5 folds).</li>
+            <li>For each Level-0 base algorithm $M_1, M_2, \dots, M_J$:
+              <ul>
+                <li>For fold $k = 1 \dots K$:
+                  <br>• Train model $M_j$ on the $K-1$ training folds.
+                  <br>• Predict on the held-out fold $k$ and store in the Out-Of-Fold matrix $\mathbf{S}_{\text{train}} \in \mathbb{R}^{N \times J}$.
+                </li>
+                <li>Fit model $M_j$ on 100% of $\mathcal{D}_{\text{train}}$ and predict on test set $\mathcal{D}_{\text{test}}$ to create $\mathbf{S}_{\text{test}} \in \mathbb{R}^{N_{\text{test}} \times J}$.</li>
+              </ul>
+            </li>
+            <li>Train the Level-1 meta-model (e.g. Ridge Regression / Logistic Regression) on $(\mathbf{S}_{\text{train}}, \mathbf{y}_{\text{train}})$.</li>
+            <li>Generate final test predictions by evaluating the meta-model on $\mathbf{S}_{\text{test}}$.</li>
+          </ol>
+        </div>
+
+        <div class="interview-alert">
+          <h4>💡 What Model Should You Use as the Level-1 Meta-Learner?</h4>
+          <p><strong>Always use a simple, regularized linear model</strong> (Ridge Regression or Logistic Regression with strong $L_2$). If you use a complex non-linear model like XGBoost at Level-1, it will overfit the Level-0 predictions, memorizing correlations rather than combining independent signals.</p>
+        </div>
+
+        <h2>2. Feature Importance: MDI vs. Permutation vs. SHAP</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Formula / Mechanism</th>
+                <th>Major Strength</th>
+                <th>Critical Interview Gotcha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>MDI (Mean Decrease Impurity)</strong><br><code>feature_importances_</code></td>
+                <td>$$\text{MDI}(j) = \sum_{t: v(t)=j} \frac{N_t}{N} \Delta I(t)$$</td>
+                <td>Computed during tree training for free; zero extra inference cost.</td>
+                <td><strong style="color:var(--danger);">Severely biased toward continuous & high-cardinality features!</strong> A random noise column with 1,000 unique values will be ranked as the #1 most important feature!</td>
+              </tr>
+              <tr>
+                <td><strong>Permutation Importance</strong><br><code>permutation_importance</code></td>
+                <td>$$\text{PI}(j) = \text{Score}(X) - \text{Score}(X^{\text{perm}(j)})$$</td>
+                <td>Model-agnostic; evaluated on held-out test data; reflects true predictive drop.</td>
+                <td>If features $A$ and $B$ are collinear ($r > 0.95$), shuffling $A$ does not drop performance because $B$ remains intact, tricking engineers into believing both features are useless!</td>
+              </tr>
+              <tr>
+                <td><strong>TreeSHAP (Shapley Additive exPlanations)</strong></td>
+                <td>Game-theoretic Shapley values:
+                $$\phi_j = \sum_{S \subseteq F \setminus \{j\}} \frac{|S|!(|F|-|S|-1)!}{|F|!} [f(S \cup \{j\}) - f(S)]$$</td>
+                <td>Guarantees 4 fundamental game theory axioms: <strong>Efficiency, Symmetry, Dummy Player, and Additivity</strong>. Evaluates true feature interactions.</td>
+                <td>TreeSHAP evaluates exact Shapley values in polynomial time $O(T L D^2)$ instead of exponential $O(2^D)$.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>3. Production Trap: The Tree Extrapolation Failure</h2>
+        <div class="interview-alert">
+          <h4>🚨 Can Random Forests or XGBoost Extrapolate Trends? (Classic FAANG Question)</h4>
+          <p><strong>Scenario:</strong> You train an XGBoost model on home prices from 2010 to 2022. In 2024, rapid inflation pushes house prices beyond any value seen in the training data.</p>
+          <p><strong>Can XGBoost predict higher house prices in 2024?</strong></p>
+          <p><strong>Answer: ABSOLUTELY NOT! Decision trees CANNOT extrapolate.</strong></p>
+          <p>A decision tree partitions space into constant rectangular boxes. If a test instance has input features beyond the training range ($x_{\text{test}} > \max(x_{\text{train}})$), it falls into the rightmost boundary leaf and outputs a <strong>flat, constant horizontal line</strong>! It cannot project linear or exponential trends outside the convex hull of training data.</p>
+          <p><strong>Production Remedies:</strong></p>
+          <ol>
+            <li><strong>Target Differencing / Detrending:</strong> Fit a linear regression trend line first, predict on residuals using trees, and add back the linear trend.</li>
+            <li><strong>Hybrid Model Architectures:</strong> Combine a Linear Model (for extrapolation) with a GBDT (for non-linear local interactions).</li>
+          </ol>
+        </div>
+
+        <h2>4. Production Inference Latency Optimization: Treelite & ONNX</h2>
+        <p>In high-frequency trading or sub-millisecond real-time ad serving, evaluating an ensemble of 500 trees in Python involves pointer-chasing across thousands of node objects in memory, causing severe CPU branch mispredictions and L1 cache misses.</p>
+        <ul>
+          <li><strong>Treelite (Model Compilation):</strong> Compiles tree ensembles directly into optimized native <strong>C source code or flat static array lookups</strong>, eliminating branch mispredictions and executing up to <strong>10–50x faster</strong> in production!</li>
+          <li><strong>ONNX Runtime:</strong> Serializes tree models into an open standard for high-throughput C++ execution on GPUs and CPUs.</li>
+        </ul>
+      </section>
+
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ FAANG / Top ML Role Interview Scenarios</h1>
+        <p class="section-subtitle">Real-world scenario questions, mathematical proofs, and system design challenges for senior machine learning roles.</p>
+
+        <details open>
+          <summary><span>Q1: Can Random Forests overfit by adding more trees ($n\_estimators \to \infty$)?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>No, Random Forests do not overfit as $B \to \infty$.</strong></p>
+            <p>By the Law of Large Numbers, the average of $B$ bootstrap trees converges to the expected value: $\lim_{B \to \infty} \frac{1}{B} \sum_{b=1}^B f_b(\mathbf{x}) = \mathbb{E}_\Theta[f(\mathbf{x}, \Theta)]$. Adding more trees simply reduces variance down to its theoretical correlation floor $\rho \sigma_T^2$ without increasing generalization error.</p>
+            <p><em>However:</em> A Random Forest CAN overfit if individual trees are unconstrained, feature noise is massive, or <code>max_features</code> is too large.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: Can Gradient Boosting overfit by adding more trees?</span> <span class="badge badge-faang">Comparison</span></summary>
+          <div class="qa-content">
+            <p><strong>YES! Absolutely.</strong></p>
+            <p>Unlike Bagging, each new tree in Gradient Boosting explicitly targets remaining training residuals. With too many iterations ($M \to \infty$), the model begins fitting random training noise and outliers, causing training error to plunge to 0 while validation loss explodes. <strong>Early stopping</strong> on a validation set is mandatory.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: Why is misclassification error never used as a splitting criterion in CART?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p>Because it is <strong>piecewise linear and not strictly concave</strong>. Two different splits—one that creates a perfectly pure leaf and another that creates two equally impure leaves—can yield the exact same misclassification error reduction. Gini and Entropy are strictly concave, heavily rewarding splits that produce pure child nodes.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: How does XGBoost handle missing values during training and inference?</span> <span class="badge badge-code">Algo</span></summary>
+          <div class="qa-content">
+            <p>During training, XGBoost evaluates the split gain assuming missing values are placed in the left branch vs. the right branch. The direction with the largest gain is recorded as the <strong>default branch</strong>. At inference time, any missing value is simply routed down this learned default branch without requiring imputation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: How does collinearity affect Random Forest predictions vs. feature importance?</span> <span class="badge badge-concept">Nuance</span></summary>
+          <div class="qa-content">
+            <p><strong>Predictions:</strong> Completely unaffected. Tree models are inherently robust to multicollinearity because either correlated feature provides the required discriminative boundary.</p>
+            <p><strong>Feature Importance:</strong> Severely distorted! The two correlated features "cannibalize" each other's splits. In MDI or Permutation Importance, their apparent importance is approximately halved, tricking data scientists into thinking neither feature is important!</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q6: Why do trees struggle with diagonal decision boundaries? How do you fix it?</span> <span class="badge badge-concept">Geometry</span></summary>
+          <div class="qa-content">
+            <p>Trees make axis-aligned splits on one feature at a time ($x_j \le s$). A diagonal decision boundary (e.g. $x_1 + x_2 > c$) requires an infinite "staircase" of horizontal and vertical splits, consuming huge depth and overfitting.</p>
+            <p><strong>Fix:</strong> Apply <strong>PCA</strong> (Principal Component Analysis) to rotate the features along the axes of maximum variance before feeding them to the tree.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the computational time complexity of training a decision tree?</span> <span class="badge badge-math">Complexity</span></summary>
+          <div class="qa-content">
+            <p>For $N$ samples and $D$ features:</p>
+            <ul>
+              <li>Evaluating all thresholds across $D$ features requires sorting $N$ values: $O(D \cdot N \log N)$.</li>
+              <li>For a balanced tree of depth $\log_2 N$, total training time complexity is $\mathcal{O}(D \cdot N \log N)$.</li>
+              <li>Inference time per instance is $\mathcal{O}(\text{depth}) = \mathcal{O}(\log N)$.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is the Out-Of-Bag (OOB) error and why does it equal 36.8%?</span> <span class="badge badge-math">Statistics</span></summary>
+          <div class="qa-content">
+            <p>Given $N$ samples drawn with replacement, the probability a sample is missed in 1 draw is $1 - 1/N$. In $N$ independent draws: $\lim_{N \to \infty} (1 - 1/N)^N = 1/e \approx 36.8\%$. Since each tree misses ~36.8% of data, predicting each instance using only trees where it was omitted provides an unbiased Leave-One-Out CV estimate for free.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why does LightGBM train dramatically faster than XGBoost?</span> <span class="badge badge-core">SOTA</span></summary>
+          <div class="qa-content">
+            <p>Due to 3 architectural innovations: (1) <strong>Histogram Binning</strong> (discretizes continuous features into 256 uint8 bins, eliminating sorting and computing child histograms via simple subtraction), (2) <strong>GOSS</strong> (keeps 100% of large-gradient samples and subsamples small-gradient samples), and (3) <strong>EFB</strong> (bundles mutually exclusive sparse features).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: What is an Oblivious Tree and why does CatBoost use it?</span> <span class="badge badge-core">CatBoost</span></summary>
+          <div class="qa-content">
+            <p>An Oblivious (Symmetric) Tree uses the exact same feature and split threshold across all nodes at the same depth. This acts as a strong regularizer against overfitting, and allows the entire tree to be evaluated as a single hardware bitwise index: $\text{index} = \sum 2^d \mathbb{I}(x_{j_d} > s_d)$, delivering up to 10x faster production inference.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q11: Why is Mean Decrease Impurity (MDI) feature importance flawed?</span> <span class="badge badge-faang">Interpretability</span></summary>
+          <div class="qa-content">
+            <p>MDI is computed in-sample and has a severe mathematical bias toward continuous and high-cardinality features. A feature with many unique values (like random noise IDs) offers many candidate split points, giving it artificial opportunities to reduce training impurity. Use <strong>Permutation Importance</strong> or <strong>TreeSHAP</strong> instead.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: Can a Random Forest or XGBoost predict an inflation-adjusted housing price in 2030 if trained on 2010–2022 data?</span> <span class="badge badge-faang">Extrapolation</span></summary>
+          <div class="qa-content">
+            <p><strong>NO! Decision trees cannot extrapolate.</strong> Tree predictions are piecewise constant averages of training samples inside terminal leaf nodes. Beyond the maximum training threshold, test points simply fall into the outermost leaf and receive a flat horizontal prediction. Fix by detrending/differencing or using linear-tree hybrids.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why does Extra-Trees have lower variance than a standard Random Forest?</span> <span class="badge badge-concept">Ensembles</span></summary>
+          <div class="qa-content">
+            <p>Because Extra-Trees picks split thresholds completely at random rather than optimizing them. This introduces extra randomization that decorrelates the trees further ($\rho \downarrow$), reducing the ensemble variance floor $\rho \sigma^2$ at the cost of a slight increase in individual tree bias.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: Explain the difference between Level-Wise and Leaf-Wise tree growth.</span> <span class="badge badge-core">Algorithms</span></summary>
+          <div class="qa-content">
+            <p>Level-wise (XGBoost/Sklearn) grows the tree level by level, maintaining a balanced tree. Leaf-wise (LightGBM) splits the single leaf that produces the maximum loss reduction anywhere in the tree. Leaf-wise achieves lower loss with fewer splits, but can produce asymmetric deep branches prone to overfitting on small datasets.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: What is Minimal Cost-Complexity Pruning ($CCP_\alpha$)?</span> <span class="badge badge-math">Pruning</span></summary>
+          <div class="qa-content">
+            <p>It minimizes $R_\alpha(T) = R(T) + \alpha |T|$, balancing training impurity $R(T)$ against tree complexity $|T|$. It finds the effective alpha threshold $\alpha_{\text{eff}} = \frac{R(t) - R(T_t)}{|T_t| - 1}$ for every node, generates a sequence of subtrees by collapsing the weakest links, and selects the best alpha via cross-validation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: How does CatBoost prevent target leakage in categorical features?</span> <span class="badge badge-core">CatBoost</span></summary>
+          <div class="qa-content">
+            <p>Using <strong>Ordered Target Statistics</strong>: It generates random permutations of the dataset and encodes instance $i$'s category using only the target values of instances that appear <em>strictly before it in the permutation</em>, ensuring an instance's own label never leaks into its feature value.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: Why do we divide by the Hessian $h_i + \lambda$ in XGBoost's leaf weights?</span> <span class="badge badge-math">Optimization</span></summary>
+          <div class="qa-content">
+            <p>The Hessian $h_i$ represents the local curvature of the loss surface. If curvature is flat ($h_i$ is small), the model takes larger steps. If curvature is steep ($h_i$ is large), steps are downscaled to prevent overshooting. Dividing by $h_i + \lambda$ provides an exact Newton-Raphson 2nd-order step for each leaf.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: What is the Random Forest Proximity Matrix and how is it used?</span> <span class="badge badge-concept">Advanced</span></summary>
+          <div class="qa-content">
+            <p>The proximity between samples $i$ and $j$ is the proportion of trees in the forest where both samples terminate in the exact same leaf node. It is used for unsupervised clustering, outlier detection (samples with low average proximity), and proximity-weighted missing value imputation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: How does Isolation Forest detect anomalies?</span> <span class="badge badge-concept">Anomalies</span></summary>
+          <div class="qa-content">
+            <p>It recursively partitions data using random features and random thresholds. Because anomalies are sparse and distant from the normal cluster, they are isolated in far fewer splits (short tree path length $h(x)$). An anomaly score near 1 signals a true outlier.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: Why should you never use XGBoost as the Level-1 meta-model in Stacking?</span> <span class="badge badge-faang">Stacking</span></summary>
+          <div class="qa-content">
+            <p>Because Level-0 predictions are highly collinear. A complex non-linear model like XGBoost at Level-1 will easily overfit the Level-0 predictions, memorizing artifacts. A simple regularized linear model (Ridge Regression / Logistic Regression) learns clean weighted combinations without overfitting.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: What is the Gain Ratio in C4.5 and why was it introduced?</span> <span class="badge badge-math">ID3 vs C4.5</span></summary>
+          <div class="qa-content">
+            <p>$\text{GainRatio} = \frac{\text{Gain}}{\text{SplitInfo}}$. It was introduced because standard Information Gain is heavily biased toward features with many distinct values (e.g. Unique ID columns), which produce fragmented pure splits. Dividing by Split Information heavily penalizes attributes that create too many small branches.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: How does TreeSHAP compute exact Shapley values in polynomial time?</span> <span class="badge badge-core">SHAP</span></summary>
+          <div class="qa-content">
+            <p>Standard Shapley value computation requires evaluating all $2^D$ feature subsets (exponential). TreeSHAP exploits the tree structure by recursively tracking the proportion of training paths that match subsets, reducing complexity to $O(T L D^2)$, where $T$ is trees, $L$ is max leaves, and $D$ is max depth.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: What is the difference between AdaBoost and Gradient Boosting?</span> <span class="badge badge-core">Boosting</span></summary>
+          <div class="qa-content">
+            <p>AdaBoost specifically optimizes Exponential Loss by reweighting training instances based on classification errors. Gradient Boosting generalizes boosting to any arbitrary differentiable loss function by training subsequent trees to predict the negative gradient of the loss (pseudo-residuals).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: What is Treelite and why is it used for production deployment?</span> <span class="badge badge-faang">Production</span></summary>
+          <div class="qa-content">
+            <p>Treelite compiles tree ensemble models directly into optimized C code or raw assembly with flat static arrays. It eliminates pointer chasing across tree node objects and removes CPU branch mispredictions, speeding up production inference by 10x to 50x.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: Why does setting max_features = sqrt(D) decorrelate trees in Random Forest?</span> <span class="badge badge-concept">RF Theory</span></summary>
+          <div class="qa-content">
+            <p>Because on average, the single strongest feature in the dataset is only available to be picked at $\sqrt{D} / D = 1 / \sqrt{D}$ of the splits. In the remaining splits, trees are forced to choose alternative, secondary predictors, producing diverse, decorrelated trees whose variance cancels out upon averaging.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>Module 4 Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your mastery of decision trees, ensembles, random forests, and modern boosting algorithms.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. In an ensemble of $B$ estimators where each estimator has variance $\sigma_T^2$ and pairwise correlation $\rho$, what is the total ensemble variance as $B \to \infty$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) 0</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) $\rho \sigma_T^2$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) $\sigma_T^2 / B$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) $(1 - \rho) \sigma_T^2$</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> Ensembles eliminate the independent variance component $\frac{1-\rho}{B}\sigma_T^2 \to 0$, but the correlation lower-bound $\rho \sigma_T^2$ remains.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Which algorithm uses Oblivious (Symmetric) Trees where all nodes at the same depth share the identical split condition?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) XGBoost</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">B) LightGBM</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">C) CatBoost</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Random Forest</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> CatBoost uses symmetric oblivious trees, allowing predictions to be compiled into hardware-friendly bitwise index operations.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. Why can't a Decision Tree or GBDT extrapolate an upward price trend on time-series data?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) Because it only works on classification.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) Because leaf predictions are bounded constant averages of training samples inside terminal boxes.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) Because Gini impurity is always 0 on new data.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) Because learning rate shrinks future predictions.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> Trees partition space into constant rectangular boxes. Beyond the maximum training threshold, all test points land in the outermost boundary leaf and receive a flat, constant prediction.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. Why is Misclassification Error ($1 - \max p_k$) never used as a splitting criterion in CART?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) Because it cannot be calculated in binary trees.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">B) Because it is piecewise linear and not strictly concave, making it blind to purity progress.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) Because it requires computing matrix inverses.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) Because it equals Gini impurity for two classes.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> Misclassification error gives the same score to a split that creates a 100% pure leaf as it does to a split that leaves both nodes mixed. Gini and Entropy strictly reward creating pure nodes.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. In a bootstrap sample of size $N$ drawn with replacement from $N$ instances, what percentage of unique instances are left out (Out-Of-Bag) as $N \to \infty$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) 50.0%</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">B) 25.0%</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">C) 36.8% ($1/e$)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) 63.2%</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> $\lim_{N \to \infty} (1 - 1/N)^N = 1/e \approx 36.8\%$. This unpicked 36.8% forms the Out-Of-Bag (OOB) validation set.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. What is the fundamental difference between Extra-Trees and standard Random Forest?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">A) Extra-Trees draws completely random split thresholds for features rather than searching for optimal cutoffs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">B) Extra-Trees uses neural networks as leaves.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) Extra-Trees does not support classification.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) Extra-Trees only uses 1 tree.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> Extra-Trees draws random thresholds uniformly between the min and max of each feature, eliminating CPU sorting bottlenecks and further decorrelating trees.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why did C4.5 replace ID3's Information Gain with Gain Ratio?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) To support GPU acceleration.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) Because Information Gain is heavily biased toward features with many distinct categories (e.g. unique IDs).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) Because Gain Ratio uses logarithms base 10 instead of base 2.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) To convert classification trees into regression trees.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> Information Gain is biased toward high-cardinality features. Gain Ratio penalizes features that create too many fragmented child splits by dividing by Split Information.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the role of the Hessian ($h_i$) in XGBoost's optimal leaf weight formula $w^* = -G / (H + \lambda)$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) It counts the number of features.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">B) It measures local loss curvature, automatically scaling down step sizes when curvature is steep to prevent overshooting.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) It computes the Out-of-Bag error.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) It converts continuous variables into integers.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> The second derivative $h_i$ captures loss curvature, enabling exact 2nd-order Newton-Raphson optimization for each individual leaf.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. Why is Mean Decrease Impurity (MDI / feature_importances_) considered unreliable in production?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) Because it cannot be computed in Random Forests.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) Because it is computed in-sample and strongly favors high-cardinality or continuous features.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) Because it requires running cross-validation 100 times.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) Because MDI is always negative.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> MDI inflates the apparent importance of continuous or high-cardinality features because they offer more candidate split points to artificially reduce training impurity.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. In Out-of-Fold (OOF) Stacking, why must the Level-1 meta-model be trained strictly on OOF predictions?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Because otherwise the models won't run on GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) To prevent data leakage; otherwise the meta-model trains on overly optimistic in-sample predictions and overfits.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Because OOF predictions are always binary.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Because Scikit-Learn throws an exception without OOF.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Base models fit their training folds closely. If in-sample predictions are passed to Level-1, the meta-model overfits to base model memorization rather than true generalizable signal.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

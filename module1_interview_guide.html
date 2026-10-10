@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 1: ML Foundations & Concept Learning — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Bar */
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #fff;
+      text-decoration: none;
+    }
+    .logo span { color: var(--accent); }
+
+    .module-nav {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.2rem 0;
+    }
+
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active {
+      color: var(--accent);
+      background: var(--accent-glow);
+      border-color: var(--accent);
+    }
+
+    /* Layout */
+    .layout-wrapper {
+      display: flex;
+      flex-grow: 1;
+    }
+
+    #sidebar {
+      width: 290px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+
+    .sidebar-title {
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* Content Area */
+    #main-content {
+      flex-grow: 1;
+      padding: 2rem 3.5rem;
+      max-width: 1050px;
+    }
+
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 { font-size: 2.1rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.8rem;
+    }
+    h2 { font-size: 1.45rem; margin: 2rem 0 0.8rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.3rem; }
+    h3 { font-size: 1.15rem; margin: 1.3rem 0 0.6rem 0; color: #e2e8f0; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.4rem; color: #cbd5e1; }
+    li { margin-bottom: 0.4rem; }
+
+    /* Cards */
+    .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
+    .interview-alert { background: rgba(251, 191, 36, 0.08); border-left: 4px solid var(--warning); border-radius: 6px; padding: 1.1rem; margin: 1.25rem 0; }
+    .interview-alert h4 { color: var(--warning); margin-bottom: 0.35rem; font-size: 0.98rem; }
+    .math-box { background: rgba(192, 132, 252, 0.08); border-left: 4px solid var(--purple); border-radius: 6px; padding: 1.1rem; margin: 1.25rem 0; overflow-x: auto; }
+    .math-box h4 { color: var(--purple); margin-bottom: 0.35rem; font-size: 0.98rem; }
+    .missing-box { background: rgba(52, 211, 153, 0.08); border-left: 4px solid var(--success); border-radius: 6px; padding: 1.1rem; margin: 1.25rem 0; }
+    .missing-box h4 { color: var(--success); margin-bottom: 0.35rem; font-size: 0.98rem; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; margin: 1.25rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); border-radius: 6px; }
+    th, td { padding: 0.8rem 0.95rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Collapsibles */
+    details { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.9rem; }
+    details[open] { border-color: var(--accent); }
+    summary { padding: 0.9rem 1.15rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.25rem; color: var(--accent); }
+    details[open] summary::after { content: '−'; }
+    .qa-content { padding: 0 1.15rem 1.15rem 1.15rem; border-top: 1px solid var(--border); padding-top: 0.85rem; font-size: 0.93rem; }
+
+    /* Quiz */
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.25rem; margin-bottom: 1.25rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.8rem; color: #fff; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.45rem; }
+    .quiz-option { background: var(--bg-primary); border: 1px solid var(--border); padding: 0.7rem 0.9rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.75rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.5rem; }
+
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-concept { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    /* Mobile Responsive */
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar {
+        position: fixed;
+        left: -300px;
+        top: 49px;
+        bottom: 0;
+        z-index: 150;
+        transition: left 0.25s ease;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.65rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">ML<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="module1_interview_guide.html" class="mod-link active">M1: Foundations</a>
+      <a href="module2_interview_guide.html" class="mod-link">M2: Pipelines</a>
+      <a href="module3_interview_guide.html" class="mod-link">M3: Regression</a>
+      <a href="module4_interview_guide.html" class="mod-link">M4: Trees/Ensembles</a>
+      <a href="module5_interview_guide.html" class="mod-link">M5: Bayesian</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">Module 1 Sections</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-tpe')">1. The T, P, E Framework</li>
+        <li class="nav-item" onclick="switchTab('tab-taxonomy')">2. ML Taxonomy & Trade-offs</li>
+        <li class="nav-item" onclick="switchTab('tab-concept')">3. Concept Learning & Hypotheses</li>
+        <li class="nav-item" onclick="switchTab('tab-finds')">4. Find-S Algorithm & Limits</li>
+        <li class="nav-item" onclick="switchTab('tab-ce')">5. Candidate Elimination Trace</li>
+        <li class="nav-item" onclick="switchTab('tab-bias')">6. Inductive Bias & No Free Lunch</li>
+        <li class="nav-item" onclick="switchTab('tab-drift')">7. Production Data Drift (Missing)</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')">8. FAANG Interview Q&As</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')">9. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: T, P, E -->
+      <section id="tab-tpe" class="tab-section active">
+        <h1>Tom Mitchell's T, P, E Definition</h1>
+        <p class="section-subtitle">How machine learning is formally defined, evaluated, and framed in system design interviews.</p>
+
+        <div class="math-box">
+          <h4>Formal Mitchell Definition (1997):</h4>
+          <p><em>"A computer program is said to learn from <strong>experience $E$</strong> with respect to some class of <strong>tasks $T$</strong> and <strong>performance measure $P$</strong>, if its performance at tasks in $T$, as measured by $P$, improves with experience $E$."</em></p>
+        </div>
+
+        <h2>Deconstructing Real-World Problems</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Real-World System</th>
+                <th>Task $T$</th>
+                <th>Performance Measure $P$</th>
+                <th>Experience $E$</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Checkers / Chess Bot</strong></td>
+                <td>Playing legal moves in checkers</td>
+                <td>% of tournament games won</td>
+                <td>Database of self-play games</td>
+              </tr>
+              <tr>
+                <td><strong>Autonomous Driving</strong></td>
+                <td>Steering and braking on 4-lane highway</td>
+                <td>Average distance driven before human intervention</td>
+                <td>Video camera logs & steering telematics from human drivers</td>
+              </tr>
+              <tr>
+                <td><strong>Spam Filter</strong></td>
+                <td>Flagging emails as Spam or Ham</td>
+                <td>Precision & Recall / F1-score on test emails</td>
+                <td>User-labeled emails marked as spam</td>
+              </tr>
+              <tr>
+                <td><strong>YouTube Recommendation</strong></td>
+                <td>Re-ranking candidate videos for user home feed</td>
+                <td>Total watch time & Click-Through Rate (CTR)</td>
+                <td>Historical click and engagement stream logs</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="interview-alert">
+          <h4>🎯 Machine Learning System Design Interview Tip:</h4>
+          <p>Whenever an interviewer asks you to <em>"Design a system for X"</em> (e.g. Fraud detection, Uber surge pricing), <strong>always start by explicitly defining $T$, $P$, and $E$</strong>! It instantly shows senior engineering maturity.</p>
+        </div>
+      </section>
+
+      <!-- TAB 2: ML TAXONOMY -->
+      <section id="tab-taxonomy" class="tab-section">
+        <h1>Machine Learning Taxonomy & Trade-offs</h1>
+        <p class="section-subtitle">Supervision styles, online vs. batch processing, and instance-based vs. model-based learning.</p>
+
+        <h2>1. Online vs. Batch (Offline) Learning</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Batch (Offline) Learning</th>
+                <th>Online (Incremental) Learning</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>How it trains</strong></td>
+                <td>Trained on all available historical data in one heavy batch. Re-trained from scratch periodically.</td>
+                <td>Trained continuously sample-by-sample or mini-batch as new data streams in.</td>
+              </tr>
+              <tr>
+                <td><strong>Hardware Cost</strong></td>
+                <td>Requires massive RAM/GPU clusters during scheduled training runs.</td>
+                <td>Lightweight; runs on small servers; can discard data immediately after update.</td>
+              </tr>
+              <tr>
+                <td><strong>Biggest Risk</strong></td>
+                <td>Stale models during rapid environment shifts.</td>
+                <td><strong>Catastrophic Forgetting</strong> and vulnerability to <strong>poisoned/bad streaming data</strong> ruining the live model!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Instance-Based vs. Model-Based Learning</h2>
+        <ul>
+          <li><strong>Instance-Based (e.g., $K$-Nearest Neighbors):</strong> Learns by storing training instances verbatim. Generalizes by comparing new points to stored points via distance metrics ($L_1, L_2$).
+            <br><em>Pros:</em> Zero training time ($O(1)$).
+            <br><em>Cons:</em> Slow inference ($O(N)$ scanning all data); memory hogs.
+          </li>
+          <li><strong>Model-Based (e.g., Linear Regression, Neural Nets, SVM):</strong> Uses training data to fit parameters $\theta$ (weights) into a mathematical function.
+            <br><em>Pros:</em> Blazing fast inference ($O(1)$ evaluating formula); low storage (store only $\theta$).
+            <br><em>Cons:</em> High training time; risk of underfitting if model assumptions are wrong.
+          </li>
+        </ul>
+      </section>
+
+      <!-- TAB 3: CONCEPT LEARNING -->
+      <section id="tab-concept" class="tab-section">
+        <h1>Concept Learning & Hypothesis Spaces</h1>
+        <p class="section-subtitle">Boolean functions over instance spaces, syntactic vs. semantic calculations.</p>
+
+        <h2>1. What is Concept Learning?</h2>
+        <p>Inferring a boolean-valued function $c: X \to \{0, 1\}$ from positive and negative training examples. If $c(x) = 1$, the instance is a positive example; if $c(x) = 0$, it is negative.</p>
+
+        <h2>2. Syntactic vs. Semantic Hypothesis Space Math</h2>
+        <div class="math-box">
+          <h4>💡 The EnjoySport Hypothesis Counting Derivation:</h4>
+          <p>Features: <code>Sky</code> (3 values), <code>AirTemp</code> (2), <code>Humidity</code> (2), <code>Wind</code> (2), <code>Water</code> (2), <code>Forecast</code> (2).</p>
+          <p>For each feature, a hypothesis can take:</p>
+          <ul>
+            <li>Specific value (e.g. <code>Warm</code>)</li>
+            <li>Don't Care wildcard: <code>?</code> (matches anything)</li>
+            <li>Null constraint: <code>∅</code> (matches nothing)</li>
+          </ul>
+
+          <p><strong>Total Distinct Instances in $X$:</strong></p>
+          $$|X| = 3 \times 2 \times 2 \times 2 \times 2 \times 2 = \mathbf{96 \text{ instances}}$$
+
+          <p><strong>Syntactically Distinct Hypotheses:</strong></p>
+          <p>For each feature, number of choices is $(\text{unique values} + 2)$: <code>Sky</code> has $3 + 2 = 5$ choices; other 5 features have $2 + 2 = 4$ choices.</p>
+          $$|H_{\text{syntactic}}| = 5 \times 4 \times 4 \times 4 \times 4 \times 4 = \mathbf{5,120 \text{ hypotheses}}$$
+
+          <p><strong>Semantically Distinct Hypotheses (Crucial Interview Detail!):</strong></p>
+          <p>Any hypothesis containing <em>even a single</em> <code>∅</code> symbol rejects every single instance (it always predicts False!). Therefore, all hypotheses with at least one <code>∅</code> are semantically identical to a single empty concept.</p>
+          $$|H_{\text{semantic}}| = 1 + (4 \times 3 \times 3 \times 3 \times 3 \times 3) = 1 + (4 \times 243) = \mathbf{973 \text{ hypotheses}}$$
+        </div>
+      </section>
+
+      <!-- TAB 4: FIND-S -->
+      <section id="tab-finds" class="tab-section">
+        <h1>The Find-S Algorithm & Its Fatal Flaws</h1>
+        <p class="section-subtitle">Finding the maximally specific hypothesis and why it fails in production.</p>
+
+        <h2>1. Find-S Mechanics</h2>
+        <ol>
+          <li>Initialize $h = \langle \emptyset, \emptyset, \emptyset, \emptyset, \emptyset, \emptyset \rangle$ (most specific hypothesis possible).</li>
+          <li>For each <strong>positive</strong> training instance $x$:
+            <br>If an attribute constraint $a_i$ in $h$ is satisfied by $x$, do nothing.
+            <br>Else, generalize $a_i$ in $h$ to the next more general constraint that matches $x$ (usually <code>?</code>).
+          </li>
+          <li><strong>Negative instances are completely ignored!</strong></li>
+          <li>Output final hypothesis $h$.</li>
+        </ol>
+
+        <div class="interview-alert">
+          <h4>🚨 The 4 Fatal Flaws of Find-S (Interview Favorite):</h4>
+          <ol>
+            <li><strong>Cannot detect inconsistency:</strong> Has zero way to know if training data contains noise or contradictions.</li>
+            <li><strong>Ignores Negative Examples:</strong> Misses crucial information carried by negative instances.</li>
+            <li><strong>Picks only ONE hypothesis:</strong> Cannot tell whether other consistent hypotheses exist.</li>
+            <li><strong>No confidence measurement:</strong> Cannot quantify uncertainty or convergence towards the true concept.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- TAB 5: CANDIDATE ELIMINATION -->
+      <section id="tab-ce" class="tab-section">
+        <h1>Candidate Elimination: Complete Trace</h1>
+        <p class="section-subtitle">Version Space maintenance, specific boundary S, and generic boundary G.</p>
+
+        <h2>1. Definitions of $S$ and $G$</h2>
+        <ul>
+          <li><strong>Specific Boundary $S$:</strong> Set of minimally general (maximally specific) hypotheses consistent with training data $\mathcal{D}$.</li>
+          <li><strong>General Boundary $G$:</strong> Set of maximally general hypotheses consistent with training data $\mathcal{D}$.</li>
+          <li><strong>Version Space ($VS$):</strong> The entire set of hypotheses lying between $S$ and $G$ that are consistent with all examples.</li>
+        </ul>
+
+        <h2>2. Solved Step-by-Step Numerical: "Japanese Economy Car"</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Step</th><th>Instance</th><th>Type</th><th>$S$ Boundary</th><th>$G$ Boundary</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>0</strong></td>
+                <td>Init</td>
+                <td>-</td>
+                <td>$S_0 = \{\langle \emptyset, \emptyset, \emptyset, \emptyset, \emptyset \rangle\}$</td>
+                <td>$G_0 = \{\langle ?, ?, ?, ?, ? \rangle\}$</td>
+              </tr>
+              <tr>
+                <td><strong>1</strong></td>
+                <td>(Japan, Honda, Blue, 1980, Economy)</td>
+                <td><strong>Positive</strong></td>
+                <td>$S_1 = \{\langle \text{Japan, Honda, Blue, 1980, Economy} \rangle\}$</td>
+                <td>$G_1 = \{\langle ?, ?, ?, ?, ? \rangle\}$</td>
+              </tr>
+              <tr>
+                <td><strong>2</strong></td>
+                <td>(Japan, Toyota, Green, 1970, Sports)</td>
+                <td><strong>Negative</strong></td>
+                <td>$S_2 = S_1$ (No change)</td>
+                <td>$G_2 = \{\langle ?, \text{Honda}, ?, ?, ? \rangle, \langle ?, ?, \text{Blue}, ?, ? \rangle, \langle ?, ?, ?, 1980, ? \rangle, \langle ?, ?, ?, ?, \text{Economy} \rangle\}$</td>
+              </tr>
+              <tr>
+                <td><strong>3</strong></td>
+                <td>(Japan, Toyota, Blue, 1990, Economy)</td>
+                <td><strong>Positive</strong></td>
+                <td>Generalize $S$:
+                  <br>$S_3 = \{\langle \text{Japan}, ?, \text{Blue}, ?, \text{Economy} \rangle\}$</td>
+                <td>Prune inconsistent members in $G$:
+                  <br>$G_3 = \{\langle ?, ?, \text{Blue}, ?, ? \rangle, \langle ?, ?, ?, ?, \text{Economy} \rangle\}$</td>
+              </tr>
+              <tr>
+                <td><strong>4</strong></td>
+                <td>(USA, Chrysler, Red, 1980, Economy)</td>
+                <td><strong>Negative</strong></td>
+                <td>$S_4 = S_3$</td>
+                <td>Specialize $G$ to exclude USA:
+                  <br>$G_4 = \{\langle ?, ?, \text{Blue}, ?, ? \rangle, \langle \text{Japan}, ?, ?, ?, \text{Economy} \rangle\}$</td>
+              </tr>
+              <tr>
+                <td><strong>5</strong></td>
+                <td>(Japan, Honda, White, 1980, Economy)</td>
+                <td><strong>Positive</strong></td>
+                <td>Generalize $S$ (Blue $\to$ ?):
+                  <br>$S_5 = \{\langle \text{Japan}, ?, ?, ?, \text{Economy} \rangle\}$</td>
+                <td>Remove $G$ members that don't cover $S_5$:
+                  <br>$G_5 = \{\langle \text{Japan}, ?, ?, ?, \text{Economy} \rangle\}$</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="interview-alert">
+          <h4>💡 Convergence Result:</h4>
+          <p>At Step 5, $S_5 = G_5 = \{\langle \text{Japan}, ?, ?, ?, \text{Economy} \rangle\}$. The Version Space has <strong>converged to a single unique target concept</strong>: <em>"Any Japanese Economy car regardless of manufacturer, color, or decade!"</em></p>
+        </div>
+      </section>
+
+      <!-- TAB 6: INDUCTIVE BIAS -->
+      <section id="tab-bias" class="tab-section">
+        <h1>Inductive Bias & The No Free Lunch Theorem</h1>
+        <p class="section-subtitle">Why unbiased learners cannot generalize, and the assumptions every algorithm makes.</p>
+
+        <div class="math-box">
+          <h4>What is Inductive Bias?</h4>
+          <p><em>The set of prior assumptions that the learner uses to predict outputs on unseen data beyond the observed training instances.</em></p>
+          <p><strong>Mathematical Rule:</strong> Without inductive bias, an algorithm can only memorize observed data (Rote Learning). It has <em>zero logical basis</em> to classify any unseen instance!</p>
+        </div>
+
+        <h2>Inductive Biases of Major ML Algorithms</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Its Specific Inductive Bias</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Find-S</strong></td>
+                <td>Target concept is representable in $H$, and all instances are negative unless entailed by positive examples.</td>
+              </tr>
+              <tr>
+                <td><strong>Candidate Elimination</strong></td>
+                <td>Target concept is contained somewhere within the hypothesis space $H$.</td>
+              </tr>
+              <tr>
+                <td><strong>K-Nearest Neighbors</strong></td>
+                <td><strong>Locality Assumption:</strong> Points close to each other in feature space share the same label.</td>
+              </tr>
+              <tr>
+                <td><strong>Linear Regression</strong></td>
+                <td>The relationship between inputs and outputs is strictly linear and additive.</td>
+              </tr>
+              <tr>
+                <td><strong>Decision Trees</strong></td>
+                <td>Short, shallow trees with high Information Gain splits near the root are preferred (Occam's Razor).</td>
+              </tr>
+              <tr>
+                <td><strong>Naïve Bayes</strong></td>
+                <td>All input features are conditionally independent given the target class.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="interview-alert">
+          <h4>⚡ The "No Free Lunch" (NFL) Theorem:</h4>
+          <p>Wolpert (1996) proved mathematically that <strong>no single machine learning algorithm outperforms all others when averaged across all possible data-generating distributions</strong>. A model only succeeds because its inductive bias happens to match the geometric structure of the specific real-world problem!</p>
+        </div>
+      </section>
+
+      <!-- TAB 7: PRODUCTION DATA DRIFT -->
+      <section id="tab-drift" class="tab-section">
+        <h1>Production Data Drift <span class="badge badge-missing">Missing in PDF</span></h1>
+        <p class="section-subtitle">Why ML models degrade in production and how senior engineers detect it.</p>
+
+        <div class="missing-box">
+          <h4>📌 Senior ML Interview Question:</h4>
+          <p><em>"Your spam filter model was launched with 98% accuracy, but 6 months later users complain spam is slipping through. What happened?"</em></p>
+        </div>
+
+        <h2>The 3 Types of Production Drift</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Type of Drift</th>
+                <th>Mathematical Definition</th>
+                <th>Real-World Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Covariate Shift (Data Drift)</strong></td>
+                <td>$P(X)$ changes, but $P(y \mid X)$ stays constant.</td>
+                <td>Self-driving car trained in sunny California is deployed in snowy Michigan. Input images change, but what constitutes a stop sign remains the same.</td>
+              </tr>
+              <tr>
+                <td><strong>Concept Drift</strong></td>
+                <td>$P(y \mid X)$ changes, but $P(X)$ distribution may be identical.</td>
+                <td>Macroeconomic inflation shifts: A loan applicant with \$5,000 monthly income was low-risk in 2020, but high-risk in 2024 due to inflation.</td>
+              </tr>
+              <tr>
+                <td><strong>Prior Probability Shift</strong></td>
+                <td>$P(y)$ changes, but $P(X \mid y)$ stays constant.</td>
+                <td>During COVID-19 pandemic, the percentage of flu patients testing positive for viral pneumonia spiked dramatically worldwide.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>How to Detect Drift in Production:</h2>
+        <ul>
+          <li><strong>PSI (Population Stability Index):</strong> Measures difference between baseline and production feature distributions. PSI $< 0.1$ = stable; PSI $> 0.25$ = significant drift, trigger model retrain!</li>
+          <li><strong>Kolmogorov-Smirnov (KS) Test:</strong> Non-parametric test comparing the empirical cumulative distributions of continuous features.</li>
+        </ul>
+      </section>
+
+      <!-- TAB 8: FAANG INTERVIEW Q&A -->
+      <section id="tab-interview" class="tab-section">
+        <h1>FAANG / Top ML Role Interview Q&As</h1>
+        <p class="section-subtitle">Real interview scenarios on Module 1 concepts.</p>
+
+        <details open>
+          <summary><span>Q1: What happens to Candidate Elimination if training data has a single noisy label?</span> <span class="badge badge-faang">FAANG Trap</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The Version Space completely collapses to the <strong>empty set ($\emptyset$)</strong>!</p>
+            <p>Because Candidate Elimination is strictly deterministic and noise-intolerant, a mislabeled positive example forces $S$ to over-generalize, while a mislabeled negative forces $G$ to over-specialize. Eventually, the $S$ boundary becomes more general than the $G$ boundary ($S$ and $G$ cross each other), meaning no hypothesis in $H$ is consistent with all data. This is why Candidate Elimination is never used in real-world noisy production environments.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: Can an unbiased machine learning algorithm generalize to unseen instances?</span> <span class="badge badge-concept">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer: No, absolutely not.</strong></p>
+            <p>An unbiased learner has no basis for preferring one unobserved classification over another. If an instance has not been seen before, every possible classification is equally consistent with the training data. Generalization is fundamentally impossible without inductive bias.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: What is PAC Learning (Probably Approximately Correct)?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p>PAC learning formalizes mathematical machine learning: An algorithm is PAC-learnable if, with high probability ($1 - \delta$), it outputs a hypothesis whose true error on unseen data is bounded by $\epsilon$, using a polynomial number of training samples $m \ge \frac{1}{\epsilon} \left( \ln |H| + \ln \frac{1}{\delta} \right)$.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- TAB 9: QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>Module 1 Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Check your retention with instant scoring.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. In the EnjoySport concept with 6 attributes (Sky has 3 values, others have 2), how many SEMANTICALLY distinct hypotheses exist?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) 5,120</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) 973</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) 96</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) 4,148</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> $1 + (4 \times 3^5) = 1 + 972 = 973$. All hypotheses containing $\emptyset$ represent the exact same empty concept, collapsing down to 1.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. When input distribution P(X) changes over time but the conditional relationship P(y|X) stays the same, what type of drift has occurred?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">A) Covariate Shift (Data Drift)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">B) Concept Drift</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) Prior Probability Shift</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Label Bias</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> Covariate shift refers to shifts in the distribution of predictors $P(X)$ while the true underlying mapping function $P(y|X)$ remains invariant.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      const target = document.getElementById(tabId);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => 
+        item.getAttribute('onclick').includes(tabId)
+      );
+      if (activeNavItem) activeNavItem.classList.add('active');
+
+      // Close mobile drawer on item tap
+      if (window.innerWidth <= 820) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    }
+
+    function checkAnswer(btn, isCorrect, explanationId) {
+      const parent = btn.parentElement;
+      const options = parent.querySelectorAll('.quiz-option');
+      options.forEach(opt => opt.onclick = null);
+
+      if (isCorrect) {
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('incorrect');
+        options.forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+
+      const exp = document.getElementById(explanationId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

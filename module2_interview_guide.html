@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Module 2: End-to-End Data Pipelines, Preprocessing & Classification Mastery</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #34d399;
+      --accent-glow: rgba(52, 211, 153, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --sky: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Bar */
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+
+    /* Sidebar Navigation */
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+      z-index: 100;
+    }
+    .sidebar-title {
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { background: var(--accent-glow); color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+
+    /* Main Content Area */
+    #main-content {
+      flex-grow: 1;
+      padding: 2.2rem 3.5rem;
+      max-width: 1100px;
+      overflow-x: hidden;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Typography & Structural Elements */
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.4rem; letter-spacing: -0.5px; }
+    .section-subtitle { font-size: 1.02rem; color: var(--text-muted); margin-bottom: 1.8rem; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem; }
+    h2 { font-size: 1.45rem; margin: 2rem 0 0.8rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.3rem 0 0.6rem 0; color: #e2e8f0; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.4rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    /* Specialized Callout Cards */
+    .card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .interview-alert { background: rgba(251, 191, 36, 0.08); border-left: 4px solid var(--warning); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .interview-alert h4 { color: var(--warning); margin-bottom: 0.4rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .math-box { background: rgba(192, 132, 252, 0.08); border-left: 4px solid var(--purple); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; overflow-x: auto; }
+    .math-box h4 { color: var(--purple); margin-bottom: 0.4rem; font-size: 1rem; }
+    .missing-box { background: rgba(52, 211, 153, 0.08); border-left: 4px solid var(--success); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .missing-box h4 { color: var(--success); margin-bottom: 0.4rem; font-size: 1rem; }
+    .first-principles { background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--sky); border-radius: 6px; padding: 1.2rem; margin: 1.3rem 0; }
+    .first-principles h4 { color: var(--sky); margin-bottom: 0.4rem; font-size: 1rem; }
+
+    /* Tables */
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border: 1px solid var(--border); border-radius: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: #162238; color: var(--accent); font-weight: 600; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Code & Syntax */
+    pre { background: var(--code-bg); border: 1px solid #1a273f; border-radius: 8px; padding: 1.25rem; overflow-x: auto; margin: 1.1rem 0 1.5rem 0; font-family: 'Consolas', 'Fira Code', monospace; font-size: 0.88rem; color: #e2e8f0; line-height: 1.55; }
+    code { font-family: 'Consolas', 'Fira Code', monospace; background: rgba(255, 255, 255, 0.08); padding: 0.15rem 0.35rem; border-radius: 4px; font-size: 0.88em; color: var(--accent); }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    /* Collapsible Details / Accordions */
+    details { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 1rem; transition: border-color 0.2s; }
+    details[open] { border-color: var(--accent); }
+    summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { padding: 0 1.25rem 1.25rem 1.25rem; border-top: 1px solid var(--border); padding-top: 0.9rem; font-size: 0.94rem; color: #cbd5e1; }
+
+    /* Quiz Widget */
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.9rem; color: #fff; font-size: 1rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { background: var(--bg-primary); border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.91rem; transition: all 0.2s; color: #cbd5e1; }
+    .quiz-option:hover { border-color: var(--accent); color: #fff; }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #16243d; border-left: 3px solid var(--accent); font-size: 0.9rem; margin-top: 0.7rem; color: #e2e8f0; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-missing { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+    .badge-core { background: rgba(56, 189, 248, 0.2); color: var(--sky); }
+
+    /* Responsive Mobile Styles */
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { position: fixed; left: -330px; top: 49px; bottom: 0; z-index: 150; transition: left 0.25s ease; box-shadow: 4px 0 20px rgba(0,0,0,0.5); }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">ML<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="module1_interview_guide.html" class="mod-link">M1: Foundations</a>
+      <a href="module2_interview_guide.html" class="mod-link active">M2: Pipelines</a>
+      <a href="module3_interview_guide.html" class="mod-link">M3: Regression</a>
+      <a href="module4_interview_guide.html" class="mod-link">M4: Trees/Ensembles</a>
+      <a href="module5_interview_guide.html" class="mod-link">M5: Bayesian</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">Module 2 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-lifecycle')"><span>🌱</span> 1. ML 101 & 8-Step Lifecycle</li>
+        <li class="nav-item" onclick="switchTab('tab-eda')"><span>🔍</span> 2. EDA & Stratified Splitting</li>
+        <li class="nav-item" onclick="switchTab('tab-imputation')"><span>🧩</span> 3. Missing Data & Rubin's Taxonomy</li>
+        <li class="nav-item" onclick="switchTab('tab-encoding')"><span>🏷️</span> 4. Outliers & Categorical Encodings</li>
+        <li class="nav-item" onclick="switchTab('tab-scaling')"><span>⚖️</span> 5. Scaling, Pipelines & Leakage</li>
+        <li class="nav-item" onclick="switchTab('tab-metrics')"><span>🎯</span> 6. Classification & Confusion Matrix</li>
+        <li class="nav-item" onclick="switchTab('tab-curves')"><span>📈</span> 7. Thresholds, PR vs. ROC Curves</li>
+        <li class="nav-item" onclick="switchTab('tab-imbalance')"><span>⚖️</span> 8. Severe Imbalance & Calibration</li>
+        <li class="nav-item" onclick="switchTab('tab-multiclass')"><span>🔢</span> 9. Multiclass, Multilabel & Multioutput</li>
+        <li class="nav-item" onclick="switchTab('tab-validation')"><span>🧪</span> 10. CV, Grid/Random Search & CI</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 22+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: LIFECYCLE & BASICS -->
+      <section id="tab-lifecycle" class="tab-section active">
+        <h1>Machine Learning 101: First Principles & The 8-Step Lifecycle</h1>
+        <p class="section-subtitle">Demystifying core terminology, regression vs. classification, and the production ML lifecycle from the ground up.</p>
+
+        <div class="first-principles">
+          <h4>🌟 What is Machine Learning? (From First Principles)</h4>
+          <p>In traditional computer programming, human software engineers write explicit <strong>Rules</strong> (nested <code>if-else</code> conditions, algorithms) and feed in <strong>Data</strong> to produce <strong>Answers</strong>:</p>
+          <p style="text-align:center; font-family:monospace; color:var(--sky); font-weight:bold;">Data + Rules &rarr; Answers (Traditional Software)</p>
+          <p>In <strong>Machine Learning</strong>, this paradigm is inverted. We feed in the <strong>Data</strong> and the corresponding ground-truth <strong>Answers</strong>, and the computer automatically extracts the underlying mathematical <strong>Rules</strong> (mapping function $f$):</p>
+          <p style="text-align:center; font-family:monospace; color:var(--accent); font-weight:bold;">Data + Answers &rarr; Rules / Model (Machine Learning)</p>
+          <p><strong>Why was this necessary?</strong> Real-world problems like predicting housing market dynamics, diagnosing tumors from MRI scans, or catching fraudulent wire transfers are governed by complex, noisy, non-linear interactions across hundreds of variables. Writing static human rules for these tasks is impossible.</p>
+        </div>
+
+        <h2>1. The Core ML Vocabulary (Every Beginner Must Master)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Plain English Analogy</th>
+                <th>Formal Mathematical Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Instance / Sample ($\mathbf{x}^{(i)}$)</strong></td>
+                <td>A single row in a spreadsheet (e.g. one specific house in California).</td>
+                <td>A vector of observations $\mathbf{x}^{(i)} \in \mathbb{R}^d$ where $i \in \{1, \dots, m\}$.</td>
+              </tr>
+              <tr>
+                <td><strong>Features ($x_1, x_2, \dots, x_d$)</strong></td>
+                <td>The columns describing the house (e.g. square footage, bedrooms, zip code).</td>
+                <td>The independent variables that form the dimensions of the feature space $\mathcal{X}$.</td>
+              </tr>
+              <tr>
+                <td><strong>Target Label ($y$)</strong></td>
+                <td>The answer you are trying to predict (e.g. actual selling price: \$450,000).</td>
+                <td>The ground-truth dependent variable $y \in \mathcal{Y}$.</td>
+              </tr>
+              <tr>
+                <td><strong>Model Parameters ($\mathbf{w}, b$)</strong></td>
+                <td>The internal knobs the algorithm turns automatically during learning.</td>
+                <td>Weights and biases adjusted by optimization algorithms (e.g. Gradient Descent, Normal Equation) to minimize loss.</td>
+              </tr>
+              <tr>
+                <td><strong>Hyperparameters ($\alpha, k$)</strong></td>
+                <td>The external settings the engineer tunes before training begins (e.g. learning rate, tree depth).</td>
+                <td>Structural configuration values not learned from data that govern the training process itself.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Supervised Learning: Regression vs. Classification</h2>
+        <p>In Supervised Learning, every training observation comes paired with an observed ground-truth target $y$. Supervised problems divide into two major branches:</p>
+        <ul>
+          <li><strong>Regression ($y \in \mathbb{R}$):</strong> Predicting a continuous, unbounded numerical value (e.g. California median home value, stock return, engine temperature).</li>
+          <li><strong>Classification ($y \in \{0, 1\}$ or $\{1, \dots, K\}$):</strong> Predicting a discrete categorical class label (e.g. is transaction fraud or legit? Is handwritten digit a 0, 1, ..., or 9?).</li>
+        </ul>
+
+        <h2>3. The 8-Step Industry Machine Learning Lifecycle</h2>
+        <p>In university textbooks, students often jump straight to <code>model.fit()</code>. In top engineering teams (Google, Meta, Uber), model training is only 10% of the effort. Here is the canonical 8-step lifecycle:</p>
+
+        <div class="card">
+          <ol style="margin-bottom:0;">
+            <li><strong>Step 1: Frame the Business Problem:</strong> Is it supervised or unsupervised? Batch or online? What is the business KPI (revenue loss from fraud, conversion rate)?</li>
+            <li><strong>Step 2: Data Acquisition & Storage:</strong> Pulling data from SQL warehouses, BigQuery, Kafka streams; checking data governance and permissions.</li>
+            <li><strong>Step 3: Exploratory Data Analysis (EDA):</strong> Inspecting distributions, finding skewness, identifying pre-capped values, visualizing spatial correlations.</li>
+            <li><strong>Step 4: Data Preprocessing & Cleaning:</strong> Diagnosing missing data mechanisms (MCAR/MAR/MNAR), imputing missing values, removing or capping outliers.</li>
+            <li><strong>Step 5: Feature Engineering:</strong> Scaling features, one-hot encoding categoricals, computing interaction ratios (e.g. rooms per household).</li>
+            <li><strong>Step 6: Model Selection & Baselines:</strong> Training simple baselines (Linear Regression, Decision Trees) to establish benchmark error before complex models.</li>
+            <li><strong>Step 7: Hyperparameter Tuning & Cross-Validation:</strong> Using GridSearchCV or RandomizedSearchCV to maximize validation performance without data leakage.</li>
+            <li><strong>Step 8: Production Deployment & Monitoring:</strong> Serving predictions via low-latency REST/gRPC endpoints, tracking data drift, concept drift, and performance decay.</li>
+          </ol>
+        </div>
+
+        <h2>4. Selecting the Performance Measure for Regression</h2>
+        <p>In the California Housing project, how should we measure error? The two primary industry metrics are Root Mean Squared Error (RMSE) and Mean Absolute Error (MAE):</p>
+
+        <div class="math-box">
+          <h4>Mathematical Formulations:</h4>
+          <p><strong>Root Mean Squared Error (RMSE) — The $L_2$ Euclidean Norm:</strong></p>
+          $$\text{RMSE}(\mathbf{X}, h) = \sqrt{\frac{1}{m} \sum_{i=1}^m \left( h(\mathbf{x}^{(i)}) - y^{(i)} \right)^2} = \frac{1}{\sqrt{m}} \|\mathbf{e}\|_2$$
+          <p><strong>Mean Absolute Error (MAE) — The $L_1$ Manhattan Norm:</strong></p>
+          $$\text{MAE}(\mathbf{X}, h) = \frac{1}{m} \sum_{i=1}^m \left| h(\mathbf{x}^{(i)}) - y^{(i)} \right| = \frac{1}{m} \|\mathbf{e}\|_1$$
+        </div>
+
+        <div class="interview-alert">
+          <h4>🔥 FAANG Interview Showdown: When to pick RMSE vs. MAE?</h4>
+          <ul>
+            <li><strong>Choose RMSE when large errors are disproportionately disastrous:</strong> Because RMSE squares each residual $(h(x) - y)^2$, an error of \$100,000 is penalized <strong>100 times more severely</strong> than an error of \$10,000. In safety-critical systems, aerospace, or loan default modeling, use RMSE. Furthermore, RMSE is smooth and everywhere differentiable, making it ideal for gradient-based optimizers.</li>
+            <li><strong>Choose MAE when your dataset contains heavy outliers:</strong> MAE penalizes all errors linearly. An extreme \$10,000,000 mansion outlier will not completely drag the model's parameters away from the normal population.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 2: EDA & STRATIFIED SPLIT -->
+      <section id="tab-eda" class="tab-section">
+        <h1>Exploratory Data Analysis (EDA) & Strategic Splitting</h1>
+        <p class="section-subtitle">Uncovering data anomalies, visualizing geographical patterns, and preventing sampling bias.</p>
+
+        <h2>1. Why EDA is Non-Negotiable</h2>
+        <p>Exploratory Data Analysis (EDA) is the detective phase of machine learning. You must interrogate your dataset to answer: Are there missing values? Are attributes right-skewed? Have values been artificially clipped by human data collectors?</p>
+
+        <pre><code>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+housing = pd.read_csv("housing.csv")
+
+# 1. Inspect first 5 rows
+print(housing.head())
+
+# 2. Check column types, memory, and non-null counts
+print(housing.info())
+# Notice: 'total_bedrooms' has 20,433 non-null entries out of 20,640 total rows (207 missing values!)
+# 'ocean_proximity' is object dtype (categorical)
+
+# 3. Summary statistics of numerical columns
+print(housing.describe())</code></pre>
+
+        <h2>2. Visualizing Distributions & The \$500,000 Data Cap Trap</h2>
+        <p>Plotting histograms of each numerical feature reveals critical data engineering insights:</p>
+        <pre><code>housing.hist(bins=50, figsize=(15, 10))
+plt.show()</code></pre>
+
+        <div class="interview-alert">
+          <h4>🚨 The Pre-Capped Data Disaster (Common Interview Question):</h4>
+          <p>Looking at the histogram of <code>median_house_value</code> in California Housing, you observe a massive vertical spike at exactly <strong>\$500,000</strong>. Similarly, <code>median_income</code> has been pre-processed (scaled into tens of thousands and capped at 15).</p>
+          <p><strong>The Danger:</strong> The data collection agency capped all house values exceeding \$500k at \$500k. If you train a model on this unadjusted data, the algorithm learns that <em>no house in California can ever be worth more than \$500,000</em>! If deployed to production, it will wildly underestimate luxury properties.</p>
+          <p><strong>Senior Engineering Remedies:</strong></p>
+          <ol>
+            <li>Collect the uncapped real ground-truth labels from the client/source.</li>
+            <li>Remove the capped instances from both the training set and the test set so the model is not evaluated on artificially corrupted labels.</li>
+          </ol>
+        </div>
+
+        <h2>3. Geographical Visualization: Revealing Non-Linear Patterns</h2>
+        <p>Because California housing includes latitude and longitude, plotting a raw scatter plot yields an uninterpretable blob. By introducing <strong>alpha blending</strong>, <strong>population-proportional marker sizing</strong>, and a <strong>heat color map</strong>, the underlying geographical structure instantly emerges:</p>
+
+        <pre><code>housing.plot(kind="scatter", x="longitude", y="latitude", alpha=0.4,
+             s=housing["population"]/100, label="population", figsize=(10,7),
+             c="median_house_value", cmap=plt.get_cmap("jet"), colorbar=True)
+plt.legend()
+plt.show()</code></pre>
+        <p><strong>Key Insight:</strong> Prices are tied to two primary physical factors: <em>proximity to the ocean</em> and <em>high-density metropolitan clusters</em> (Los Angeles and the San Francisco Bay Area). This informs our feature engineering.</p>
+
+        <h2>4. Pearson's Correlation Coefficient ($r$) & Its Fatal Blindspot</h2>
+        <p>We compute the standard linear correlation matrix between every feature and the target:</p>
+        $$\rho_{X, Y} = \frac{\sum_{i=1}^m (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^m (x_i - \bar{x})^2 \sum_{i=1}^m (y_i - \bar{y})^2}}$$
+
+        <pre><code>corr_matrix = housing.corr(numeric_only=True)
+print(corr_matrix["median_house_value"].sort_values(ascending=False))
+# median_house_value    1.000000
+# median_income         0.687160  <-- Extremely strong predictor!
+# total_rooms           0.134153
+# ...
+# latitude             -0.144160
+# longitude            -0.045967</code></pre>
+
+        <div class="math-box">
+          <h4>⚠️ The Fatal Blindspot of Pearson's $r$:</h4>
+          <p>Pearson's $r$ measures <strong>strictly LINEAR relationships</strong>. If $y = x^2$ centered around 0, or if $y = \sin(x)$, Pearson's correlation is exactly <strong>$r = 0$</strong>! A junior engineer might mistakenly drop $x$ thinking it has no predictive power, even though $y$ can be predicted 100% deterministically from $x$. Always inspect scatter plots or use mutual information / tree feature importances for non-linear interactions.</p>
+        </div>
+
+        <h2>5. Dataset Splitting: Random vs. Stratified Sampling</h2>
+        <p>A naive train-test split randomly allocates 20% of the dataset to testing. Why is this dangerous?</p>
+
+        <div class="first-principles">
+          <h4>🎲 The Flaw of Random Splitting:</h4>
+          <p>Suppose you conduct a political election survey across 1,000 citizens in a nation that is 51% female and 49% male. If you randomly sample 100 people, you might accidentally draw 65% men and 35% women due to sampling noise. Your survey results will be completely biased!</p>
+          <p>In California Housing, <code>median_income</code> is the #1 predictor of house price. If our test set randomly receives too many low-income or high-income households, our test evaluation score will be completely unreliable.</p>
+        </div>
+
+        <p><strong>Stratified Sampling Solution:</strong> Divide the dataset into homogeneous subgroups called <strong>strata</strong>, and ensure the test set contains the exact percentage of each stratum as the full population:</p>
+
+        <pre><code>from sklearn.model_selection import StratifiedShuffleSplit
+
+# Step 1: Create discrete income strata (1 to 5)
+housing["income_cat"] = pd.cut(housing["median_income"],
+                               bins=[0., 1.5, 3.0, 4.5, 6., np.inf],
+                               labels=[1, 2, 3, 4, 5])
+
+# Step 2: Perform Stratified Shuffle Split
+split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
+for train_index, test_index in split.split(housing, housing["income_cat"]):
+    strat_train_set = housing.loc[train_index]
+    strat_test_set = housing.loc[test_index]
+
+# Step 3: Remove the temporary income_cat column to restore clean data
+for set_ in (strat_train_set, strat_test_set):
+    set_.drop("income_cat", axis=1, inplace=True)</code></pre>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Income Category</th>
+                <th>Overall Population Proportion</th>
+                <th>Random Split Proportion</th>
+                <th>Stratified Split Proportion</th>
+                <th>Random Error %</th>
+                <th>Stratified Error %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Category 1</strong></td>
+                <td>3.98%</td>
+                <td>4.24%</td>
+                <td>3.99%</td>
+                <td style="color:var(--danger); font-weight:bold;">+6.45%</td>
+                <td style="color:var(--success); font-weight:bold;">+0.16%</td>
+              </tr>
+              <tr>
+                <td><strong>Category 2</strong></td>
+                <td>31.74%</td>
+                <td>30.74%</td>
+                <td>31.73%</td>
+                <td style="color:var(--danger); font-weight:bold;">-3.13%</td>
+                <td style="color:var(--success); font-weight:bold;">-0.01%</td>
+              </tr>
+              <tr>
+                <td><strong>Category 3</strong></td>
+                <td>35.06%</td>
+                <td>34.52%</td>
+                <td>35.05%</td>
+                <td style="color:var(--danger); font-weight:bold;">-1.54%</td>
+                <td style="color:var(--success); font-weight:bold;">-0.01%</td>
+              </tr>
+              <tr>
+                <td><strong>Category 4</strong></td>
+                <td>17.63%</td>
+                <td>18.41%</td>
+                <td>17.64%</td>
+                <td style="color:var(--danger); font-weight:bold;">+4.42%</td>
+                <td style="color:var(--success); font-weight:bold;">+0.04%</td>
+              </tr>
+              <tr>
+                <td><strong>Category 5</strong></td>
+                <td>11.44%</td>
+                <td>12.09%</td>
+                <td>11.45%</td>
+                <td style="color:var(--danger); font-weight:bold;">+5.63%</td>
+                <td style="color:var(--success); font-weight:bold;">+0.08%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: MISSING DATA & RUBIN'S TAXONOMY -->
+      <section id="tab-imputation" class="tab-section">
+        <h1>Missing Data & Rubin's Taxonomy <span class="badge badge-missing">Missing in PDF</span></h1>
+        <p class="section-subtitle">Why naive dropping ruins models, Rubin's 3 mechanisms (MCAR, MAR, MNAR), and modern imputation algorithms.</p>
+
+        <div class="first-principles">
+          <h4>🤔 Why Does Data Go Missing?</h4>
+          <p>In California Housing, <code>total_bedrooms</code> has 207 missing values. Why can't we simply call <code>housing.dropna()</code> and delete those rows?</p>
+          <p><strong>The Catastrophe of Naive Dropping:</strong> Deleting missing rows (complete case analysis) destroys sample size, discards all other perfectly valid features in those rows, and most dangerously, introduces <strong>severe selection bias</strong> if the missingness was not completely random!</p>
+        </div>
+
+        <h2>1. Rubin's Taxonomy of Missingness (FAANG Favorite)</h2>
+        <p>In 1976, Harvard statistician Donald Rubin proved that how you handle missing data depends fundamentally on the underlying <strong>missingness mechanism</strong>:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Mechanism</th>
+                <th>Formal Definition</th>
+                <th>Real-World Example</th>
+                <th>Imputation Strategy</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>MCAR<br>(Missing Completely at Random)</strong></td>
+                <td>$$P(M \mid Y_{\text{obs}}, Y_{\text{mis}}) = P(M)$$
+                The probability of missingness is purely independent of both observed and unobserved data.</td>
+                <td>A lab assistant accidentally drops and shatters a blood test tube. A network packet randomly drops due to static noise.</td>
+                <td>Mean / Median imputation is unbiased for the mean. Dropping rows does not introduce bias, only reduces statistical power.</td>
+              </tr>
+              <tr>
+                <td><strong>MAR<br>(Missing at Random)</strong></td>
+                <td>$$P(M \mid Y_{\text{obs}}, Y_{\text{mis}}) = P(M \mid Y_{\text{obs}})$$
+                Missingness depends systematically on <em>observed</em> features, but NOT on the missing value itself.</td>
+                <td>Older men in a survey are less likely to report depression. However, <em>within</em> the demographic of older men, depression reporting is random.</td>
+                <td>Dropping rows introduces bias! You must use conditional imputation: <strong>KNNImputer</strong> or <strong>MICE (IterativeImputer)</strong> conditioned on observed features.</td>
+              </tr>
+              <tr>
+                <td><strong>MNAR<br>(Missing Not at Random)</strong></td>
+                <td>$$P(M \mid Y_{\text{obs}}, Y_{\text{mis}}) \text{ depends on } Y_{\text{mis}}$$
+                The probability of a value being missing depends directly on the unobserved value itself!</td>
+                <td>Ultra-wealthy individuals refuse to report their annual income. Severely depressed patients drop out of a clinical trial.</td>
+                <td>Standard imputation is heavily biased. You MUST append a <strong>Missing Indicator</strong> flag column and use selection modeling (e.g. Heckman correction).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Modern Imputation Algorithms Compared</h2>
+
+        <div class="card">
+          <h3>Option A: Simple Imputation (Mean vs. Median vs. Mode)</h3>
+          <p>Replaces missing cells with a constant summary statistic calculated from training data.</p>
+          <ul>
+            <li><strong>Median:</strong> Preferred for skewed distributions (like income or bedrooms) because extreme outliers do not pull the imputed value.</li>
+            <li><strong>Mean:</strong> Preferred for symmetric, Gaussian distributions.</li>
+            <li><strong>Mode:</strong> Used for categorical attributes.</li>
+          </ul>
+          <pre><code>from sklearn.impute import SimpleImputer
+
+imputer = SimpleImputer(strategy="median")
+# Fit ONLY on numerical training attributes!
+housing_num = strat_train_set.drop("ocean_proximity", axis=1)
+imputer.fit(housing_num)
+
+# imputer.statistics_ contains computed medians for all columns
+X_imputed = imputer.transform(housing_num)</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Option B: KNN Imputation (Preserving Local Manifolds)</h3>
+          <p>Finds the $k$-nearest neighbors for the missing instance based on all other observed features using Euclidean distance, then imputes the weighted average of those neighbors.</p>
+          <pre><code>from sklearn.impute import KNNImputer
+
+knn_imputer = KNNImputer(n_neighbors=5, weights="distance")
+X_knn = knn_imputer.fit_transform(housing_num)</code></pre>
+          <p><strong>Pros:</strong> Preserves complex local feature interactions. <strong>Cons:</strong> Computationally expensive at inference time ($O(N \cdot D)$ search per query sample).</p>
+        </div>
+
+        <div class="card">
+          <h3>Option C: MICE / IterativeImputer (The Gold Standard)</h3>
+          <p>Multivariate Imputation by Chained Equations (MICE) treats each feature with missing values as a dependent variable in a regression model, using all other features as predictors. It runs through multiple iterative cycles until convergence.</p>
+          <pre><code>from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+from sklearn.ensemble import RandomForestRegressor
+
+mice_imputer = IterativeImputer(estimator=RandomForestRegressor(n_estimators=10), max_iter=10, random_state=42)
+X_mice = mice_imputer.fit_transform(housing_num)</code></pre>
+        </div>
+
+        <div class="interview-alert">
+          <h4>💡 The MissingIndicator Feature Engineering Trick:</h4>
+          <p>When data is MNAR, the fact that a value was missing is itself a predictive signal! Scikit-learn provides <code>MissingIndicator</code> (or <code>add_indicator=True</code> inside <code>SimpleImputer</code>):</p>
+          <pre><code>imputer = SimpleImputer(strategy="median", add_indicator=True)
+# Outputs imputed values AND an extra boolean column: 'was_total_bedrooms_missing'</code></pre>
+          <p>In credit risk modeling, applicants who refuse to disclose existing loans have a 4x higher default rate. The boolean indicator captures this signal perfectly!</p>
+        </div>
+      </section>
+
+      <!-- TAB 4: OUTLIERS & CATEGORICAL ENCODING -->
+      <section id="tab-encoding" class="tab-section">
+        <h1>Outlier Detection & Categorical Encodings</h1>
+        <p class="section-subtitle">Mathematical outlier bounds, Tukey's 1.5 IQR proof, the Dummy Variable Trap, and Target Encoding leakage.</p>
+
+        <h2>1. Outlier Detection: Parametric vs. Non-Parametric</h2>
+
+        <div class="math-box">
+          <h4>Method 1: Z-Score (Parametric — Assumes Gaussian Distribution)</h4>
+          $$z = \frac{x - \mu}{\sigma}$$
+          <p>Flag instance as an outlier if $|z| > 3$. Under a standard normal distribution $\mathcal{N}(0, 1)$, 99.73% of data falls within $\pm 3\sigma$. Only 0.27% are outliers.</p>
+          <p><strong>Flaw:</strong> If the data is right-skewed (e.g. income or house prices), the mean $\mu$ and standard deviation $\sigma$ are themselves distorted by the extreme outliers!</p>
+        </div>
+
+        <div class="math-box">
+          <h4>Method 2: Interquartile Range (IQR) / Tukey's Boxplot Rule (Non-Parametric)</h4>
+          $$\text{IQR} = Q_3 - Q_1$$
+          $$\text{Lower Bound} = Q_1 - 1.5 \cdot \text{IQR}, \quad \text{Upper Bound} = Q_3 + 1.5 \cdot \text{IQR}$$
+          <p>Any observation falling outside $[\text{Lower Bound}, \text{Upper Bound}]$ is flagged as an outlier.</p>
+        </div>
+
+        <div class="first-principles">
+          <h4>📐 Mathematical Proof: Why did John Tukey choose 1.5?</h4>
+          <p>For a standard normal distribution $\mathcal{N}(0, 1)$, the 25th percentile $Q_1$ and 75th percentile $Q_3$ are computed using the inverse standard normal CDF $\Phi^{-1}$:</p>
+          $$Q_1 = \Phi^{-1}(0.25) \approx -0.6745 \sigma$$
+          $$Q_3 = \Phi^{-1}(0.75) \approx +0.6745 \sigma$$
+          $$\text{IQR} = Q_3 - Q_1 = 0.6745 - (-0.6745) = 1.3490 \sigma$$
+          <p>Now evaluate Tukey's outer cutoff points:</p>
+          $$\text{Cutoff} = Q_3 + 1.5 \cdot \text{IQR} = 0.6745 \sigma + 1.5 \cdot (1.3490 \sigma) = 0.6745 \sigma + 2.0235 \sigma = \mathbf{2.698 \sigma}$$
+          <p>The cumulative probability outside $\pm 2.698\sigma$ in a normal distribution is:</p>
+          $$P(|Z| > 2.698) = 2 \cdot (1 - \Phi(2.698)) \approx 2 \cdot (1 - 0.9965) \approx \mathbf{0.007} \quad (0.7\%)$$
+          <p><strong>Conclusion:</strong> Tukey chose the multiplier $1.5$ because it neatly encompasses <strong>99.3%</strong> of Gaussian data, making it sensitive enough to flag true anomalies while preventing excessive false alarms on standard data!</p>
+        </div>
+
+        <h2>2. Outlier Remediation Strategies</h2>
+        <ul>
+          <li><strong>Trimming:</strong> Dropping outlier rows entirely. (Risk: discards valuable sample size).</li>
+          <li><strong>Winsorization (Capping):</strong> Clamping values exceeding the 99th percentile to the 99th percentile value, and below the 1st percentile to the 1st percentile.</li>
+          <li><strong>Robust Transformations:</strong> Passing skewed features through $f(x) = \log(1 + x)$ or Box-Cox / Yeo-Johnson power transformations.</li>
+        </ul>
+
+        <h2>3. Categorical Encodings Masterclass</h2>
+        <p>In California Housing, <code>ocean_proximity</code> contains text labels: <code>['&lt;1H OCEAN', 'INLAND', 'ISLAND', 'NEAR BAY', 'NEAR OCEAN']</code>. Machine learning algorithms operate strictly on numbers. How do we convert them?</p>
+
+        <div class="card">
+          <h3>Approach 1: Ordinal Encoding (Integer Mapping)</h3>
+          <p>Maps each category to an arbitrary integer: <code>{'&lt;1H OCEAN': 0, 'INLAND': 1, 'ISLAND': 2, ...}</code></p>
+          <pre><code>from sklearn.preprocessing import OrdinalEncoder
+ordinal_encoder = OrdinalEncoder()
+housing_cat_encoded = ordinal_encoder.fit_transform(housing[["ocean_proximity"]])</code></pre>
+          <p><strong>🚨 The Junior Trap:</strong> ML models (especially linear regression, SVM, KNN) assume that two nearby values are more similar than two distant values ($0 &lt; 1 &lt; 2$). Here, the model would assume that <code>ISLAND (2)</code> is twice as "oceanic" as <code>INLAND (1)</code>! Use OrdinalEncoder <strong>only</strong> when true intrinsic ranking exists (e.g. <code>['Junior', 'Mid', 'Senior', 'Staff']</code>).</p>
+        </div>
+
+        <div class="card">
+          <h3>Approach 2: One-Hot Encoding & The Dummy Variable Trap</h3>
+          <p>Creates a binary column for every distinct category ($1$ if present, $0$ otherwise).</p>
+          <pre><code>from sklearn.preprocessing import OneHotEncoder
+cat_encoder = OneHotEncoder(drop='first', sparse_output=False)
+housing_cat_1hot = cat_encoder.fit_transform(housing[["ocean_proximity"]])</code></pre>
+
+          <div class="interview-alert">
+            <h4>⚠️ The Dummy Variable Trap (Multicollinearity):</h4>
+            <p>If a categorical feature has $K$ categories, the sum of all $K$ one-hot indicator columns is always identically 1:</p>
+            $$\sum_{j=1}^K x_{ij} = 1 \quad \forall i$$
+            <p>If your Linear Regression model includes an intercept term $\beta_0$, one feature is a perfect linear combination of the others ($x_K = 1 - \sum_{j=1}^{K-1} x_j$). The feature matrix $X$ loses full column rank, and $(X^T X)$ becomes <strong>singular (non-invertible)</strong>!</p>
+            <p><strong>Fix:</strong> Set <code>drop='first'</code> in Scikit-Learn to create $K-1$ columns. (Note: Tree-based models like Random Forests do not suffer from the dummy variable trap and prefer keeping all $K$ columns).</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Approach 3: Target Encoding & The In-Sample Leakage Disaster <span class="badge badge-missing">Missing in PDF</span></h3>
+          <p>What if a categorical column has 50,000 distinct categories (e.g. zip codes)? One-Hot Encoding would explode into 50,000 sparse columns, crashing GPU memory. <strong>Target Encoding</strong> replaces each category $c$ with the mean of the target variable $y$ for that category:</p>
+          $$\hat{x}_c = \frac{1}{n_c} \sum_{i \in c} y_i$$
+
+          <div class="interview-alert">
+            <h4>🚨 The Fatal Leakage of Naive Target Encoding:</h4>
+            <p>Suppose zip code <code>90210</code> appears only <strong>once</strong> in your training set with house price \$1,500,000. Naive target encoding replaces <code>90210</code> with 1,500,000. The model learns to simply copy this feature! On unseen test data, this rare category severely overfits.</p>
+            <p><strong>The 2 Industry Solutions:</strong></p>
+            <ol>
+              <li><strong>Additive Smoothing ($m$-estimate):</strong>
+                $$S_i = \frac{n_c \cdot \bar{y}_c + m \cdot \bar{y}_{\text{global}}}{n_c + m}$$
+                Where $m$ is smoothing weight. For rare categories ($n_c \to 0$), $S_i$ shrinks toward the global average $\bar{y}_{\text{global}}$.
+              </li>
+              <li><strong>Out-of-Fold (OOF) Target Encoding:</strong> Compute category target means using strictly the other $K-1$ cross-validation folds!</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: SCALING, PIPELINES & LEAKAGE -->
+      <section id="tab-scaling" class="tab-section">
+        <h1>Feature Scaling, Pipelines & Data Leakage Prevention</h1>
+        <p class="section-subtitle">Mathematical formulations, algorithm sensitivity, custom Scikit-Learn transformers, and the 4 deadly sins of data leakage.</p>
+
+        <h2>1. Feature Scalers: Mathematical Formulations & Trade-offs</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Scaler</th>
+                <th>Formula</th>
+                <th>Properties</th>
+                <th>Outlier Sensitivity</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>StandardScaler</strong></td>
+                <td>$$z = \frac{x - \mu}{\sigma}$$</td>
+                <td>Centers at $\mu = 0$, scales variance to $\sigma^2 = 1$. Unbounded.</td>
+                <td>Moderate. Outliers shift the mean $\mu$ and inflate $\sigma$, but inliers are not crushed.</td>
+              </tr>
+              <tr>
+                <td><strong>MinMaxScaler</strong></td>
+                <td>$$x_{\text{scaled}} = \frac{x - x_{\text{min}}}{x_{\text{max}} - x_{\text{min}}}$$</td>
+                <td>Compresses all values strictly into $[0, 1]$ (or custom range).</td>
+                <td><strong style="color:var(--danger);">Catastrophic!</strong> A single outlier of $10^6$ compresses 99.9% of normal data into $[0, 0.001]$.</td>
+              </tr>
+              <tr>
+                <td><strong>RobustScaler</strong></td>
+                <td>$$x_{\text{scaled}} = \frac{x - \text{median}}{\text{IQR}}$$</td>
+                <td>Centers at median, scales by Interquartile Range ($Q_3 - Q_1$).</td>
+                <td><strong style="color:var(--success);">Best for heavy outliers!</strong> Neither median nor IQR is skewed by tail extremes.</td>
+              </tr>
+              <tr>
+                <td><strong>PowerTransformer<br>(Yeo-Johnson)</strong></td>
+                <td>$$y^{(\lambda)} = \begin{cases} ((y+1)^\lambda - 1)/\lambda & \text{if } \lambda \neq 0, y \geq 0 \\ \log(y+1) & \text{if } \lambda = 0, y \geq 0 \end{cases}$$</td>
+                <td>Transforms skewed, non-Gaussian features into an approximately Gaussian distribution.</td>
+                <td>Stabilizes variance and normalizes heavy tails for linear models.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Which Algorithms Require Scaling? (And Mathematical Why)</h2>
+        <div class="card">
+          <ul>
+            <li><strong>Gradient Descent Optimizers (Linear/Logistic Regression, Neural Networks):</strong>
+              If feature 1 is bounded in $[0, 1]$ and feature 2 is in $[0, 100,000]$, the loss surface forms an extremely elongated elliptical valley. The gradient points nearly orthogonal to the true minimum, forcing tiny learning rates and slow zig-zagging. Scaling makes contours circular ($\kappa(H) \approx 1$), allowing direct gradient paths.
+            </li>
+            <li><strong>Distance-Based Algorithms (KNN, K-Means, SVM):</strong>
+              Euclidean distance is defined as $d(\mathbf{p}, \mathbf{q}) = \sqrt{\sum (p_i - q_i)^2}$. A feature with range $[0, 100,000]$ completely dominates the distance metric, rendering smaller features (like age or rating) mathematically invisible!
+            </li>
+            <li><strong>Regularized Linear Models (Ridge, Lasso, ElasticNet):</strong>
+              Regularization penalizes coefficients $\lambda \sum \theta_j^2$. A feature in dollars has a tiny weight $\theta$, while a feature in millions of dollars has a huge weight. Regularization unfairly penalizes unscaled features.
+            </li>
+            <li><strong>Tree-Based Algorithms (Decision Trees, Random Forests, XGBoost):</strong>
+              <strong style="color:var(--success);">DO NOT require scaling!</strong> A decision tree evaluates splits of the form $x_j \le c$. Threshold splitting is monotonic and rank-based; scaling features leaves split decisions completely unchanged.
+            </li>
+          </ul>
+        </div>
+
+        <h2>3. Creating Custom Scikit-Learn Transformers</h2>
+        <p>In California Housing, raw features like <code>total_rooms</code> are far less predictive than engineered ratios: <strong>rooms per household</strong> and <strong>bedrooms per room</strong>. By inheriting from <code>BaseEstimator</code> and <code>TransformerMixin</code>, your transformer plugs seamlessly into Scikit-Learn pipelines:</p>
+
+        <pre><code>from sklearn.base import BaseEstimator, TransformerMixin
+import numpy as np
+
+# Column indices in housing numerical numpy array
+rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
+
+class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
+    def __init__(self, add_bedrooms_per_room=True):
+        self.add_bedrooms_per_room = add_bedrooms_per_room
+        
+    def fit(self, X, y=None):
+        return self # Nothing to learn, return self
+        
+    def transform(self, X):
+        rooms_per_household = X[:, rooms_ix] / X[:, households_ix]
+        population_per_household = X[:, population_ix] / X[:, households_ix]
+        if self.add_bedrooms_per_room:
+            bedrooms_per_room = X[:, bedrooms_ix] / X[:, rooms_ix]
+            return np.c_[X, rooms_per_household, population_per_household, bedrooms_per_room]
+        else:
+            return np.c_[X, rooms_per_household, population_per_household]</code></pre>
+
+        <h2>4. The 4 Deadly Sins of Data Leakage (Interview Favorite)</h2>
+        <div class="interview-alert">
+          <h4>🚨 The 4 Forms of Data Leakage:</h4>
+          <ol>
+            <li><strong>Preprocessing Leakage:</strong> Calling <code>fit_transform()</code> on the entire dataset before splitting or cross-validation. The mean and standard deviation of the validation/test set leak into training.</li>
+            <li><strong>Target Leakage:</strong> Including features that would not be available at the exact moment of inference in production (e.g. using <code>refund_reason</code> to predict customer return probability).</li>
+            <li><strong>Temporal Leakage:</strong> Randomly shuffling time-series data. Training on next week's stock price to predict yesterday's trend. Fix: Use <code>TimeSeriesSplit</code>.</li>
+            <li><strong>Group / Entity Leakage:</strong> Multiple medical images from the same patient appearing in both train and test sets. The model memorizes patient anatomy rather than disease pathology. Fix: Use <code>GroupKFold</code>.</li>
+          </ol>
+        </div>
+
+        <h2>5. The Full Industrial Pipeline Architecture</h2>
+        <p>A Scikit-Learn <code>Pipeline</code> combined with <code>ColumnTransformer</code> guarantees zero data leakage during cross-validation:</p>
+
+        <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# Pipeline for numerical attributes
+num_pipeline = Pipeline([
+    ('imputer', SimpleImputer(strategy="median")),
+    ('attribs_adder', CombinedAttributesAdder()),
+    ('std_scaler', StandardScaler()),
+])
+
+num_attribs = list(housing_num.columns)
+cat_attribs = ["ocean_proximity"]
+
+# Full ColumnTransformer combining numerical and categorical pipelines
+full_pipeline = ColumnTransformer([
+    ("num", num_pipeline, num_attribs),
+    ("cat", OneHotEncoder(drop='first'), cat_attribs),
+])
+
+# Fit ONLY on the training set!
+housing_prepared = full_pipeline.fit_transform(strat_train_set)
+# On unseen test data, strictly call transform!
+X_test_prepared = full_pipeline.transform(strat_test_set)</code></pre>
+      </section>
+
+      <!-- TAB 6: CLASSIFICATION & CONFUSION MATRIX -->
+      <section id="tab-metrics" class="tab-section">
+        <h1>Classification Fundamentals & The Confusion Matrix</h1>
+        <p class="section-subtitle">MNIST classification, why accuracy fails on skewed datasets, precision vs. recall trade-offs, and F1 harmonic mean derivation.</p>
+
+        <h2>1. Binary Classification: The MNIST 5-Detector</h2>
+        <p>The MNIST dataset contains 70,000 small $28 \times 28$ grayscale images of handwritten digits (0 through 9). To understand binary classification, we cast the task as: <em>Is this digit a '5' or 'not-5'?</em></p>
+
+        <pre><code>from sklearn.datasets import fetch_openml
+from sklearn.linear_model import SGDClassifier
+import numpy as np
+
+mnist = fetch_openml('mnist_784', version=1, as_frame=False)
+X, y = mnist["data"], mnist["target"].astype(np.uint8)
+
+X_train, X_test, y_train, y_test = X[:60000], X[60000:], y[:60000], y[60000:]
+y_train_5 = (y_train == 5) # True for all 5s, False for all other digits
+y_test_5 = (y_test == 5)
+
+# Train a Stochastic Gradient Descent (SGD) Classifier
+sgd_clf = SGDClassifier(random_state=42)
+sgd_clf.fit(X_train, y_train_5)</code></pre>
+
+        <h2>2. The Accuracy Paradox on Skewed Data</h2>
+        <p>If we evaluate the accuracy of <code>sgd_clf</code> using 3-fold cross-validation, it scores over <strong>95% accuracy</strong>! Looks brilliant, right?</p>
+
+        <div class="interview-alert">
+          <h4>🚨 The Never5 Dumb Classifier Baseline:</h4>
+          <p>Consider a completely brainless classifier that predicts <code>False</code> (Not-5) for every single image:</p>
+          <pre><code>from sklearn.base import BaseEstimator
+
+class Never5Classifier(BaseEstimator):
+    def fit(self, X, y=None):
+        return self
+    def predict(self, X):
+        return np.zeros((len(X), 1), dtype=bool)</code></pre>
+          <p>Because only roughly 10% of the images in MNIST are 5s, this dumb classifier achieves <strong>90% accuracy</strong> without looking at a single pixel!</p>
+          <p><strong>The Golden Lesson:</strong> Accuracy is completely useless when evaluating models on skewed datasets where some classes are much more frequent than others. Never report accuracy alone in an ML interview!</p>
+        </div>
+
+        <h2>3. The Confusion Matrix from First Principles</h2>
+        <p>A Confusion Matrix evaluates classification performance by counting the number of times class A is categorized as class B:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th colspan="2" rowspan="2"></th>
+                <th colspan="2" style="text-align:center; background:#1e293b; color:var(--sky);">Predicted Class</th>
+              </tr>
+              <tr>
+                <th style="background:#162238; color:var(--text);">Predicted Negative (0)</th>
+                <th style="background:#162238; color:var(--accent);">Predicted Positive (1)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th rowspan="2" style="background:#1e293b; color:var(--sky); vertical-align:middle;">Actual Class</th>
+                <th style="background:#162238; color:var(--text);">Actual Negative (0)</th>
+                <td><strong>True Negative (TN)</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Correctly identified healthy / non-fraud</span></td>
+                <td style="color:var(--danger);"><strong>False Positive (FP)</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Type I Error: False Alarm</span></td>
+              </tr>
+              <tr>
+                <th style="background:#162238; color:var(--accent);">Actual Positive (1)</th>
+                <td style="color:var(--danger);"><strong>False Negative (FN)</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Type II Error: Missed Detection</span></td>
+                <td style="color:var(--success);"><strong>True Positive (TP)</strong><br><span style="font-size:0.8rem; color:var(--text-muted);">Correctly identified disease / fraud</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>4. Metric Formulas & Real-World Business Intuition</h2>
+        <div class="math-box">
+          <h4>The Core Metric Equations:</h4>
+          $$\text{Accuracy} = \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} + \text{FP} + \text{FN}}$$
+          $$\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}} = \frac{\text{True Positives}}{\text{Total Predicted Positive}}$$
+          $$\text{Recall} / \text{Sensitivity} / \text{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}} = \frac{\text{True Positives}}{\text{Total Actual Positive}}$$
+          $$\text{Specificity} / \text{TNR} = \frac{\text{TN}}{\text{TN} + \text{FP}}, \quad \text{FPR} = \frac{\text{FP}}{\text{TN} + \text{FP}} = 1 - \text{Specificity}$$
+        </div>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Industry Problem</th>
+                <th>Optimize For?</th>
+                <th>Real-World Business Rationale</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cancer Screening</strong></td>
+                <td><strong style="color:var(--accent);">High Recall</strong></td>
+                <td>Missing a malignant tumor (False Negative) can be fatal to the patient! A false alarm (False Positive) is merely inconvenient and cleared by a biopsy.</td>
+              </tr>
+              <tr>
+                <td><strong>Spam Filter / Safe Video Filter for Kids</strong></td>
+                <td><strong style="color:var(--accent);">High Precision</strong></td>
+                <td>Sending an urgent job offer email to Spam (False Positive) is catastrophic. Missing an occasional spam email in the inbox (False Negative) is slightly annoying.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>5. The F1-Score & $F_\beta$ Harmonic Mean Derivation</h2>
+        <p>The F1-score combines Precision and Recall into a single number via their <strong>harmonic mean</strong>:</p>
+        $$\text{F1} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}} = \frac{2}{\frac{1}{\text{Precision}} + \frac{1}{\text{Recall}}}$$
+
+        <div class="first-principles">
+          <h4>💡 Why Harmonic Mean Instead of Arithmetic Mean?</h4>
+          <p>Suppose Classifier A has $\text{Precision} = 1.0$ and $\text{Recall} = 0.0$ (it predicted only 1 instance as positive and got it right, but missed all other positives):</p>
+          $$\text{Arithmetic Mean} = \frac{1.0 + 0.0}{2} = \mathbf{0.50} \quad (\text{Looks deceivingly decent!})$$
+          $$\text{Harmonic Mean (F1)} = \frac{2}{\frac{1}{1.0} + \frac{1}{0.0}} = \mathbf{0.00} \quad (\text{Correctly penalizes total recall failure!})$$
+          <p>The harmonic mean gives much more weight to low values. It rewards models <strong>only if both Precision and Recall are high</strong>!</p>
+        </div>
+
+        <div class="math-box">
+          <h4>The General $F_\beta$-Score:</h4>
+          $$F_\beta = (1 + \beta^2) \cdot \frac{\text{Precision} \cdot \text{Recall}}{(\beta^2 \cdot \text{Precision}) + \text{Recall}}$$
+          <ul>
+            <li><strong>$\beta = 0.5$ ($F_{0.5}$):</strong> Weighs Precision twice as heavily as Recall (Spam filtering, ad click prediction).</li>
+            <li><strong>$\beta = 1.0$ ($F_1$):</strong> Balanced harmonic mean.</li>
+            <li><strong>$\beta = 2.0$ ($F_2$):</strong> Weighs Recall twice as heavily as Precision (Medical diagnosis, fraud catching).</li>
+          </ul>
+        </div>
+
+        <h2>6. Step-by-Step Toy Numerical Walkthrough</h2>
+        <p>Consider a medical clinic screening 10 patients for a disease ($1 = \text{Sick}, 0 = \text{Healthy}$):</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Patient ID</th>
+                <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Actual ($y$)</strong></td>
+                <td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+              </tr>
+              <tr>
+                <td><strong>Predicted ($\hat{y}$)</strong></td>
+                <td>1</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <p>Let's calculate each metric manually:</p>
+          <ul>
+            <li><strong>Actual Positives:</strong> Patients 1, 2, 3, 4 ($P = 4$) | <strong>Actual Negatives:</strong> Patients 5, 6, 7, 8, 9, 10 ($N = 6$)</li>
+            <li><strong>True Positives (TP):</strong> Patients 1, 2, 3 $\implies \mathbf{3}$</li>
+            <li><strong>False Negatives (FN):</strong> Patient 4 was Sick but predicted Healthy $\implies \mathbf{1}$</li>
+            <li><strong>False Positives (FP):</strong> Patient 5 was Healthy but predicted Sick $\implies \mathbf{1}$</li>
+            <li><strong>True Negatives (TN):</strong> Patients 6, 7, 8, 9, 10 $\implies \mathbf{5}$</li>
+            <li><strong>Precision:</strong> $\frac{\text{TP}}{\text{TP} + \text{FP}} = \frac{3}{3 + 1} = \mathbf{0.75}$ (75%)</li>
+            <li><strong>Recall:</strong> $\frac{\text{TP}}{\text{TP} + \text{FN}} = \frac{3}{3 + 1} = \mathbf{0.75}$ (75%)</li>
+            <li><strong>F1-Score:</strong> $2 \cdot \frac{0.75 \times 0.75}{0.75 + 0.75} = \mathbf{0.75}$</li>
+            <li><strong>Accuracy:</strong> $\frac{3 + 5}{10} = \mathbf{0.80}$ (80%)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- TAB 7: THRESHOLDS, PR VS ROC CURVES -->
+      <section id="tab-curves" class="tab-section">
+        <h1>Decision Thresholds, PR-Curves & ROC-AUC Math</h1>
+        <p class="section-subtitle">The decision threshold mechanism, precision-recall trade-offs, and the mathematical proof of why ROC-AUC fails under class imbalance.</p>
+
+        <h2>1. The Decision Threshold ($\tau$) Mechanism</h2>
+        <p>In Scikit-learn, classifiers like <code>SGDClassifier</code> or <code>LogisticRegression</code> do not directly spit out binary classes. Instead, they compute a continuous confidence score for each instance via <code>decision_function()</code> (distance to hyperplane) or <code>predict_proba()</code> (estimated probability):</p>
+        $$\hat{y} = \begin{cases} 1 & \text{if } f(\mathbf{x}) \ge \tau \\ 0 & \text{if } f(\mathbf{x}) < \tau \end{cases}$$
+
+        <div class="card">
+          <h3>The Precision/Recall Trade-off Dynamics:</h3>
+          <ul>
+            <li><strong>Raising Threshold ($\tau \uparrow$):</strong> Only instances with overwhelmingly high confidence are classified as positive.
+              $\implies$ <strong>False Positives plummet</strong>, so <strong>Precision increases</strong>. However, more actual positives are missed ($\text{FN} \uparrow$), so <strong>Recall decreases</strong>.
+            </li>
+            <li><strong>Lowering Threshold ($\tau \downarrow$):</strong> The classifier becomes aggressive, flagging more samples as positive.
+              $\implies$ <strong>False Negatives drop</strong>, so <strong>Recall increases</strong>. However, false alarms multiply ($\text{FP} \uparrow$), so <strong>Precision decreases</strong>.
+            </li>
+          </ul>
+        </div>
+
+        <pre><code>from sklearn.metrics import precision_recall_curve
+import matplotlib.pyplot as plt
+
+# Get decision scores via cross-validation
+y_scores = cross_val_predict(sgd_clf, X_train, y_train_5, cv=3, method="decision_function")
+precisions, recalls, thresholds = precision_recall_curve(y_train_5, y_scores)
+
+# Plot Precision and Recall vs Threshold
+plt.plot(thresholds, precisions[:-1], "b--", label="Precision")
+plt.plot(thresholds, recalls[:-1], "g-", label="Recall")
+plt.xlabel("Threshold")
+plt.legend()
+plt.show()</code></pre>
+
+        <h2>2. Receiver Operating Characteristic (ROC) & ROC-AUC</h2>
+        <p>The ROC curve plots the <strong>True Positive Rate (Recall / Sensitivity)</strong> against the <strong>False Positive Rate (FPR / $1 - \text{Specificity}$)</strong> across all thresholds:</p>
+        $$\text{TPR} = \frac{\text{TP}}{\text{TP} + \text{FN}}, \quad \text{FPR} = \frac{\text{FP}}{\text{TN} + \text{FP}}$$
+
+        <div class="math-box">
+          <h4>Probabilistic Meaning of ROC-AUC:</h4>
+          <p>The Area Under the ROC Curve (ROC-AUC) has a profound probabilistic interpretation: It represents the exact probability that the classifier will rank a randomly chosen positive instance higher than a randomly chosen negative instance:</p>
+          $$\text{ROC-AUC} = P\left( f(\mathbf{x}_{\text{pos}}) > f(\mathbf{x}_{\text{neg}}) \right)$$
+          <ul>
+            <li><strong>$\text{AUC} = 1.0$:</strong> Perfect classifier (curve reaches top-left $(0, 1)$).</li>
+            <li><strong>$\text{AUC} = 0.5$:</strong> Pure random coin-flipping (diagonal dashed line).</li>
+          </ul>
+        </div>
+
+        <h2>3. The Imbalance Showdown: Why ROC-AUC is Severely Misleading</h2>
+        <div class="interview-alert">
+          <h4>🚨 The #1 FAANG Interview Trap on Model Evaluation:</h4>
+          <p><strong>Scenario:</strong> You are building a Credit Card Fraud Detection system at Visa. You have a test set of <strong>1,000,000 transactions</strong>:</p>
+          <ul>
+            <li><strong>Actual Fraud (Positives):</strong> $1,000$ transactions ($0.1\%$)</li>
+            <li><strong>Legitimate (Negatives):</strong> $999,000$ transactions ($99.9\%$)</li>
+          </ul>
+          <p>Suppose your model catches all $1,000$ fraud transactions ($\text{TP} = 1,000, \text{FN} = 0$), but generates <strong>10,000 False Alarms ($\text{FP} = 10,000$)</strong>:</p>
+          
+          <div style="background:var(--bg-primary); padding:1rem; border-radius:6px; margin:0.8rem 0;">
+            <p><strong>1. Look at the ROC metric (FPR):</strong></p>
+            $$\text{FPR} = \frac{\text{FP}}{\text{TN} + \text{FP}} = \frac{10,000}{989,000 + 10,000} = \frac{10,000}{999,000} \approx \mathbf{0.010} \quad (\mathbf{1.0\%}!)$$
+            <p>The False Positive Rate is only 1%! The ROC curve is pinned to the top-left ceiling, and <strong>ROC-AUC $> 0.98$</strong>! A junior engineer proudly presents this model to leadership.</p>
+            
+            <p><strong>2. Now calculate Precision (PR Curve):</strong></p>
+            $$\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}} = \frac{1,000}{1,000 + 10,000} = \frac{1,000}{11,000} \approx \mathbf{0.091} \quad (\mathbf{9.1\%}!)$$
+            <p>Out of all cards your model blocked, <strong>over 90% were completely legitimate customers!</strong> Customer support is flooded with angry calls, and business operations crash.</p>
+          </div>
+
+          <p><strong>The Mathematical Why:</strong> In the FPR formula $\frac{\text{FP}}{\text{TN} + \text{FP}}$, the denominator includes the gigantic pool of True Negatives ($999,000$). The massive $\text{TN}$ completely drowns out the $10,000$ false positives!</p>
+          <p><strong>The Golden Rule:</strong> Whenever the positive class is rare (fraud, cancer, search ad click CTR), <strong>ALWAYS use the Precision-Recall (PR) Curve and PR-AUC (Average Precision), NEVER ROC-AUC!</strong></p>
+        </div>
+      </section>
+
+      <!-- TAB 8: SEVERE CLASS IMBALANCE & CALIBRATION -->
+      <section id="tab-imbalance" class="tab-section">
+        <h1>Severe Class Imbalance & Probability Calibration <span class="badge badge-missing">Missing in PDF</span></h1>
+        <p class="section-subtitle">Production strategies for 1:1,000 imbalanced data (Cost-Sensitive Learning, Focal Loss, SMOTE) and calibrating uncalibrated models.</p>
+
+        <h2>1. The 4-Tier Arsenal for Severe Class Imbalance</h2>
+
+        <div class="card">
+          <h3>Tier 1: Cost-Sensitive Learning / Class Weighting (Zero Extra Data)</h3>
+          <p>Instead of treating all errors equally, we modify the loss function so that making an error on a minority positive instance costs $\frac{N_{\text{neg}}}{N_{\text{pos}}}$ times more than an error on a majority negative instance:</p>
+          $$\mathcal{L} = -\sum_{i=1}^m \left[ w_1 y_i \log(\hat{p}_i) + w_0 (1 - y_i) \log(1 - \hat{p}_i) \right]$$
+          <p>Where $w_1 = \frac{m}{2 \cdot N_{\text{pos}}}$ and $w_0 = \frac{m}{2 \cdot N_{\text{neg}}}$.</p>
+          <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
+# Scikit-Learn automatically calculates inverse class frequencies:
+clf = LogisticRegression(class_weight='balanced')
+rf = RandomForestClassifier(class_weight='balanced_subsample')
+
+# In XGBoost:
+# scale_pos_weight = count(negative_samples) / count(positive_samples)</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Tier 2: Focal Loss (Lin et al. — RetinaNet)</h3>
+          <p>Standard Cross-Entropy loss sums errors across all samples. In imbalanced data, millions of easy negative examples generate small individual losses that sum together to completely overwhelm the gradient.</p>
+          <div class="math-box">
+            <h4>Mathematical Formulation of Focal Loss:</h4>
+            $$\text{FL}(p_t) = -\alpha_t (1 - p_t)^\gamma \log(p_t)$$
+            <p>Where $p_t$ is the model's estimated probability for the correct class, $\alpha_t$ addresses class prevalence, and $\gamma \ge 0$ is the <strong>focusing parameter</strong>.</p>
+          </div>
+          <p><strong>The Intuition:</strong></p>
+          <ul>
+            <li>When an instance is easy and well-classified ($p_t = 0.99$), the modulating factor $(1 - p_t)^\gamma = (0.01)^2 = \mathbf{0.0001}$. Its loss is suppressed by 10,000x!</li>
+            <li>When an instance is hard and misclassified ($p_t = 0.1$), the modulating factor $(1 - p_t)^\gamma = (0.9)^2 = \mathbf{0.81}$. Its loss remains prominent.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Tier 3: Synthetic Resampling (SMOTE & ADASYN)</h3>
+          <p><strong>SMOTE (Synthetic Minority Over-sampling Technique):</strong> Rather than duplicating existing points (which causes severe overfitting), SMOTE synthesizes new minority points along the line segments connecting minority instances to their $k$-nearest minority neighbors:</p>
+          $$\mathbf{x}_{\text{synthetic}} = \mathbf{x}_i + \lambda \cdot (\mathbf{x}_{\text{neighbor}} - \mathbf{x}_i), \quad \lambda \sim U(0, 1)$$
+
+          <div class="interview-alert">
+            <h4>🚨 The Mandatory Cross-Validation Rule with SMOTE:</h4>
+            <p><strong>Never apply SMOTE to the entire dataset before Cross-Validation!</strong> If synthetic points are created globally, synthetic children of test-fold instances will leak into the training fold. Always embed SMOTE inside an <code>imblearn.pipeline.Pipeline</code> so it resamples <em>strictly the training folds</em>:</p>
+            <pre><code>from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+
+pipeline = ImbPipeline([
+    ('smote', SMOTE(random_state=42)),
+    ('classifier', LogisticRegression())
+])
+# SMOTE is fitted ONLY during cross-validation training steps!</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tier 4: Threshold Moving via Cost Matrix</h3>
+          <p>In industry, False Positives and False Negatives have concrete dollar costs. In fraud detection, missing a fraud costs \$500 ($C_{\text{FN}} = 500$), while investigating a false alarm costs \$10 ($C_{\text{FP}} = 10$).</p>
+          <p>We find the optimal operational threshold $\tau^*$ that minimizes total financial loss:</p>
+          $$\tau^* = \arg\min_\tau \left( C_{\text{FN}} \cdot \text{FN}(\tau) + C_{\text{FP}} \cdot \text{FP}(\tau) \right)$$
+        </div>
+
+        <h2>2. Probability Calibration: Why Models Lie About Confidence</h2>
+        <div class="first-principles">
+          <h4>🎯 What is a Calibrated Probability?</h4>
+          <p>A classifier is <strong>well-calibrated</strong> if: Among all instances where the model predicts an 80% probability of being Positive, <strong>exactly 80% of them actually turn out to be Positive</strong>.</p>
+          <p>Most popular classifiers output completely uncalibrated probabilities out of the box:</p>
+          <ul>
+            <li><strong>Support Vector Machines (SVM):</strong> Margin distances are not probabilities. Sigmoid wrappers can be skewed.</li>
+            <li><strong>Na&iuml;ve Bayes:</strong> Due to the unrealistic feature independence assumption, probabilities are pushed aggressively toward extreme values of $0$ and $1$.</li>
+            <li><strong>Tree Ensembles (Random Forests):</strong> Averaging binary tree predictions pushes probabilities toward $0.5$ and away from the extreme tails.</li>
+          </ul>
+        </div>
+
+        <h2>3. Calibration Techniques: Platt Scaling vs. Isotonic Regression</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Mathematical Formula</th>
+                <th>Type</th>
+                <th>When to Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Platt Scaling</strong></td>
+                <td>$$P(y=1 \mid f) = \frac{1}{1 + \exp(A f + B)}$$</td>
+                <td>Parametric (fits a 1D logistic regression on validation logits).</td>
+                <td>Best for small datasets ($N < 1,000$); prevents overfitting. Assumes sigmoid distortion.</td>
+              </tr>
+              <tr>
+                <td><strong>Isotonic Regression</strong></td>
+                <td>$$y_i = m(f_i) + \epsilon_i \quad \text{s.t. } m(f_i) \ge m(f_j) \text{ if } f_i \ge f_j$$</td>
+                <td>Non-parametric (fits a piecewise-constant monotonic increasing step function).</td>
+                <td>Best for large datasets ($N > 10,000$); fits arbitrary distortions but can overfit on small samples.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <pre><code>from sklearn.calibration import CalibratedClassifierCV
+from sklearn.svm import LinearSVC
+
+# Train LinearSVC with Platt Scaling (sigmoid) or Isotonic Regression
+svm = LinearSVC()
+calibrated_svm = CalibratedClassifierCV(svm, cv=5, method='sigmoid')
+calibrated_svm.fit(X_train, y_train)
+
+# Now predict_proba outputs true calibrated probabilities!
+probs = calibrated_svm.predict_proba(X_test)</code></pre>
+
+        <div class="math-box">
+          <h4>Evaluating Calibration: Brier Score</h4>
+          $$\text{Brier Score} = \frac{1}{N} \sum_{i=1}^N (p_i - y_i)^2$$
+          <p>The Brier score measures the mean squared difference between predicted probabilities $p_i$ and true binary outcomes $y_i \in \{0, 1\}$. Lower is better (0 is perfect calibration and perfect accuracy).</p>
+        </div>
+      </section>
+
+      <!-- TAB 9: MULTICLASS, MULTILABEL & MULTIOUTPUT -->
+      <section id="tab-multiclass" class="tab-section">
+        <h1>Multiclass, Multilabel & Multioutput Classification</h1>
+        <p class="section-subtitle">Binary adaptation strategies (OvR vs. OvO), multiclass metric math (Micro vs. Macro vs. Weighted F1), error analysis, and multilabel setups.</p>
+
+        <h2>1. Adapting Binary Classifiers to Multiclass ($K > 2$)</h2>
+        <p>Some algorithms (Random Forest, Na&iuml;ve Bayes) handle multiple classes natively. Others (Support Vector Machines, Logistic Regression, SGDClassifier) are strictly binary. How do we adapt binary models for $K$ classes?</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Strategy</th>
+                <th>Models Trained</th>
+                <th>Decision Rule</th>
+                <th>Pros & Cons</th>
+                <th>When to Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>One-vs-Rest<br>(OvR / OvA)</strong></td>
+                <td>$$K \text{ models}$$</td>
+                <td>Each classifier $k$ is trained to distinguish class $k$ from all other $K-1$ classes combined. Predict $\arg\max_k f_k(\mathbf{x})$.</td>
+                <td><strong>Pros:</strong> Fast to train, only $K$ models.<br><strong>Cons:</strong> Individual training sets are imbalanced ($1$ vs $K-1$).</td>
+                <td>Default for Logistic Regression, SGDClassifier, and linear models. Preferred for large datasets.</td>
+              </tr>
+              <tr>
+                <td><strong>One-vs-One<br>(OvO)</strong></td>
+                <td>$$\frac{K(K - 1)}{2} \text{ models}$$</td>
+                <td>A classifier is trained for every distinct pair $(i, j)$. Class with the most pairwise votes wins.</td>
+                <td><strong>Pros:</strong> Each classifier is trained on a tiny subset (only samples of classes $i$ and $j$).<br><strong>Cons:</strong> Many models for large $K$ ($K=10 \implies 45$ models).</td>
+                <td><strong>Essential for Kernel SVMs!</strong> Kernel SVM complexity scales as $O(N^2)$ to $O(N^3)$ with dataset size $N$. Training many models on small subsets is orders of magnitude faster!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <pre><code>from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
+
+# Scikit-learn automatically selects OvO for SVC
+svm_clf = SVC()
+svm_clf.fit(X_train[:1000], y_train[:1000]) # Trains 45 pairwise classifiers for 10 MNIST digits
+
+# To force One-vs-Rest on SVC:
+ovr_clf = OneVsRestClassifier(SVC())
+ovr_clf.fit(X_train[:1000], y_train[:1000]) # Trains 10 classifiers</code></pre>
+
+        <h2>2. Multiclass Metrics: Micro-F1 vs. Macro-F1 vs. Weighted-F1</h2>
+        <p>In multi-class problems, how do we aggregate F1 across all $K$ classes?</p>
+
+        <div class="card">
+          <h3>Toy 3-Class Example: Class A (100 samples), Class B (20 samples), Class C (5 samples)</h3>
+          <ul>
+            <li><strong>Macro-F1:</strong> Calculates F1 independently for each class, then takes the simple unweighted arithmetic mean:
+              $$\text{Macro-F1} = \frac{\text{F1}_A + \text{F1}_B + \text{F1}_C}{3}$$
+              <strong style="color:var(--accent);">Key Property:</strong> Treats every class with equal importance regardless of size. <em>Use Macro-F1 when doing well on rare minority classes is vital!</em>
+            </li>
+            <li><strong>Weighted-F1:</strong> Calculates F1 for each class, weighted by the number of true instances (support $N_k$) in that class:
+              $$\text{Weighted-F1} = \frac{N_A \cdot \text{F1}_A + N_B \cdot \text{F1}_B + N_C \cdot \text{F1}_C}{N_A + N_B + N_C}$$
+              Reflects real-world class frequency, but performance on small classes is easily masked by common classes.
+            </li>
+            <li><strong>Micro-F1:</strong> Aggregates global True Positives, False Positives, and False Negatives across all classes first, then computes F1:
+              $$\text{Micro-Precision} = \frac{\sum \text{TP}_k}{\sum \text{TP}_k + \sum \text{FP}_k}, \quad \text{Micro-Recall} = \frac{\sum \text{TP}_k}{\sum \text{TP}_k + \sum \text{FN}_k}$$
+            </li>
+          </ul>
+        </div>
+
+        <div class="first-principles">
+          <h4>📐 Mathematical Proof: Why Micro-F1 = Accuracy in Multi-Class Classification</h4>
+          <p>In single-label multi-class classification, every single instance has exactly one true label and receives exactly one predicted label.</p>
+          <p>If an observation is misclassified (e.g. true label is Class A, but model predicted Class B):</p>
+          <ul>
+            <li>For Class A, this is a <strong>False Negative (FN)</strong>.</li>
+            <li>For Class B, this is simultaneously a <strong>False Positive (FP)</strong>.</li>
+          </ul>
+          <p>Therefore, across the entire dataset, the total number of False Positives globally must exactly equal the total number of False Negatives:</p>
+          $$\sum_{k=1}^K \text{FP}_k = \sum_{k=1}^K \text{FN}_k = \text{Total Misclassifications}$$
+          <p>Furthermore, the sum of True Positives $\sum_{k=1}^K \text{TP}_k$ is simply the total number of correct predictions!</p>
+          $$\text{Micro-Precision} = \frac{\text{Correct}}{\text{Correct} + \text{Misclassifications}} = \frac{\text{Correct}}{N} = \mathbf{\text{Accuracy}}$$
+          $$\text{Micro-Recall} = \frac{\text{Correct}}{\text{Correct} + \text{Misclassifications}} = \frac{\text{Correct}}{N} = \mathbf{\text{Accuracy}}$$
+          $$\text{Micro-F1} = 2 \cdot \frac{\text{Accuracy} \cdot \text{Accuracy}}{\text{Accuracy} + \text{Accuracy}} = \mathbf{\text{Accuracy}}$$
+          <p><strong>Senior Interview Takeaway:</strong> In single-label multiclass classification, Micro-Precision, Micro-Recall, and Micro-F1 are mathematically identical to overall Accuracy!</p>
+        </div>
+
+        <h2>3. Error Analysis: Diagnosing Morphological Confusions</h2>
+        <p>To inspect where your model fails, compute the confusion matrix and normalize each cell by the total number of images in that true class (row sum):</p>
+
+        <pre><code>from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+
+y_train_pred = cross_val_predict(sgd_clf, X_train, y_train, cv=3)
+conf_mx = confusion_matrix(y_train, y_train_pred)
+
+# Normalize by row sum to get error rates
+row_sums = conf_mx.sum(axis=1, keepdims=True)
+norm_conf_mx = conf_mx / row_sums
+
+# Zero out diagonal to focus purely on errors
+np.fill_diagonal(norm_conf_mx, 0)
+plt.matshow(norm_conf_mx, cmap=plt.cm.gray)
+plt.show()</code></pre>
+        <p><strong>Insight:</strong> In MNIST, digits <strong>3 and 5</strong> show a bright off-diagonal block. Why? Handwritten 3s and 5s differ only by the small top-left stroke and curve direction. This diagnosis immediately tells engineers to add data augmentation (slight rotations and shear transformations) to help the model distinguish these shapes.</p>
+
+        <h2>4. Multilabel & Multioutput Classification</h2>
+        <div class="card">
+          <h3>Multilabel Classification</h3>
+          <p>Each instance is assigned multiple binary tags (e.g., face recognition: $[is\_Alice, is\_Bob, is\_Charlie]$ where an image can contain both Alice and Bob).</p>
+          <pre><code>from sklearn.neighbors import KNeighborsClassifier
+
+# Predict two targets: is digit >= 7 AND is digit odd?
+y_train_large = (y_train >= 7)
+y_train_odd = (y_train % 2 == 1)
+y_multilabel = np.c_[y_train_large, y_train_odd]
+
+knn_clf = KNeighborsClassifier()
+knn_clf.fit(X_train, y_multilabel)
+print(knn_clf.predict([some_digit])) # Output: [[False, True]] (e.g. digit 5)</code></pre>
+        </div>
+
+        <div class="card">
+          <h3>Multioutput-Multiclass Classification (e.g. Image Denoising)</h3>
+          <p>A generalization of multilabel classification where each label can take on multiple values. In image denoising, each pixel is an output label, and each pixel's intensity ranges from 0 to 255.</p>
+        </div>
+      </section>
+
+      <!-- TAB 10: VALIDATION, TUNING & CONFIDENCE INTERVALS -->
+      <section id="tab-validation" class="tab-section">
+        <h1>Validation, Hyperparameter Tuning & Confidence Intervals</h1>
+        <p class="section-subtitle">Cross-validation strategies, GridSearchCV vs. RandomizedSearchCV (Bergstra & Bengio proof), and computing test generalization confidence intervals.</p>
+
+        <h2>1. Diagnosing Bias vs. Variance (Underfitting vs. Overfitting)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Diagnostic Sign</th>
+                <th>Underlying Problem</th>
+                <th>Engineering Remedies</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>High Training Error + High Validation Error</strong></td>
+                <td><strong style="color:var(--warning);">Underfitting (High Bias)</strong><br>The model is too simplistic to capture the underlying pattern.</td>
+                <td>Select a more powerful model (e.g. Decision Tree / Random Forest instead of Linear Regression), engineer better interaction features, reduce regularization penalties ($\lambda \downarrow$).</td>
+              </tr>
+              <tr>
+                <td><strong>Tiny Training Error + High Validation Error</strong></td>
+                <td><strong style="color:var(--danger);">Overfitting (High Variance)</strong><br>The model memorized training noise rather than generalizable signals.</td>
+                <td>Collect more training data, simplify model architecture, apply regularization ($L_1 / L_2$, tree pruning, dropout), remove noisy features.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Cross-Validation Strategies</h2>
+        <ul>
+          <li><strong>$K$-Fold Cross-Validation:</strong> Splits training data into $K$ equal folds. Trains on $K-1$ folds and validates on the remaining fold. Repeats $K$ times and computes mean score and standard deviation $\sigma$.</li>
+          <li><strong>Stratified $K$-Fold:</strong> Preserves the percentage of each target class across every fold. Mandatory for classification.</li>
+          <li><strong>TimeSeriesSplit:</strong> Rolling walk-forward validation. Never evaluates on the past using a model trained on the future.</li>
+          <li><strong>GroupKFold:</strong> Ensures that distinct groups (e.g. patients, organizations) do not span both training and validation folds.</li>
+        </ul>
+
+        <h2>3. GridSearchCV vs. RandomizedSearchCV (The Bergstra & Bengio Proof)</h2>
+        <div class="card">
+          <p><strong>GridSearchCV:</strong> Exhaustively explores every combination of specified hyperparameter values.</p>
+          <p><strong>RandomizedSearchCV:</strong> Evaluates a fixed number of random combinations by sampling from specified continuous distributions or discrete sets.</p>
+        </div>
+
+        <div class="first-principles">
+          <h4>🌟 Why RandomizedSearchCV is Exponentially Superior:</h4>
+          <p>In a landmark 2012 paper, James Bergstra and Yoshua Bengio proved mathematically why Random Search dominates Grid Search:</p>
+          <p><em>In most machine learning problems, only a small subset of hyperparameters actually have a strong impact on model performance.</em></p>
+          <p>Suppose you are tuning 2 hyperparameters: Parameter 1 (crucial, e.g. learning rate) and Parameter 2 (useless, e.g. random seed):</p>
+          <ul>
+            <li><strong>Grid Search (3x3 = 9 trials):</strong> Evaluates only <strong>3 distinct values</strong> of Parameter 1 (each tested 3 times with different redundant values of Parameter 2). You wasted 6 trials!</li>
+            <li><strong>Random Search (9 trials):</strong> Evaluates <strong>9 completely distinct values</strong> of Parameter 1! In high-dimensional spaces (e.g. 10 hyperparameters), Random Search explores the critical parameter subspace exponentially more thoroughly with the same compute budget.</li>
+          </ul>
+        </div>
+
+        <pre><code>from sklearn.model_selection import RandomizedSearchCV
+from sklearn.ensemble import RandomForestRegressor
+from scipy.stats import randint
+
+param_distribs = {
+    'n_estimators': randint(low=10, high=200),
+    'max_features': randint(low=2, high=8),
+}
+
+forest_reg = RandomForestRegressor(random_state=42)
+rnd_search = RandomizedSearchCV(forest_reg, param_distributions=param_distribs,
+                                n_iter=10, cv=5, scoring='neg_mean_squared_error',
+                                random_state=42)
+rnd_search.fit(housing_prepared, housing_labels)</code></pre>
+
+        <h2>4. Final Test Set Evaluation & 95% Confidence Intervals</h2>
+        <p>After finding the champion model via Cross-Validation, evaluate it <strong>strictly once</strong> on the untouched Test Set. Never fit any transformers on the test data!</p>
+
+        <pre><code>final_model = rnd_search.best_estimator_
+
+X_test = strat_test_set.drop("median_house_value", axis=1)
+y_test = strat_test_set["median_house_value"].copy()
+
+# Call transform, NEVER fit_transform!
+X_test_prepared = full_pipeline.transform(X_test)
+final_predictions = final_model.predict(X_test_prepared)
+
+final_mse = mean_squared_error(y_test, final_predictions)
+final_rmse = np.sqrt(final_mse)
+print(f"Final Test RMSE: ${final_rmse:.2f}")</code></pre>
+
+        <div class="math-box">
+          <h4>Calculating 95% Confidence Interval for Generalization Error:</h4>
+          <p>A single point estimate (e.g. $\text{RMSE} = \$47,730$) does not convey statistical certainty. We construct a 95% confidence interval using Student's $t$-distribution:</p>
+          $$\text{CI} = \bar{e} \pm t_{1 - \alpha/2, n-1} \cdot \frac{s}{\sqrt{n}}$$
+          <pre><code>from scipy import stats
+
+confidence = 0.95
+squared_errors = (final_predictions - y_test) ** 2
+ci = np.sqrt(stats.t.interval(confidence, len(squared_errors) - 1,
+                              loc=squared_errors.mean(),
+                              scale=stats.sem(squared_errors)))
+print(f"95% Confidence Interval: [${ci[0]:.2f}, ${ci[1]:.2f}]")
+# e.g.: [$45,682, $49,691]</code></pre>
+          <p>This tells executive stakeholders: <em>"With 95% confidence, our model's production generalization error lies between \$45.6k and \$49.7k."</em></p>
+        </div>
+      </section>
+
+      <!-- TAB 11: 22+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>22+ FAANG / Top ML Role Interview Scenarios</h1>
+        <p class="section-subtitle">Real-world system design, theoretical derivations, and tricky edge-case interview questions with model-grade answers.</p>
+
+        <details open>
+          <summary><span>Q1: If a fraud detection model scores 99.8% accuracy on test data, is it ready for production?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer: Absolutely not without verifying class distribution!</strong></p>
+            <p>In fraud detection, positive instances represent approximately 0.1% of transactions (1 in 1,000). A dummy model predicting <code>False</code> (legit) for every transaction achieves 99.9% accuracy while having 0% Recall (catching 0 fraud). Always evaluate imbalanced problems using the Confusion Matrix, Precision, Recall, F1-score, and Precision-Recall AUC.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: What is the exact difference between Micro-F1, Macro-F1, and Weighted-F1? When do you choose Macro over Micro?</span> <span class="badge badge-core">Core ML</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Macro-F1:</strong> Computes the F1-score for each class independently, then takes the unweighted arithmetic mean. Treats rare classes with equal weight to large classes.</li>
+              <li><strong>Weighted-F1:</strong> Calculates F1 for each class, weighted by the number of true instances (support) in that class.</li>
+              <li><strong>Micro-F1:</strong> Aggregates global True Positives, False Positives, and False Negatives across all classes first, then computes F1. Equal to overall accuracy in single-label multiclass.</li>
+            </ul>
+            <p><strong>When to choose Macro over Micro:</strong> Choose Macro-F1 when doing well on small, rare classes is critical to business or clinical outcomes (e.g. rare disease diagnosis or hate speech classification), where a model that ignores small classes must be heavily penalized.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: Prove mathematically why Micro-F1 equals Accuracy in single-label multi-class classification.</span> <span class="badge badge-math">Math Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>In single-label multi-class classification, each sample receives exactly one prediction. Whenever a sample of true class $i$ is misclassified as class $j$, it creates simultaneously one False Negative for class $i$ and one False Positive for class $j$.</p>
+            <p>Summing across all $K$ classes: $\sum_{k=1}^K \text{FP}_k = \sum_{k=1}^K \text{FN}_k = \text{Total Misclassifications}$.</p>
+            <p>Since $\sum \text{TP}_k = \text{Total Correct Predictions}$:</p>
+            $$\text{Micro-Precision} = \frac{\sum \text{TP}}{\sum \text{TP} + \sum \text{FP}} = \frac{\text{Correct}}{N} = \text{Accuracy}$$
+            $$\text{Micro-Recall} = \frac{\sum \text{TP}}{\sum \text{TP} + \sum \text{FN}} = \frac{\text{Correct}}{N} = \text{Accuracy}$$
+            $$\text{Micro-F1} = 2 \cdot \frac{\text{Accuracy} \cdot \text{Accuracy}}{\text{Accuracy} + \text{Accuracy}} = \text{Accuracy} \quad \blacksquare$$
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Why does fitting a StandardScaler before train-test split cause data leakage?</span> <span class="badge badge-faang">Pipeline Design</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p><code>StandardScaler</code> computes the global sample mean $\mu$ and sample standard deviation $\sigma$ across all rows passed to <code>fit()</code>. If you call <code>fit()</code> on the full dataset before splitting, the distribution of the test set leaks into the training features.</p>
+            <p>In production, test data represents completely unseen future inputs. Using leaked statistics artificially inflates validation performance, causing the model to underperform when deployed. Transformers must call <code>fit_transform()</code> strictly on the training fold, and strictly <code>transform()</code> on validation/test folds.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: Explain Rubin's taxonomy of missing data (MCAR, MAR, MNAR) with real-world examples.</span> <span class="badge badge-missing">Missing in PDF</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>MCAR (Missing Completely at Random):</strong> Missingness is independent of both observed and unobserved data ($P(M|Y_{\text{obs}}, Y_{\text{mis}}) = P(M)$). <em>Example:</em> A sensor battery randomly dies or a sample tube drops in a lab. Dropping rows reduces power but does not bias mean estimates.</li>
+              <li><strong>MAR (Missing at Random):</strong> Missingness depends on observed features, but not the missing value itself ($P(M|Y_{\text{obs}}, Y_{\text{mis}}) = P(M|Y_{\text{obs}})$). <em>Example:</em> Men are less likely to report depression in a survey, but within the male demographic, reporting is random. Can be recovered by conditional imputation (MICE, KNNImputer).</li>
+              <li><strong>MNAR (Missing Not at Random):</strong> Missingness depends directly on the unobserved value itself. <em>Example:</em> High-income earners refusing to disclose their wealth. Standard imputation introduces severe bias. Requires appending a <code>MissingIndicator</code> feature or selection modeling.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q6: Why is median imputation preferred over mean imputation for skewed features like house prices?</span> <span class="badge badge-core">Core ML</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>The sample mean is non-robust: a single extreme outlier (e.g. a \$50,000,000 Beverly Hills mansion) pulls the mean sharply to the right. Imputing with the mean introduces an artificially inflated value into normal working-class homes.</p>
+            <p>The median is a robust order statistic (it has a breakdown point of 50%, meaning up to 50% of the data can be contaminated with infinite values without moving the median beyond the middle range). For skewed features, the median represents the true typical observation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the Dummy Variable Trap in One-Hot Encoding, and why does it break Linear Regression but not Decision Trees?</span> <span class="badge badge-math">Multicollinearity</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>For a categorical feature with $K$ categories, the sum of all $K$ binary indicator columns is identically 1: $\sum_{j=1}^K x_{ij} = 1$.</p>
+            <p>In a Linear Regression model with an intercept $\beta_0$, the constant column is identical to the sum of the one-hot columns ($x_K = 1 - \sum_{j=1}^{K-1} x_j$). This induces <strong>perfect multicollinearity</strong>. The Gram matrix $(X^T X)$ is singular (rank-deficient) and cannot be inverted in the Normal Equation $\hat{\theta} = (X^T X)^{-1} X^T y$. Setting <code>drop='first'</code> removes one category and restores full rank.</p>
+            <p>Decision Trees evaluate one feature split at a time ($x_j \le 0.5$) using greedy purity criteria (Gini/Entropy). They never invert matrices or compute joint linear combinations, so collinearity is completely harmless to them.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is Target Encoding, how does naive target encoding leak data, and how do you regularize it?</span> <span class="badge badge-faang">High Cardinality</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Target Encoding replaces each categorical level $c$ with the mean of the target variable $y$ for that category: $\hat{x}_c = \frac{1}{n_c} \sum_{i \in c} y_i$.</p>
+            <p><strong>The Leakage:</strong> If a rare category appears only once with $y=1$, naive target encoding maps that category to 1.0. The model memorizes the target directly in training, resulting in severe overfitting on unseen test data.</p>
+            <p><strong>The 2 Regularization Solutions:</strong></p>
+            <ol>
+              <li><strong>Additive Smoothing ($m$-estimate):</strong> $S_i = \frac{n_c \bar{y}_c + m \bar{y}_{\text{global}}}{n_c + m}$. Rare categories shrink toward global average.</li>
+              <li><strong>Out-of-Fold (OOF) Target Encoding:</strong> Calculate category averages using strictly the other $K-1$ folds during cross-validation.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why does the IQR outlier rule use a multiplier of 1.5? Prove it mathematically.</span> <span class="badge badge-math">Math Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Under a standard normal distribution $\mathcal{N}(0, 1)$:</p>
+            $$Q_1 = \Phi^{-1}(0.25) \approx -0.6745\sigma, \quad Q_3 = \Phi^{-1}(0.75) \approx +0.6745\sigma$$
+            $$\text{IQR} = Q_3 - Q_1 = 1.3490\sigma$$
+            $$\text{Upper Cutoff} = Q_3 + 1.5 \cdot \text{IQR} = 0.6745\sigma + 1.5(1.3490\sigma) = 2.698\sigma$$
+            <p>The probability of a normal variable falling outside $\pm 2.698\sigma$ is $2(1 - \Phi(2.698)) \approx 0.007$ (0.7%). Thus, 1.5 covers <strong>99.3%</strong> of Gaussian data, making it sensitive to true tail anomalies without excessive false alarms.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: Why do Gradient Descent and distance-based algorithms require feature scaling, while tree models do not?</span> <span class="badge badge-core">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Gradient Descent:</strong> Unscaled features cause loss contours to form steep, narrow elliptical valleys. The condition number of the Hessian $\kappa(H) \gg 1$, forcing gradients to oscillate perpendicular to the minimum. Scaling creates circular contours ($\kappa(H) \approx 1$), allowing direct gradient descent steps.</li>
+              <li><strong>Distance Algorithms (KNN, SVM, K-Means):</strong> Rely on Euclidean distance $d = \sqrt{\sum (x_i - y_i)^2}$. Features on large scales ($[0, 10^6]$) completely dominate distance sums, drowning out small features ($[0, 1]$).</li>
+              <li><strong>Tree Models:</strong> Find splits via $x_j \le c$ by sorting feature values. Splitting decisions are monotonic rank-order searches, completely invariant to monotonic scaling.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q11: When would you use MinMaxScaler over StandardScaler, and what is its fatal flaw?</span> <span class="badge badge-core">Feature Engineering</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p><strong>When to use:</strong> Use <code>MinMaxScaler</code> when the algorithm requires strictly bounded features in $[0, 1]$ (e.g. image pixel intensities, neural networks with sigmoid/tanh activations, or algorithms that do not assume Gaussian distributions).</p>
+            <p><strong>The Fatal Flaw:</strong> Extreme sensitivity to outliers! If a dataset has values in $[0, 100]$ and a single outlier arrives with value $100,000$, MinMaxScaler maps normal data into $[0, 0.001]$, collapsing the variance of inliers into an indistinguishable narrow band.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: Why does F1-score use the harmonic mean instead of arithmetic or geometric mean?</span> <span class="badge badge-math">Formulation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>The harmonic mean of two positive numbers $x, y$ is $\frac{2}{\frac{1}{x} + \frac{1}{y}}$. It is heavily dominated by the smaller of the two numbers.</p>
+            <p>If a classifier predicts positive for only 1 sample and gets it right, but misses all other 1,000 positives: $\text{Precision} = 1.0, \text{Recall} = 0.001$. The arithmetic mean is $\approx 0.50$ (deceptively high). The harmonic mean is $\approx 0.002$, correctly flagging total recall failure. It rewards models only when <em>both</em> Precision and Recall are balanced.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why is ROC-AUC misleading when evaluated on highly imbalanced datasets?</span> <span class="badge badge-faang">Imbalance Trap</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>The ROC curve plots $\text{TPR}$ vs $\text{FPR} = \frac{\text{FP}}{\text{TN} + \text{FP}}$. When the negative class is overwhelmingly dominant (e.g. 999,000 legitimate vs 1,000 fraud), the True Negative count $\text{TN}$ in the denominator is enormous.</p>
+            <p>If the model generates 10,000 False Alarms, $\text{FPR} = \frac{10,000}{999,000} \approx 1.0\%$. The ROC curve looks stellar ($\text{AUC} > 0.98$). However, $\text{Precision} = \frac{1,000}{1,000 + 10,000} = 9.1\%$, meaning 91% of alerts are false alarms! Always use Precision-Recall AUC (PR-AUC) on imbalanced data because its denominator ($\text{TP} + \text{FP}$) does not include $\text{TN}$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: How does SMOTE work, and why must it never be applied before Cross-Validation?</span> <span class="badge badge-missing">Resampling</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p><strong>Mechanism:</strong> For each minority instance $\mathbf{x}_i$, SMOTE finds its $k$-nearest minority neighbors. It randomly selects a neighbor $\mathbf{x}_{\text{nn}}$ and generates a synthetic point along the line segment: $\mathbf{x}_{\text{syn}} = \mathbf{x}_i + \lambda (\mathbf{x}_{\text{nn}} - \mathbf{x}_i)$ where $\lambda \sim U(0, 1)$.</p>
+            <p><strong>Why never before CV:</strong> If SMOTE is applied globally to the dataset, synthetic instances will be created using information from test-fold samples. Those synthetic points will appear in the training fold, causing severe <strong>data leakage</strong> and artificially optimistic cross-validation scores. SMOTE must be inside an <code>imblearn.pipeline.Pipeline</code> so it resamples strictly the training folds.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: Explain Focal Loss and how the modulating factor addresses class imbalance.</span> <span class="badge badge-math">Deep Learning</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Focal Loss modifies Cross-Entropy: $\text{FL}(p_t) = -\alpha_t (1 - p_t)^\gamma \log(p_t)$.</p>
+            <p>In imbalanced datasets, millions of easily classified negative examples ($p_t \ge 0.9$) produce small individual losses that sum together to completely dominate the gradient. The modulating factor $(1 - p_t)^\gamma$ dynamically downweights easy examples. If $p_t = 0.99$ and $\gamma = 2$, $(1 - 0.99)^2 = 0.0001$, suppressing loss by $10,000\times$. The optimizer focuses exclusively on hard, ambiguous examples.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: What is probability calibration? Why is an SVM or Naïve Bayes classifier uncalibrated out of the box?</span> <span class="badge badge-missing">Calibration</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p><strong>Definition:</strong> A model is calibrated if the predicted probability matches the empirical long-run frequency (e.g. among events predicted with 70% probability, exactly 70% occur).</p>
+            <p><strong>Why uncalibrated:</strong></p>
+            <ul>
+              <li><strong>SVM:</strong> Outputs geometric margin distances, not probabilities. Standard sigmoid transformations fit poorly on arbitrary margin scales.</li>
+              <li><strong>Na&iuml;ve Bayes:</strong> Multiplies conditional probabilities assuming strict feature independence. When features correlate, evidence is double-counted, pushing probabilities artificially to $0.0$ and $1.0$.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: Compare Platt Scaling and Isotonic Regression for model calibration.</span> <span class="badge badge-core">Production</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Platt Scaling:</strong> Parametric method that fits a 1D logistic regression $P(y=1|f) = \frac{1}{1 + \exp(Af + B)}$ on validation logits. Best for small datasets ($N < 1,000$); cannot overfit, but assumes a sigmoid calibration curve.</li>
+              <li><strong>Isotonic Regression:</strong> Non-parametric method fitting a piecewise-constant monotonic increasing step function. Capable of correcting arbitrary distortions on large datasets ($N > 10,000$), but prone to severe overfitting on small sample sizes.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: How does One-vs-Rest (OvR) differ from One-vs-One (OvO)? Why does SVC use OvO by default?</span> <span class="badge badge-core">Algorithms</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>OvR trains $K$ classifiers (each class against all others combined). OvO trains $\frac{K(K-1)}{2}$ binary classifiers (one for every distinct pair of classes).</p>
+            <p><strong>Why SVC uses OvO:</strong> Kernel Support Vector Machine training complexity scales quadratically or cubically with sample size ($O(N^2)$ to $O(N^3)$). Training many classifiers on small two-class subsets ($N_{\text{pair}} \ll N$) is dramatically faster than training $K$ models on the full dataset of $N$ instances.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: Explain why RandomizedSearchCV is superior to GridSearchCV according to Bergstra & Bengio (2012).</span> <span class="badge badge-faang">Hyperparameters</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Bergstra & Bengio proved that most machine learning problems have a low effective dimensionality: only a small subset of hyperparameters have a strong impact on performance.</p>
+            <p>Grid Search wastes trials evaluating identical values of the important hyperparameter across redundant grids of the unimportant hyperparameter. Random Search evaluates distinct values of every hyperparameter on every trial, exploring the critical subspace far more thoroughly within the same compute budget.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: How do you construct a 95% confidence interval for a model's test generalization error?</span> <span class="badge badge-math">Statistics</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p>Compute individual squared errors $e_i = (\hat{y}_i - y_i)^2$ on the untouched test set of size $n$. Compute sample mean $\bar{e}$ and standard error of the mean $\text{SE} = \frac{s}{\sqrt{n}}$.</p>
+            <p>Using Student's $t$-distribution with $n-1$ degrees of freedom:</p>
+            $$\text{CI} = \sqrt{\bar{e} \pm t_{0.975, n-1} \cdot \frac{s}{\sqrt{n}}}$$
+            <p>In Python: <code>np.sqrt(scipy.stats.t.interval(0.95, len(e)-1, loc=e.mean(), scale=stats.sem(e)))</code>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: What are Temporal Leakage and Group Leakage, and which CV splitters prevent them?</span> <span class="badge badge-faang">Validation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Temporal Leakage:</strong> Randomly shuffling time-series data. The model trains on future samples to predict past samples. <em>Prevention:</em> Use <code>TimeSeriesSplit</code> (rolling walk-forward validation).</li>
+              <li><strong>Group Leakage:</strong> Multiple observations belonging to the same entity (e.g. multiple MRI scans from the same patient) are split across train and test folds. The model memorizes patient-specific artifacts rather than disease signals. <em>Prevention:</em> Use <code>GroupKFold</code>.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: In California Housing, total_rooms had r = 0.13 with price, but rooms_per_household had r = 0.38. Why?</span> <span class="badge badge-core">Feature Engineering</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <p><code>total_rooms</code> is an aggregate district-level count: a dense district with 10,000 tiny apartments has more total rooms than an exclusive luxury neighborhood with 50 mansions. It reflects population density, not house size.</p>
+            <p>Dividing by <code>households</code> normalizes for district size, yielding <code>rooms_per_household</code>, which directly measures average house square footage. Feature ratios turn uninformative aggregates into powerful predictive signals.</p>
+          </div>
+        </details>
+      </section>
+
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>Module 2 Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your mastery of data pipelines, imputation, scaling, and classification metrics.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. In an ad click-through rate (CTR) prediction task where only 0.05% of impressions result in clicks, which evaluation metric should you prioritize over ROC-AUC?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) Accuracy</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) PR-AUC (Precision-Recall AUC / Average Precision)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) Mean Squared Error</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) R-squared</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> When the negative class is overwhelmingly dominant, FPR stays tiny because the True Negative pool is enormous, artificially inflating ROC-AUC. PR-AUC evaluates Precision directly against True Positives, immediately exposing massive False Positive counts.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Why does the F1-Score use the harmonic mean of Precision and Recall instead of the arithmetic mean?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) Because the harmonic mean is faster to compute on GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) Because the harmonic mean heavily penalizes extreme disparities where one metric is near zero.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) Because Precision and Recall are normally distributed.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) To ensure that accuracy is always higher than F1.</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> If Precision is 1.0 and Recall is 0.0, the arithmetic mean is 0.50 (deceptively good), whereas the harmonic mean is 0.0. The harmonic mean gives high scores only when both Precision and Recall are solid.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. What happens if you call `StandardScaler.fit()` on the entire dataset before splitting into train and test sets?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) Scikit-Learn throws a ValueError during execution.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) Preprocessing data leakage occurs, inflating validation performance and harming production generalization.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) The model automatically switches to Lasso regularization.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) Features become completely non-linear.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> The test set must simulate completely unseen data. Fitting transformers on the full dataset leaks global test statistics into training, producing over-optimistic cross-validation scores that drop in production.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. Under Rubin's taxonomy, what is the defining property of MNAR (Missing Not at Random)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) Missingness is purely random and independent of all features.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">B) Missingness depends only on observed features.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">C) The probability of a value being missing depends directly on the unobserved missing value itself.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) Missingness only occurs in categorical columns.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> In MNAR, the missingness mechanism depends on the hidden value (e.g. ultra-rich individuals refusing to report income). Standard imputation introduces severe bias unless a Missing Indicator flag or selection model is applied.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. Why is One-vs-One (OvO) preferred over One-vs-Rest (OvR) when training Kernel SVMs on multiclass data?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">A) Because Kernel SVM training complexity scales as O(N^2) to O(N^3); training many models on tiny pairwise subsets is dramatically faster.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">B) Because OvO requires training fewer total classifiers than OvR.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) Because OvR cannot compute decision function boundaries.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) Because OvO avoids the Dummy Variable Trap.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> For Kernel SVMs, training time scales quadratically or cubically with sample size. Training K(K-1)/2 classifiers on small two-class subsets is much faster than training K classifiers on the massive full dataset.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. In single-label multi-class classification, what is the mathematical relationship between Micro-F1 and overall Accuracy?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">A) Micro-F1 is mathematically identical to overall Accuracy.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">B) Micro-F1 is always lower than Accuracy by a factor of 1/K.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) Micro-F1 equals Macro-F1 divided by class support.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) Micro-F1 equals the Brier score.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> Because every misclassification in single-label multiclass is simultaneously a False Positive for the predicted class and a False Negative for the true class, global FP equals global FN. Hence Micro-Precision = Micro-Recall = Micro-F1 = Accuracy!
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why did Bergstra and Bengio (2012) prove that RandomizedSearchCV outperforms GridSearchCV in high-dimensional spaces?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) Because Random Search uses quantum annealing.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) Because only a few hyperparameters typically drive performance; Random Search explores distinct values of the important hyperparameters on every trial.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) Because Grid Search cannot evaluate integer hyperparameters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) Because Random Search guarantees global convex convergence.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> Most ML models have low effective dimensionality. Grid Search wastes evaluations testing identical values of the important parameter against redundant grid settings of unimportant parameters.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. Which feature scaling method is most robust when a dataset contains severe extreme outliers?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) MinMaxScaler</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">B) StandardScaler</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">C) RobustScaler (centers by median, scales by IQR)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) MaxAbsScaler</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> RobustScaler uses order statistics: the median and Interquartile Range ($Q_3 - Q_1$). Neither metric is distorted by extreme tail values, preserving inlier variance.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. What is the primary purpose of Focal Loss in imbalanced classification?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) To eliminate the need for an activation function.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) To dynamically downweight easy well-classified instances so the model concentrates on hard, ambiguous examples.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) To convert multi-label problems into regression problems.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) To calculate the Brier score in real-time.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> The modulating factor $(1 - p_t)^\gamma$ in Focal Loss rapidly shrinks to 0 for easy examples ($p_t \approx 1$), preventing millions of background negative samples from dominating the gradient update.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. Where should the SMOTE resampling algorithm be positioned in your machine learning codebase?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) Globally on the full dataset before calling train_test_split.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) Exclusively inside the training fold of cross-validation pipelines (e.g. using imblearn.pipeline.Pipeline).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) Only on the test set after model training is complete.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) Inside the custom transformer fit() method on both train and test.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> If SMOTE is run globally, synthetic points generated from test-set observations leak into training folds. Always use an imbalanced-learn pipeline to guarantee resampling applies strictly to training folds!
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

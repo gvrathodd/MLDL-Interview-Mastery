@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DL Module 5: Transformers, Large Language Models & Generative Deep Learning — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #a855f7;
+      --accent-glow: rgba(168, 85, 247, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --cyan: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(168, 85, 247, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--cyan); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">DL<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link">DL1: Foundations</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link">DL2: Optimization</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link">DL3: CNNs & CV</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link">DL4: RNNs & Attention</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link active">DL5: Transformers & LLMs</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">DL Module 5 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-transformer-physics')"><span>🤖</span> 1. Transformer & Attention Physics</li>
+        <li class="nav-item" onclick="switchTab('tab-seq-mha-rope')"><span>🌀</span> 2. MHA & RoPE Math</li>
+        <li class="nav-item" onclick="switchTab('tab-norm-residuals')"><span>🛣️</span> 3. Pre-LN vs Post-LN & SwiGLU</li>
+        <li class="nav-item" onclick="switchTab('tab-model-archetypes')"><span>🏛️</span> 4. BERT vs GPT vs T5 Archetypes</li>
+        <li class="nav-item" onclick="switchTab('tab-kv-flash')"><span>⚡</span> 5. KV Cache & FlashAttention</li>
+        <li class="nav-item" onclick="switchTab('tab-scaling-tokenization')"><span>⚖️</span> 6. Scaling Laws & Tokenization</li>
+        <li class="nav-item" onclick="switchTab('tab-alignment-rlhf')"><span>🎯</span> 7. Post-Training: SFT, RLHF & DPO</li>
+        <li class="nav-item" onclick="switchTab('tab-peft-quant')"><span>🗜️</span> 8. PEFT (LoRA/QLoRA) & Quantization</li>
+        <li class="nav-item" onclick="switchTab('tab-generative-diffusion')"><span>🎨</span> 9. Generative VAEs & Diffusion</li>
+        <li class="nav-item" onclick="switchTab('tab-attention-numerical')"><span>🧮</span> 10. Worked Toy Attention Numbers</li>
+        <li class="nav-item" onclick="switchTab('tab-interview-dl5')"><span>💼</span> 11. 28+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz-dl5')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: THE TRANSFORMER ARCHITECTURE & ATTENTION PHYSICS -->
+      <section id="tab-transformer-physics" class="tab-section active">
+        <h1>The Transformer Architecture: Overview & Attention Physics</h1>
+        <p class="section-subtitle">Why sequential recurrence died, the $O(1)$ path length revolution, and the mathematical mechanics of Scaled Dot-Product Attention.</p>
+
+        <div class="first-principles">
+          <h4>💡 The Fundamental Crisis of Recurrence: Why Transformers Were Inevitable</h4>
+          <p>For decades, recurrent neural networks (RNNs, LSTMs, GRUs) were the unquestioned standard for sequential data. However, recurrent architectures suffered from two fatal physical bottlenecks:</p>
+          <ol>
+            <li><strong>The Sequential Computation Bottleneck (Zero GPU Parallelism):</strong>
+              <br>To compute hidden state $h_t$, the RNN <em>must wait</em> for $h_{t-1}$. Across a sequence of length $L$, the compute graph has sequential depth $O(L)$. Modern GPUs contain tens of thousands of arithmetic cores designed for massive matrix parallelization. Feeding an RNN token-by-token leaves 95%+ of GPU compute cores idle waiting for sequential clock cycles.
+            </li>
+            <br>
+            <li><strong>The Gradient Path Length Bottleneck:</strong>
+              <br>For token $x_1$ to interact with token $x_L$, information and gradients must traverse $L-1$ sequential recurrent transitions. Even with LSTMs, signals attenuate over dozens of hops.
+            </li>
+          </ol>
+          <p><strong>The Transformer Breakthrough (Vaswani et al., 2017):</strong> Discard recurrence entirely. Connect every token directly to every other token in parallel using <strong>Self-Attention</strong>. The maximum path length between any two tokens drops from $O(L)$ to $\mathbf{O(1)}$. Training parallelizes completely across all $L$ tokens simultaneously.</p>
+        </div>
+
+        <h2>1. The Query-Key-Value ($Q, K, V$) Intuition</h2>
+        <div class="example-box">
+          <h4>📚 Physical Analogy: The Academic Research Library</h4>
+          <p>To understand the tri-vector representation ($Q, K, V$), consider searching an academic research library:</p>
+          <ul>
+            <li><strong>Query ($Q$):</strong> The specific research question you write in your notebook (e.g., <em>"What is the mathematical proof of He initialization?"</em>).</li>
+            <li><strong>Key ($K$):</strong> The topic tags and index labels pasted on the spines of all books in the library (e.g., <em>"Neural Network Weight Initialization"</em>).</li>
+            <li><strong>Value ($V$):</strong> The actual substantive contents printed inside each book.</li>
+          </ul>
+          <p><strong>The Process:</strong> You take your <strong>Query</strong> and compute its compatibility (dot product) against every book's <strong>Key</strong>. You normalize these match scores into probabilities (Softmax). Finally, you take a weighted sum of the books' <strong>Values</strong> based on those match scores.</p>
+        </div>
+
+        <h2>2. Mathematical Formulation: Scaled Dot-Product Attention</h2>
+        <div class="math-box">
+          <h4>Mathematical Definition:</h4>
+          $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) V$$
+          <p>Given an input sequence matrix $X \in \mathbb{R}^{L \times d_{\text{model}}}$:</p>
+          <ul>
+            <li>$Q = X W^Q \in \mathbb{R}^{L \times d_k}$ (Queries)</li>
+            <li>$K = X W^K \in \mathbb{R}^{L \times d_k}$ (Keys)</li>
+            <li>$V = X W^V \in \mathbb{R}^{L \times d_v}$ (Values)</li>
+          </ul>
+          <p>where $W^Q \in \mathbb{R}^{d_{\text{model}} \times d_k}$, $W^K \in \mathbb{R}^{d_{\text{model}} \times d_k}$, and $W^V \in \mathbb{R}^{d_{\text{model}} \times d_v}$ are learnable projection matrices.</p>
+        </div>
+
+        <h2>3. Rigorous Proof: Why Divide by $\sqrt{d_k}$?</h2>
+        <div class="deep-dive">
+          <h4>🔍 Mathematical Derivation: Softmax Gradient Saturation</h4>
+          <p>Why do we scale the dot products by $\frac{1}{\sqrt{d_k}}$? Let us analyze the variance of the dot product between a query vector $q \in \mathbb{R}^{d_k}$ and a key vector $k \in \mathbb{R}^{d_k}$.</p>
+          <p>Assume that the components of $q$ and $k$ are independent random variables with zero mean and unit variance:</p>
+          $$\mathbb{E}[q_i] = 0, \quad \text{Var}(q_i) = 1, \quad \mathbb{E}[k_i] = 0, \quad \text{Var}(k_i) = 1$$
+          <p>The dot product is the sum of $d_k$ independent scalar products:</p>
+          $$S = q \cdot k = \sum_{i=1}^{d_k} q_i k_i$$
+          <p>By linearity of expectation (since $q_i, k_i$ are independent):</p>
+          $$\mathbb{E}[S] = \sum_{i=1}^{d_k} \mathbb{E}[q_i k_i] = \sum_{i=1}^{d_k} \mathbb{E}[q_i] \mathbb{E}[k_i] = 0$$
+          <p>Now, let us compute the variance of $q_i k_i$:</p>
+          $$\text{Var}(q_i k_i) = \mathbb{E}[(q_i k_i)^2] - (\mathbb{E}[q_i k_i])^2 = \mathbb{E}[q_i^2]\mathbb{E}[k_i^2] - 0 = \text{Var}(q_i)\text{Var}(k_i) = 1 \times 1 = 1$$
+          <p>Since the $d_k$ terms are mutually independent, the variance of the sum is the sum of the variances:</p>
+          $$\text{Var}(S) = \sum_{i=1}^{d_k} \text{Var}(q_i k_i) = \sum_{i=1}^{d_k} 1 = \mathbf{d_k}$$
+          <p>The standard deviation is therefore $\mathbf{\sqrt{d_k}}$.</p>
+
+          <div class="interview-alert">
+            <h4>⚠️ The Softmax Catastrophe for Large $d_k$</h4>
+            <p>In modern models, $d_k$ is typically $64$ or $128$. For $d_k = 64$, the standard deviation of raw dot products is $\sqrt{64} = 8$. Dot product scores routinely reach values like $+24$ or $-24$.</p>
+            <p>Recall the derivative of the Softmax function: $\frac{\partial S_i}{\partial z_j} = S_i (\delta_{ij} - S_j)$. When one logit is significantly larger than all others ($z_1 \gg z_j$), the output distribution becomes a one-hot hard argmax:</p>
+            $$S_1 \approx 1, \quad S_j \approx 0 \implies \frac{\partial S_i}{\partial z_j} \approx 0$$
+            <p><strong>The gradients vanish completely!</strong> Dividing by $\sqrt{d_k}$ normalizes the variance back to $1$ ($\text{Var}\left(\frac{S}{\sqrt{d_k}}\right) = \frac{d_k}{d_k} = 1$), keeping the logits in the active, sensitive linear region of the Softmax function where gradients flow smoothly.</p>
+          </div>
+        </div>
+
+        <h2>4. Causal (Autoregressive) Attention Masking</h2>
+        <div class="math-box">
+          <h4>Preventing Information Leakage from the Future:</h4>
+          <p>In generative language modeling (e.g., GPT, LLaMA), token $t$ must predict token $t+1$ without looking ahead at future tokens $t+1, t+2, \dots, L$.</p>
+          <p>We enforce this causal structure by adding a mask matrix $M \in \mathbb{R}^{L \times L}$ before the Softmax:</p>
+          $$M_{ij} = \begin{cases} 0 & \text{if } i \ge j \quad (\text{past and present}) \\ -\infty & \text{if } i < j \quad (\text{future}) \end{cases}$$
+          $$\text{CausalAttention}(Q, K, V) = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}} + M\right) V$$
+          <p>Since $e^{-\infty} = 0$, the Softmax assigns exactly $\mathbf{0.0}$ probability to all future tokens, preserving strict temporal causality.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 2: MULTI-HEAD ATTENTION & POSITIONAL ENCODINGS -->
+      <section id="tab-seq-mha-rope" class="tab-section">
+        <h1>Multi-Head Attention & Positional Encodings (RoPE Math)</h1>
+        <p class="section-subtitle">Subspace specialization, parameter invariance proofs, and the mathematical mechanics of Rotary Position Embeddings (RoPE).</p>
+
+        <h2>1. Multi-Head Attention (MHA) Formulation</h2>
+        <div class="first-principles">
+          <h4>💡 Why Multiple Heads? The Subspace Specialization Hypothesis</h4>
+          <p>In natural language, a single token carries multiple simultaneous relationships:</p>
+          <ul>
+            <li><strong>Syntactic head:</strong> Links a verb to its direct object (<em>"threw" $\to$ "ball"</em>).</li>
+            <li><strong>Coreference head:</strong> Resolves pronouns to referents (<em>"she" $\to$ "Alice"</em>).</li>
+            <li><strong>Positional head:</strong> Attends strictly to adjacent immediate predecessor tokens.</li>
+          </ul>
+          <p>A single attention head averages all these relationships into one probability distribution, muddying distinct signals. <strong>Multi-Head Attention (MHA)</strong> projects queries, keys, and values into $h$ distinct lower-dimensional representation subspaces, allowing the model to jointly attend to information from different representation subspaces at different positions.</p>
+        </div>
+
+        <div class="math-box">
+          <h4>Mathematical Definition of Multi-Head Attention:</h4>
+          $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \text{head}_2, \dots, \text{head}_h) W^O$$
+          $$\text{where } \text{head}_i = \text{Attention}(Q W_i^Q, K W_i^K, V W_i^V)$$
+          <p>Dimensions:</p>
+          <ul>
+            <li>$W_i^Q \in \mathbb{R}^{d_{\text{model}} \times d_k}, \quad W_i^K \in \mathbb{R}^{d_{\text{model}} \times d_k}, \quad W_i^V \in \mathbb{R}^{d_{\text{model}} \times d_v}$</li>
+            <li>$W^O \in \mathbb{R}^{h d_v \times d_{\text{model}}}$</li>
+            <li>Typically $d_k = d_v = \frac{d_{\text{model}}}{h}$.</li>
+          </ul>
+        </div>
+
+        <div class="deep-dive">
+          <h4>⚖️ Proof: MHA Adds No Additional Computational Cost Over Single-Head Attention</h4>
+          <p>A common interview trap: <em>"Doesn't having 8 or 32 attention heads make the model 8x or 32x more expensive?"</em></p>
+          <p><strong>Proof:</strong> Let $d_{\text{model}} = 512$ and $h = 8$, so $d_k = 512 / 8 = 64$.</p>
+          <ul>
+            <li><strong>Single-head attention</strong> with full dimension:
+              $$\text{Parameters for } W^Q = 512 \times 512 = 262,144$$
+            </li>
+            <li><strong>Multi-head attention</strong> with $h=8$ heads of size $64$:
+              $$\text{Parameters for } h \text{ heads} = 8 \times (512 \times 64) = 8 \times 32,768 = \mathbf{262,144}$$
+            </li>
+          </ul>
+          <p>The total parameter count and FLOPs for the linear projections are <strong>exactly identical</strong>. MHA simply slices the single large matrix into $h$ smaller blocks that execute concurrently!</p>
+        </div>
+
+        <h2>2. Positional Encodings: Injecting Spatial Geometry</h2>
+        <p>Because self-attention is a permutation-equivariant set operation: $\text{Attention}(P X) = P \text{Attention}(X)$ for any permutation matrix $P$. Without positional information, <em>"The dog bit the man"</em> and <em>"The man bit the dog"</em> produce mathematically identical representations!</p>
+
+        <h3>A. Vaswani Sinusoidal Positional Encodings (2017)</h3>
+        <div class="math-box">
+          $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)$$
+          $$PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{\text{model}}}}\right)$$
+          <p><strong>Why sinusoidal functions?</strong> By standard trigonometric angle-addition identities:</p>
+          $$\sin(\omega(pos + k)) = \sin(\omega \cdot pos)\cos(\omega k) + \cos(\omega \cdot pos)\sin(\omega k)$$
+          <p>For any fixed offset $k$, $PE_{pos+k}$ can be represented as a <strong>linear transformation</strong> of $PE_{pos}$. This theoretically allows the network to learn relative positional relationships easily.</p>
+        </div>
+
+        <h3>B. Rotary Position Embeddings (RoPE - Su et al., 2021)</h3>
+        <div class="first-principles">
+          <h4>🌟 The Modern SOTA: RoPE (LLaMA-1/2/3, Mistral, Gemma, Qwen)</h4>
+          <p>Standard positional encodings add vectors: $x_{pos} = x + PE_{pos}$, corrupting the semantic embedding space. <strong>RoPE rotates the query and key vectors in the 2D complex plane</strong> instead of adding offsets!</p>
+          <p><strong>Core Objective:</strong> Find an operation $R(x, m)$ such that the inner product between query at position $m$ and key at position $n$ depends <em>only</em> on the relative distance $m - n$:</p>
+          $$\langle R(q, m), R(k, n) \rangle = g(q, k, m - n)$$
+        </div>
+
+        <div class="math-box">
+          <h4>RoPE Mathematical Derivation:</h4>
+          <p>Consider a 2D vector represented as a complex number: $q = q_0 + i q_1 \in \mathbb{C}$. Rotation by angle $m \theta$ corresponds to multiplication by $e^{i m \theta}$:</p>
+          $$R(q, m) = q \cdot e^{i m \theta}$$
+          $$R(k, n) = k \cdot e^{i n \theta}$$
+          <p>Now take their complex Hermitian inner product:</p>
+          $$\langle R(q, m), R(k, n) \rangle = \text{Re}\left[ (q e^{i m \theta}) (k e^{i n \theta})^* \right] = \text{Re}\left[ q k^* e^{i (m - n)\theta} \right] = \mathbf{g(q, k, m - n)}$$
+          <p>The dot product depends <strong>strictly on relative offset $m - n$</strong>! For high-dimensional vectors $d_k$, RoPE pairs adjacent coordinates $(x_{2i}, x_{2i+1})$ and applies 2D rotation matrix block-diagonally:</p>
+          $$R_{\Theta, m} x = \begin{pmatrix} 
+          \cos m\theta_1 & -\sin m\theta_1 & 0 & 0 & \dots \\
+          \sin m\theta_1 & \cos m\theta_1 & 0 & 0 & \dots \\
+          0 & 0 & \cos m\theta_2 & -\sin m\theta_2 & \dots \\
+          0 & 0 & \sin m\theta_2 & \cos m\theta_2 & \dots 
+          \end{pmatrix} x, \quad \theta_i = 10000^{-2(i-1)/d}$$
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 3: NORMALIZATION, RESIDUALS & LAYER ORDERING -->
+      <section id="tab-norm-residuals" class="tab-section">
+        <h1>Normalization, Residuals & Layer Ordering (Pre-LN vs Post-LN)</h1>
+        <p class="section-subtitle">Deep gradient highways, why Post-LN requires fragile warm-up, SwiGLU activation physics, and RMSNorm speedups.</p>
+
+        <h2>1. The Pre-LN vs Post-LN Architecture Crisis</h2>
+        <div class="first-principles">
+          <h4>🏛️ Post-LN (Vaswani et al., 2017) vs Pre-LN (GPT-2, LLaMA)</h4>
+          <p>The original 2017 Transformer paper placed Layer Normalization <em>after</em> the residual connection (Post-LN):</p>
+          $$\text{Post-LN: } x_{l+1} = \text{LayerNorm}(x_l + \text{SubLayer}(x_l))$$
+          <p>Modern Large Language Models place Layer Normalization <em>inside</em> the residual branch (Pre-LN):</p>
+          $$\text{Pre-LN: } x_{l+1} = x_l + \text{SubLayer}(\text{LayerNorm}(x_l))$$
+        </div>
+
+        <div class="deep-dive">
+          <h4>📉 Mathematical Proof: Why Post-LN Vanishes Gradients in Deep Transformers</h4>
+          <p>Let us analyze gradient propagation from layer $L$ back to layer $l$ for both designs.</p>
+          
+          <p><strong>1. Post-LN Gradient Analysis:</strong></p>
+          <p>In Post-LN, at every single layer, the entire state vector passes through LayerNorm. When backpropagating, the chain rule yields:</p>
+          $$\frac{\partial x_L}{\partial x_l} = \prod_{k=l}^{L-1} \left( \frac{\partial \text{LN}}{\partial z_k} \left( \mathbf{I} + \frac{\partial \text{SubLayer}}{\partial x_k} \right) \right)$$
+          <p>The LayerNorm Jacobian scales inversely with the norm of its input: $\|\frac{\partial \text{LN}}{\partial z}\| \propto \frac{1}{\sqrt{\text{Var}(z)}}$. As depth increases, variance accumulates, scaling factors compound, and the gradient norm near the early layers drops exponentially:</p>
+          $$\|\nabla_{x_1} \mathcal{L}\| \ll \|\nabla_{x_L} \mathcal{L}\|$$
+          <p><em>Consequence:</em> Training deep Post-LN models (>12 layers) without an ultra-delicate learning rate warmup (often 10,000+ steps) results in immediate gradient explosion or complete divergence.</p>
+
+          <p><strong>2. Pre-LN Gradient Analysis:</strong></p>
+          <p>Expanding the recurrence for Pre-LN from layer $0$ to $L$:</p>
+          $$x_L = x_0 + \sum_{k=0}^{L-1} \text{SubLayer}(\text{LayerNorm}(x_k))$$
+          <p>Differentiating $x_L$ with respect to $x_l$:</p>
+          $$\frac{\partial x_L}{\partial x_l} = \mathbf{I} + \sum_{k=l}^{L-1} \frac{\partial \text{SubLayer}(\text{LayerNorm}(x_k))}{\partial x_l}$$
+          <p><strong>The Identity Highway $\mathbf{I}$ is completely unattenuated!</strong> Gradients can flow directly from the final loss back to the very first token embeddings without passing through any normalization layers. Deep Pre-LN transformers (70B+ parameters, 80+ layers) train stably from step 1 without fragile warm-up.</p>
+        </div>
+
+        <h2>2. RMSNorm: Dropping Mean Centering for Speed</h2>
+        <div class="math-box">
+          <h4>RMSNorm Formulation (Zhang & Sennrich, 2019 / LLaMA):</h4>
+          <p>Standard LayerNorm computes both mean and variance:</p>
+          $$\text{LayerNorm}(x) = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} \odot \gamma + \beta, \quad \mu = \frac{1}{d}\sum_{i=1}^d x_i, \quad \sigma^2 = \frac{1}{d}\sum_{i=1}^d (x_i - \mu)^2$$
+          <p>Empirical analysis showed that the regularization power of LayerNorm comes almost entirely from scaling by the root-mean-square norm, while mean re-centering ($\mu$) contributes negligible training stability.</p>
+          <p><strong>Root Mean Square Normalization (RMSNorm)</strong> drops mean centering and bias $\beta$:</p>
+          $$\text{RMSNorm}(x) = \frac{x}{\text{RMS}(x)} \odot \gamma, \quad \text{RMS}(x) = \sqrt{\frac{1}{d} \sum_{i=1}^d x_i^2 + \epsilon}$$
+          <p><em>System Benefit:</em> Eliminates two GPU global memory reduction passes (mean calculation and difference calculation), reducing normalization kernel execution time by <strong>7% to 12%</strong> across training and inference.</p>
+        </div>
+
+        <h2>3. Feed-Forward Networks & SwiGLU Activation</h2>
+        <div class="first-principles">
+          <h4>Gated Linear Units (GLU) vs Standard ReLU/GELU MLP</h4>
+          <p>The standard Transformer FFN consists of two linear layers with an expansion factor of 4 ($d_{\text{model}} \to 4d_{\text{model}} \to d_{\text{model}}$):</p>
+          $$\text{FFN}_{\text{standard}}(x) = \text{GELU}(x W_1 + b_1) W_2 + b_2$$
+          <p><strong>SwiGLU (Shazeer, 2020 / LLaMA):</strong> Replaces the simple activation with a bilinear element-wise gating mechanism:</p>
+          $$\text{SwiGLU}(x) = \left( \text{Swish}(x W_1) \odot (x W_3) \right) W_2$$
+          $$\text{where } \text{Swish}(z) = z \cdot \sigma(\beta z)$$
+          <p>To preserve total parameter count with 3 weight matrices ($W_1, W_2, W_3$), the hidden dimension is typically scaled to $\frac{2}{3} \times 4d_{\text{model}} = \frac{8}{3}d_{\text{model}}$ (e.g., in LLaMA-7B: $4096 \to 11008 \to 4096$). SwiGLU consistently achieves lower perplexity across downstream benchmarks.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 4: ARCHETYPES OF TRANSFORMER MODELS -->
+      <section id="tab-model-archetypes" class="tab-section">
+        <h1>Archetypes of Transformer Models (Encoder-Only vs Decoder-Only vs Seq2Seq)</h1>
+        <p class="section-subtitle">BERT vs GPT vs T5: Architectural design patterns, attention connectivity matrices, and pre-training objectives.</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Attribute</th>
+                <th>Encoder-Only (e.g., BERT, RoBERTa)</th>
+                <th>Decoder-Only (e.g., GPT, LLaMA, Claude)</th>
+                <th>Encoder-Decoder (e.g., T5, BART)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Attention Mask</strong></td>
+                <td>Bidirectional (all-to-all, full $L \times L$ visibility)</td>
+                <td>Causal / Lower Triangular (tokens only see past & self)</td>
+                <td>Encoder: Bidirectional; Decoder: Causal + Cross-Attention</td>
+              </tr>
+              <tr>
+                <td><strong>Primary Pretraining Objective</strong></td>
+                <td>Masked Language Modeling (MLM: predict 15% masked tokens)</td>
+                <td>Autoregressive Next-Token Prediction ($\sum \log P(x_t \mid x_{<t})$)</td>
+                <td>Span Corruption (denoising corrupted text spans)</td>
+              </tr>
+              <tr>
+                <td><strong>Generation Ability</strong></td>
+                <td>Poor (cannot naturally generate auto-regressively)</td>
+                <td>SOTA (seamless, open-ended coherent text generation)</td>
+                <td>Strong for conditional transduction (translation, summary)</td>
+              </tr>
+              <tr>
+                <td><strong>Best Tasks</strong></td>
+                <td>Classification, NER, Embeddings, Semantic Search</td>
+                <td>Reasoning, Chatbots, Code, In-Context Few-Shot Learning</td>
+                <td>Summarization, Machine Translation, Grammatical Correction</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>1. Why Did the Industry Converge on Decoder-Only LLMs?</h2>
+        <div class="first-principles">
+          <h4>💡 The 3 Pillars of Decoder-Only Supremacy:</h4>
+          <ol>
+            <li><strong>Zero Training Token Waste (100% Compute Efficiency):</strong>
+              <br>In BERT's MLM, only 15% of tokens are masked, meaning <strong>only 15% of tokens produce training loss gradients per forward pass</strong>. In a Decoder-Only model, every single token in the context predicts the next token—100% of tokens generate loss and backprop gradients, yielding $6\times$ higher training data efficiency.
+            </li>
+            <br>
+            <li><strong>In-Context Learning & Prompt Unification:</strong>
+              <br>Decoder-only models unify every natural language task (classification, translation, math, code) into a single identical format: <em>"Given prefix tokens $x_{<t}$, predict token $x_t$."</em> There is no architectural distinction between input prompt and output completion.
+            </li>
+            <br>
+            <li><strong>Inference Serving KV-Cache Optimization:</strong>
+              <br>In Encoder-Decoder models, the encoder must re-encode the entire prompt and cross-attention must attend to encoder keys/values at every step. In Decoder-only architectures, unified causal KV caching scales with extreme hardware efficiency in fused GPU kernels (vLLM, TensorRT-LLM).
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Masked Language Modeling (MLM) Math</h2>
+        <div class="math-box">
+          <h4>BERT MLM Objective:</h4>
+          <p>Given sequence $X = (x_1, \dots, x_n)$, randomly select 15% of positions $M$:</p>
+          <ul>
+            <li>80% replaced with `[MASK]` token</li>
+            <li>10% replaced with random token</li>
+            <li>10% left unchanged</li>
+          </ul>
+          $$\mathcal{L}_{\text{MLM}}(\theta) = -\sum_{i \in M} \log P(x_i \mid \tilde{X}; \theta)$$
+          <p>Bidirectional context allows BERT to represent rich contextual polysemy (e.g., distinguishing <em>"bank"</em> of a river vs <em>"bank"</em> of a river versus financial <em>"bank"</em>) better than unidirectional representations.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 5: EFFICIENT ATTENTION & KV CACHING MECHANICS -->
+      <section id="tab-kv-flash" class="tab-section">
+        <h1>Efficient Attention & KV Caching Mechanics</h1>
+        <p class="section-subtitle">Autoregressive generation bottlenecks, exact KV cache VRAM sizing math, MQA vs GQA, and the FlashAttention SRAM tiling revolution.</p>
+
+        <h2>1. The Autoregressive Generation Bottleneck</h2>
+        <div class="first-principles">
+          <h4>💡 The Quadratic Recomputation Trap</h4>
+          <p>During inference, an LLM generates text token-by-token. To generate token $t+1$, standard self-attention requires attending to all prior tokens $1, 2, \dots, t$.</p>
+          <p>Without caching, generating a sequence of length $L$ requires re-projecting and re-computing attention across all previous tokens at every step:</p>
+          $$\text{Total Compute Without Cache} = \sum_{t=1}^L O(t \cdot d_{\text{model}}) = O(L^2 \cdot d_{\text{model}})$$
+          <p>Because the representations of past tokens do not change in causal attention, we can save their computed <strong>Key ($K$)</strong> and <strong>Value ($V$)</strong> vectors in GPU memory. At step $t+1$, we only project the newest token to $q_{t+1}, k_{t+1}, v_{t+1}$, append $k_{t+1}, v_{t+1}$ to the cache, and compute attention: $O(t)$ compute per token!</p>
+        </div>
+
+        <h2>2. Mathematical Derivation: Exact KV Cache Memory Sizing</h2>
+        <div class="math-box">
+          <h4>Derivation of the KV Cache VRAM Formula:</h4>
+          <p>For each generated token, at each transformer layer, we must store both its Key vector and its Value vector for every attention head:</p>
+          <ul>
+            <li>Number of layers: $n_{\text{layers}}$</li>
+            <li>Number of KV heads: $n_{\text{kv\_heads}}$</li>
+            <li>Dimension per head: $d_{\text{head}}$</li>
+            <li>Sequence context length: $L$</li>
+            <li>Batch size: $B$</li>
+            <li>Bytes per parameter: $P$ ($2$ bytes for FP16/BF16, $1$ byte for INT8, $0.5$ bytes for FP4)</li>
+          </ul>
+          $$\mathbf{\text{KV Cache Memory (Bytes)}} = \mathbf{2 \times n_{\text{layers}} \times n_{\text{kv\_heads}} \times d_{\text{head}} \times L \times B \times P}$$
+          <p><em>(The factor of 2 accounts for both Keys and Values).</em></p>
+        </div>
+
+        <div class="deep-dive">
+          <h4>🧮 Concrete Production Calculation: LLaMA-2-70B Context Scaling</h4>
+          <p>Let us calculate the KV cache memory footprint for <strong>LLaMA-2-70B</strong> (Standard MHA: $n_{\text{layers}} = 80$, $n_{\text{heads}} = 64$, $d_{\text{head}} = 128$, precision = BF16 ($P=2$)):</p>
+          <p>For a single request ($B = 1$) at context length $L = 4,096$ tokens:</p>
+          $$\text{KV Memory} = 2 \times 80 \times 64 \times 128 \times 4096 \times 1 \times 2 = 10,737,418,240 \text{ bytes} \approx \mathbf{10.0 \text{ GB VRAM!}}$$
+          <p>If serving a batch of $B = 16$ concurrent users at context length $4k$:</p>
+          $$\text{Total KV Cache} = 16 \times 10.0 \text{ GB} = \mathbf{160 \text{ GB VRAM!}}$$
+          <p>The KV cache alone requires two entire 80GB NVIDIA A100 GPUs before allocating a single byte for model weights!</p>
+        </div>
+
+        <h2>3. Grouped-Query Attention (GQA) & Multi-Query Attention (MQA)</h2>
+        <div class="first-principles">
+          <h4>MHA vs MQA vs GQA (Ainslie et al., 2023 / LLaMA-3)</h4>
+          <ul>
+            <li><strong>Multi-Head Attention (MHA):</strong> $H$ Query heads, $H$ Key heads, $H$ Value heads (1:1:1 ratio). Maximum representational power, but massive KV cache footprint.</li>
+            <li><strong>Multi-Query Attention (MQA - Shazeer 2019):</strong> $H$ Query heads share a <em>single</em> Key head and a <em>single</em> Value head ($H:1:1$ ratio). Slashes KV cache by $H\times$ (e.g. $32\times$ or $64\times$), but degrades reasoning and translation quality slightly.</li>
+            <li><strong>Grouped-Query Attention (GQA):</strong> The ideal Pareto trade-off. $H$ Query heads are partitioned into $G$ groups, with each group sharing 1 Key and 1 Value head (e.g. in LLaMA-3: 32 Q heads, 8 KV heads $\implies 4$ Q heads per KV head).
+              <br><strong>Result:</strong> $4\times - 8\times$ reduction in KV cache memory and memory bandwidth with virtually zero accuracy degradation!
+            </li>
+          </ul>
+        </div>
+
+        <h2>4. The FlashAttention Revolution: IO-Aware SRAM Tiling</h2>
+        <div class="deep-dive">
+          <h4>⚡ Memory Hierarchy Reality: Why Standard Attention is Memory-Bound</h4>
+          <p>Modern GPUs have two primary memory tiers:</p>
+          <ol>
+            <li><strong>High-Bandwidth Memory (HBM / GPU VRAM):</strong> Huge capacity (80 GB), but relatively slow bandwidth ($\approx 2.0 - 3.3 \text{ TB/s}$).</li>
+            <li><strong>On-Chip Static RAM (SRAM / Shared Memory):</strong> Ultra-fast bandwidth ($\approx 19 \text{ TB/s}$), but tiny capacity ($\approx 192 \text{ KB}$ per Streaming Multiprocessor).</li>
+          </ol>
+          <p><strong>The Flaw of Standard Attention:</strong> Standard PyTorch attention materializes the intermediate $L \times L$ attention score matrix $S = Q K^T$ into slow HBM ($O(L^2)$ memory reads and writes), then reads it back to compute Softmax, and writes it back again. For long sequences ($L=8k$ or $32k$), GPU tensor cores spend 80%+ of their time stalled waiting for HBM memory bus transfers!</p>
+
+          <h4>The FlashAttention Algorithm (Dao et al., 2022-2024):</h4>
+          <p>FlashAttention achieves a $2\times - 4\times$ wall-clock speedup and reduces memory from $O(L^2)$ to $O(L)$ by never materializing the $L \times L$ matrix in HBM! Instead, it uses <strong>Tiling</strong> with the <strong>Online Softmax Trick</strong>:</p>
+          <ol>
+            <li>Load small blocks of $Q$ and $K, V$ into ultra-fast SRAM ($B_r \times d, B_c \times d$).</li>
+            <li>Compute partial dot products in SRAM.</li>
+            <li>Update the running Softmax normalizer incrementally using the algebraic identity:
+              $$\text{softmax}([x^{(1)}, x^{(2)}])_i = \frac{e^{x_i - m_{\text{new}}}}{\sum e^{x_k - m_{\text{new}}}}, \quad m_{\text{new}} = \max(m_1, m_2)$$
+            </li>
+            <li>Multiply directly with $V$ in SRAM and write only the final $L \times d$ output back to HBM.</li>
+          </ol>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 6: SCALING LAWS, PRE-TRAINING & TOKENIZATION -->
+      <section id="tab-scaling-tokenization" class="tab-section">
+        <h1>Scaling Laws, Pre-training & Tokenization</h1>
+        <p class="section-subtitle">Chinchilla compute-optimal scaling ($C \approx 6ND$), Subword Tokenization algorithms (BPE, WordPiece), and training dynamics.</p>
+
+        <h2>1. Chinchilla Scaling Laws (Hoffmann et al., DeepMind 2022)</h2>
+        <div class="first-principles">
+          <h4>Kaplan et al. (OpenAI 2020) vs Chinchilla: The Million-Dollar Correction</h4>
+          <p>In 2020, OpenAI published empirical scaling laws suggesting that when compute increases, model parameter size $N$ should be scaled substantially faster than training token volume $D$ ($N \propto C^{0.73}, D \propto C^{0.27}$). Consequently, models like GPT-3 (175B parameters) were trained on only 300 billion tokens.</p>
+          <p><strong>DeepMind's Chinchilla Finding:</strong> DeepMind discovered that Kaplan's learning rate schedules were suboptimal. Under compute-optimal allocation, <strong>model size $N$ and token count $D$ should scale in equal 1:1 proportion</strong>!</p>
+          $$N \propto C^{0.5}, \quad D \propto C^{0.5}$$
+        </div>
+
+        <div class="math-box">
+          <h4>The Core Chinchilla Formulas:</h4>
+          <p>Total training compute FLOPs $C$ is approximately:</p>
+          $$\mathbf{C \approx 6 N D}$$
+          <p><em>(Derivation: 2 FLOPs per parameter for forward pass + 4 FLOPs per parameter for backward pass = 6 FLOPs per parameter per token).</em></p>
+          <p>The compute-optimal token-to-parameter ratio is:</p>
+          $$\mathbf{D \approx 20 \times N}$$
+          <p>For example, a compute-optimal 70B model requires at least $70 \times 20 = \mathbf{1.4 \text{ Trillion tokens}}$ during pre-training.</p>
+          <div class="interview-alert">
+            <h4>💡 Production Reality: Over-training for Inference Efficiency</h4>
+            <p>Chinchilla optimal is <em>training compute-optimal</em>, ignoring inference costs. In production, an open-weights model like LLaMA-3-8B is trained on <strong>15 Trillion tokens</strong> (a ratio of nearly $1,800 \times N$). Spending extra compute during pre-training produces a small, ultra-dense model that saves millions of dollars in GPU serving costs across billions of inference requests!</p>
+          </div>
+        </div>
+
+        <h2>2. Tokenization: Bridging Raw Text and Tensors</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Algorithm</th>
+                <th>Models Used</th>
+                <th>Merge Selection Criterion</th>
+                <th>Vocabulary Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Byte-Pair Encoding (BPE)</strong></td>
+                <td>GPT-2/3/4, LLaMA, RoBERTa</td>
+                <td>Most frequent adjacent character/byte pair frequency</td>
+                <td>32,000 – 128,000</td>
+              </tr>
+              <tr>
+                <td><strong>WordPiece</strong></td>
+                <td>BERT, DistilBERT</td>
+                <td>Maximizes training data likelihood increase / mutual information</td>
+                <td>30,522</td>
+              </tr>
+              <tr>
+                <td><strong>Unigram / SentencePiece</strong></td>
+                <td>T5, ALBERT, Gemma</td>
+                <td>Starts with large vocab and iteratively prunes candidates via entropy loss</td>
+                <td>32,000 – 256,000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="deep-dive">
+          <h4>🔍 Byte-Level BPE & The Elimination of the `<unk>` Token</h4>
+          <p>Traditional character-level tokenizers failed on out-of-vocabulary Unicode characters, emojis, and non-Latin alphabets, mapping them to `<unk>`. Byte-Level BPE (Radford et al., 2019) starts with an alphabet of all <strong>256 raw bytes</strong>. Because any valid UTF-8 text string can be decomposed into bytes, Byte-Level BPE can tokenize <em>any arbitrary text, code, or binary data</em> without ever producing an `<unk>` token!</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 7: POST-TRAINING: ALIGNMENT & PREFERENCE OPTIMIZATION -->
+      <section id="tab-alignment-rlhf" class="tab-section">
+        <h1>Post-Training: Alignment, Instruction Tuning & Preference Optimization</h1>
+        <p class="section-subtitle">The 3-stage LLM lifecycle, SFT loss masking, RLHF/PPO reward modeling, and the Direct Preference Optimization (DPO) mathematical breakthrough.</p>
+
+        <h2>1. The 3-Stage LLM Training Lifecycle</h2>
+        <div class="first-principles">
+          <ol>
+            <li><strong>Stage 1: Pre-training (World Knowledge):</strong> Unsupervised causal language modeling on trillions of raw web tokens. The base model becomes an exceptional statistical next-token predictor, but tends to hallucinate, repeat prompts, or output toxic content.</li>
+            <li><strong>Stage 2: Supervised Fine-Tuning (SFT / Instruction Following):</strong> Training on high-quality $(x_{\text{prompt}}, y_{\text{response}})$ demonstration datasets. Converts a raw text-continuation engine into a helpful chatbot assistant.</li>
+            <li><strong>Stage 3: Preference Alignment (RLHF / DPO):</strong> Steering model outputs toward human values (helpfulness, accuracy, harmlessness) using pairwise preference rankings ($y_w \succ y_l$).</li>
+          </ol>
+        </div>
+
+        <h2>2. Supervised Fine-Tuning (SFT) & Loss Masking</h2>
+        <div class="math-box">
+          <h4>Why Loss Masking is Mandatory in SFT:</h4>
+          <p>During SFT, training examples consist of a prompt $x$ and a target assistant response $y$. If we compute cross-entropy loss over the entire sequence $[x; y]$, the model wastes gradient updates trying to predict the user's prompt tokens!</p>
+          $$\mathcal{L}_{\text{SFT}}(\theta) = -\sum_{t=1}^{|y|} \log P(y_t \mid x, y_{<t}; \theta)$$
+          <p>In PyTorch, all prompt token labels are masked with `label = -100` (`CrossEntropyLoss(ignore_index=-100)`), ensuring gradients flow <strong>only through generated assistant response tokens</strong>.</p>
+        </div>
+
+        <h2>3. Reinforcement Learning from Human Feedback (RLHF - PPO)</h2>
+        <div class="deep-dive">
+          <h4>The Classic RLHF Pipeline (Ouyang et al. / InstructGPT):</h4>
+          <ol>
+            <li><strong>Reward Model Training:</strong> Train a scalar reward model $r_\psi(x, y)$ on human preference pairs where $y_w$ is preferred over $y_l$ using the <strong>Bradley-Terry preference model</strong>:
+              $$\mathcal{L}_{\text{RM}}(\psi) = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma\left(r_\psi(x, y_w) - r_\psi(x, y_l)\right) \right]$$
+            </li>
+            <li><strong>Policy Optimization with PPO:</strong> Optimize the LLM policy $\pi_\theta$ to maximize expected reward while adding a KL divergence penalty against the frozen reference model $\pi_{\text{ref}}$ to prevent "reward hacking" (generating repetitive, nonsensical text that exploits flaws in $r_\psi$):
+              $$\max_{\theta} \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta} \left[ r_\psi(x, y) - \beta \mathbb{D}_{\text{KL}}(\pi_\theta(y \mid x) \parallel \pi_{\text{ref}}(y \mid x)) \right]$$
+            </li>
+          </ol>
+          <p><em>The Engineering Pain of PPO:</em> Requires orchestrating <strong>4 separate models in GPU VRAM simultaneously</strong>: Policy model ($\pi_\theta$), Value/Critic model ($V_\phi$), Reward model ($r_\psi$), and Reference model ($\pi_{\text{ref}}$). Extremely complex and unstable to train.</p>
+        </div>
+
+        <h2>4. The DPO Breakthrough: Direct Preference Optimization</h2>
+        <div class="first-principles">
+          <h4>🌟 Direct Preference Optimization (Rafailov et al., Stanford 2023)</h4>
+          <p>Rafailov et al. proved a profound mathematical equivalence: <strong>the constrained RL objective has a closed-form analytical solution for the optimal policy $\pi^*$ in terms of the ground-truth reward $r$</strong>:</p>
+          $$r(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \beta \log Z(x)$$
+          <p>Substituting this exact expression directly into the Bradley-Terry preference loss cancels out the partition function $Z(x)$ completely, yielding the <strong>DPO Loss</strong>:</p>
+        </div>
+
+        <div class="math-box">
+          $$\mathbf{\mathcal{L}_{\text{DPO}}(\theta) = -\mathbb{E}_{(x, y_w, y_l)} \left[ \log \sigma \left( \beta \log \frac{\pi_\theta(y_w \mid x)}{\pi_{\text{ref}}(y_w \mid x)} - \beta \log \frac{\pi_\theta(y_l \mid x)}{\pi_{\text{ref}}(y_l \mid x)} \right) \right]}$$
+          <p><strong>Why DPO Changed the World:</strong></p>
+          <ul>
+            <li>Eliminates the separate Reward Model completely.</li>
+            <li>Eliminates the PPO Actor-Critic reinforcement learning training loop.</li>
+            <li>Trains with simple supervised classification cross-entropy loss directly on preference pairs!</li>
+            <li>Requires only 2 models ($\pi_\theta$ and frozen $\pi_{\text{ref}}$), drastically cutting GPU VRAM requirements.</li>
+          </ul>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 8: PEFT & QUANTIZATION -->
+      <section id="tab-peft-quant" class="tab-section">
+        <h1>Parameter-Efficient Fine-Tuning (PEFT) & Quantization</h1>
+        <p class="section-subtitle">LoRA low-rank mathematical proofs, QLoRA NF4 mechanics, and post-training quantization (AWQ vs GPTQ vs SmoothQuant).</p>
+
+        <h2>1. The VRAM Physics of Full Fine-Tuning</h2>
+        <div class="deep-dive">
+          <h4>Why Full Fine-Tuning 70B Models is Inaccessible:</h4>
+          <p>For a model with $N$ parameters trained with 16-bit mixed precision and AdamW optimizer:</p>
+          <ul>
+            <li><strong>Model Parameters (FP16):</strong> $2 \times N$ bytes</li>
+            <li><strong>Gradients (FP16):</strong> $2 \times N$ bytes</li>
+            <li><strong>AdamW Optimizer States (FP32 First Moment $m$):</strong> $4 \times N$ bytes</li>
+            <li><strong>AdamW Optimizer States (FP32 Second Moment $v$):</strong> $4 \times N$ bytes</li>
+            <li><strong>Master FP32 Weights (for numerical stability):</strong> $4 \times N$ bytes</li>
+          </ul>
+          $$\mathbf{\text{Total Memory per Parameter}} = 2 + 2 + 4 + 4 + 4 = \mathbf{16 \text{ Bytes per parameter!}}$$
+          <p>For a 70-Billion parameter model: $70 \times 10^9 \times 16 \text{ bytes} \approx \mathbf{1,120 \text{ GB VRAM}}$ just for static model states, requiring a cluster of 16 $\times$ 80GB A100 GPUs!</p>
+        </div>
+
+        <h2>2. LoRA: Low-Rank Adaptation (Hu et al., Microsoft 2021)</h2>
+        <div class="first-principles">
+          <h4>💡 The Intrinsic Low-Rank Hypothesis:</h4>
+          <p>Aghajanyan et al. (2020) demonstrated that the weight updates $\Delta W$ learned during downstream task adaptation have a very low "intrinsic dimension".</p>
+          <p>Given a frozen pretrained weight matrix $W_0 \in \mathbb{R}^{d \times k}$, LoRA constrains the update $\Delta W$ by representing it as the product of two low-rank matrices:</p>
+          $$\mathbf{W = W_0 + \Delta W = W_0 + \frac{\alpha}{r} B A}$$
+          <p>where $B \in \mathbb{R}^{d \times r}$ and $A \in \mathbb{R}^{r \times k}$, with rank $r \ll \min(d, k)$ (typically $r \in [4, 64]$).</p>
+        </div>
+
+        <div class="math-box">
+          <h4>LoRA Initialization & Scaling:</h4>
+          <ul>
+            <li><strong>Initialization:</strong> Matrix $A$ is initialized with Gaussian noise $\mathcal{N}(0, \sigma^2)$, and matrix $B$ is initialized to <strong>all zeros</strong>.
+              $$\Delta W = B A = 0 \times A = \mathbf{0}$$
+              Training begins with the exact behavior of the base pretrained model!
+            </li>
+            <li><strong>Scaling factor $\frac{\alpha}{r}$:</strong> $\alpha$ is a constant scaling hyperparameter. When varying rank $r$, $\alpha / r$ ensures learning rate updates remain well-conditioned without aggressive retuning.</li>
+            <li><strong>Zero Inference Latency:</strong> At inference time, the adapter weights can be permanently folded into the base weights: $W_{\text{serving}} = W_0 + \frac{\alpha}{r} B A$. Standard inference forward pass requires zero additional matrix multiplications!</li>
+          </ul>
+        </div>
+
+        <h2>3. QLoRA: Quantized Low-Rank Adaptation (Dettmers et al., 2023)</h2>
+        <div class="deep-dive">
+          <h4>The 3 Inventions of QLoRA:</h4>
+          <ol>
+            <li><strong>4-bit NormalFloat (NF4):</strong> Standard INT4 quantization uses uniform grid steps. However, pretrained neural network weights follow a normal distribution $\mathcal{N}(0, \sigma^2)$. NF4 builds quantiles with equal theoretical information content per bin, achieving superior precision compared to uniform 4-bit integers.</li>
+            <li><strong>Double Quantization (DQ):</strong> Quantizing quantization constants! Standard block quantization adds 0.5 bits per parameter in quantization constants. Double quantization compresses these constants to 8-bit, saving 0.37 bits/param ($\approx 3$ GB VRAM on a 65B model).</li>
+            <li><strong>Paged Optimizers:</strong> Uses CUDA Unified Memory to automatically page AdamW states to CPU RAM during memory spikes, preventing out-of-memory (OOM) crashes.</li>
+          </ol>
+          <p><em>Impact:</em> Enables fine-tuning a <strong>LLaMA-65B model on a single 48GB GPU</strong> in 24 hours with zero degradation in benchmark accuracy!</p>
+        </div>
+
+        <h2>4. Post-Training Quantization: AWQ vs GPTQ vs SmoothQuant</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Quantization Focus</th>
+                <th>Salience Metric</th>
+                <th>Key Advantage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>GPTQ (Frantar et al.)</strong></td>
+                <td>Weight-Only (INT4)</td>
+                <td>Second-order inverse Hessian information ($H^{-1}$)</td>
+                <td>Fast one-shot second-order weight quantization</td>
+              </tr>
+              <tr>
+                <td><strong>AWQ (Lin et al.)</strong></td>
+                <td>Weight-Only (INT4)</td>
+                <td>Activation magnitude ($W \cdot s$ based on salient features)</td>
+                <td>Protects top 1% salient weights; superior zero-shot reasoning</td>
+              </tr>
+              <tr>
+                <td><strong>SmoothQuant (Xiao et al.)</strong></td>
+                <td>Weight & Activation (W8A8)</td>
+                <td>Per-channel migration factor $s_j = \max(|X_j|)^\alpha / \max(|W_j|)^{1-\alpha}$</td>
+                <td>Enables INT8 Tensor Core speedups without outlier clipping errors</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 9: GENERATIVE MODELS: VAES & DIFFUSION -->
+      <section id="tab-generative-diffusion" class="tab-section">
+        <h1>Generative Models: VAEs & Diffusion Models (DDPM)</h1>
+        <p class="section-subtitle">The taxonomy of deep generative modeling, ELBO & reparameterization trick, DDPM forward-reverse physics, and Latent Diffusion.</p>
+
+        <h2>1. The Taxonomy of Deep Generative Models</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Paradigm</th>
+                <th>Core Principle</th>
+                <th>Training Stability</th>
+                <th>Sample Quality vs Speed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Autoregressive (LLMs)</strong></td>
+                <td>Exact factorization $P(x) = \prod P(x_t \mid x_{<t})$</td>
+                <td>Extremely stable (cross-entropy)</td>
+                <td>Unmatched text; $O(L)$ sequential generation latency</td>
+              </tr>
+              <tr>
+                <td><strong>VAEs</strong></td>
+                <td>Maximize Evidence Lower Bound (ELBO) on latent space</td>
+                <td>Stable (variational inference)</td>
+                <td>Fast 1-step sampling; blurry image reconstructions</td>
+              </tr>
+              <tr>
+                <td><strong>GANs</strong></td>
+                <td>Adversarial minimax game (Generator vs Discriminator)</td>
+                <td>Unstable (mode collapse, oscillations)</td>
+                <td>Sharp images; 1-step sampling; poor diversity</td>
+              </tr>
+              <tr>
+                <td><strong>Diffusion (DDPM)</strong></td>
+                <td>Gradual noise addition & learned reverse denoising</td>
+                <td>Extremely stable (MSE loss)</td>
+                <td>Photorealistic state-of-the-art; multi-step sampling</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Variational Autoencoders (VAEs) & The Reparameterization Trick</h2>
+        <div class="math-box">
+          <h4>The Evidence Lower Bound (ELBO) Derivation:</h4>
+          <p>We want to maximize the log marginal likelihood of the data $\log p_\theta(x) = \log \int p_\theta(x, z) dz$. Since the true posterior $p_\theta(z \mid x)$ is intractable, we introduce a recognition network $q_\phi(z \mid x)$:</p>
+          $$\log p_\theta(x) = \mathbb{E}_{q_\phi(z \mid x)}\left[\log \frac{p_\theta(x, z)}{q_\phi(z \mid x)}\right] + \mathbb{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p_\theta(z \mid x))$$
+          <p>Since $\mathbb{D}_{\text{KL}} \ge 0$, the first term forms the <strong>Evidence Lower Bound (ELBO)</strong>:</p>
+          $$\mathbf{\text{ELBO}(\theta, \phi) = \mathbb{E}_{q_\phi(z \mid x)}[\log p_\theta(x \mid z)] - \mathbb{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p(z))}$$
+          <ul>
+            <li><strong>Reconstruction Term $\mathbb{E}[\log p_\theta(x \mid z)]$:</strong> Measures how faithfully the decoder reconstructs the input from latent vector $z$.</li>
+            <li><strong>KL Regularization Term $\mathbb{D}_{\text{KL}}(q_\phi(z \mid x) \parallel p(z))$:</strong> Forces the approximate posterior to match a standard Gaussian prior $p(z) = \mathcal{N}(0, \mathbf{I})$, ensuring the latent space is continuous and smooth for sampling.</li>
+          </ul>
+        </div>
+
+        <div class="first-principles">
+          <h4>💡 The Reparameterization Trick (Kingma & Welling, 2013)</h4>
+          <p><strong>The Crisis:</strong> The encoder outputs mean $\mu$ and standard deviation $\sigma$. To feed the decoder, we must sample $z \sim \mathcal{N}(\mu, \sigma^2)$. But <strong>random sampling is a non-differentiable stochastic node</strong>! Backpropagation cannot compute $\frac{\partial z}{\partial \mu}$ or $\frac{\partial z}{\partial \sigma}$ through a random number generator.</p>
+          <p><strong>The Mathematical Solution:</strong> Decouple the randomness into an independent auxiliary noise variable $\epsilon \sim \mathcal{N}(0, \mathbf{I})$:</p>
+          $$\mathbf{z = \mu(x) + \sigma(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, \mathbf{I})}$$
+          <p>Now, the sampling operation is a <strong>deterministic, differentiable function</strong> of $\mu$ and $\sigma$! Gradients flow cleanly via the standard chain rule back into the encoder weights.</p>
+        </div>
+
+        <h2>3. Denoising Diffusion Probabilistic Models (DDPM - Ho et al., 2020)</h2>
+        <div class="deep-dive">
+          <h4>The Forward (Noising) and Reverse (Denoising) Markov Chains:</h4>
+          
+          <p><strong>1. Forward Process $q(x_t \mid x_{t-1})$:</strong> Gradually injects Gaussian noise across $T$ steps ($T \approx 1000$):</p>
+          $$q(x_t \mid x_{t-1}) = \mathcal{N}(x_t; \sqrt{1 - \beta_t} x_{t-1}, \beta_t \mathbf{I})$$
+          <p>By defining $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{s=1}^t \alpha_s$, we can sample $x_t$ at any arbitrary step $t$ in <strong>closed-form without iterating</strong>:</p>
+          $$\mathbf{x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, \quad \epsilon \sim \mathcal{N}(0, \mathbf{I})}$$
+
+          <p><strong>2. Reverse Process $p_\theta(x_{t-1} \mid x_t)$:</strong> A neural network $\epsilon_\theta(x_t, t)$ (typically a U-Net or DiT) is trained to predict the noise $\epsilon$ added at step $t$:</p>
+          $$\mathbf{\mathcal{L}_{\text{simple}}(\theta) = \mathbb{E}_{t, x_0, \epsilon} \left[ \|\epsilon - \epsilon_\theta(x_t, t)\|^2 \right]}$$
+
+          <h4>3. Latent Diffusion Models (Stable Diffusion - Rombach et al., 2022):</h4>
+          <p>Operating diffusion directly in pixel space ($512 \times 512 \times 3 = 786,432$ values) requires staggering compute. Latent Diffusion pre-trains a VAE encoder $\mathcal{E}$ to compress images into a latent space ($64 \times 64 \times 4 = 16,384$ values)—an exact <strong>$48\times$ reduction in spatial dimensionality</strong>! Diffusion is executed entirely inside the compressed latent space, saving massive GPU FLOPs.</p>
+
+          <h4>4. Classifier-Free Guidance (CFG - Ho & Salimans, 2021):</h4>
+          <p>To steer generation towards a user text prompt $c$, the model is trained with prompt dropping ($c = \emptyset$ 10% of the time). At inference, the noise prediction is extrapolated away from unconditional noise:</p>
+          $$\tilde{\epsilon}_\theta(x_t, c) = \epsilon_\theta(x_t, \emptyset) + s \cdot (\epsilon_\theta(x_t, c) - \epsilon_\theta(x_t, \emptyset))$$
+          <p>where $s > 1.0$ (typically $s \in [7.0, 9.0]$) is the CFG scale. Higher $s$ dramatically sharpens text-image alignment at the slight cost of diversity.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 10: WORKED TOY ATTENTION WALKTHROUGH WITH REAL NUMBERS -->
+      <section id="tab-attention-numerical" class="tab-section">
+        <h1>Step-by-Step Worked Numerical Walkthrough: Scaled Dot-Product Attention</h1>
+        <p class="section-subtitle">Complete arithmetic walkthrough with real numbers: linear projections, scaling, softmax normalization, and output pooling.</p>
+
+        <div class="first-principles">
+          <h4>🎯 Setup: A Concrete 2-Token, 2-Head Attention System</h4>
+          <p>Let us process an input sequence of $L = 2$ tokens with embedding dimension $d_{\text{model}} = 4$:</p>
+          $$X = \begin{pmatrix} 1.0 & 0.0 & 1.0 & 0.0 \\ 0.0 & 2.0 & 0.0 & 1.0 \end{pmatrix} \in \mathbb{R}^{2 \times 4}$$
+          <p>where Row 1 represents token $t_1$, and Row 2 represents token $t_2$.</p>
+          <p>We configure $h = 2$ attention heads, with head dimension $d_k = 2$ (so $h \times d_k = 4 = d_{\text{model}}$).</p>
+        </div>
+
+        <h2>Step 1: Compute Linear Projections for Head 1</h2>
+        <div class="math-box">
+          <p>Let the projection weights for Head 1 be:</p>
+          $$W_1^Q = \begin{pmatrix} 1 & 0 \\ 0 & 1 \\ 1 & 0 \\ 0 & 1 \end{pmatrix}, \quad 
+          W_1^K = \begin{pmatrix} 0 & 1 \\ 1 & 0 \\ 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad 
+          W_1^V = \begin{pmatrix} 1 & 1 \\ 0 & 1 \\ 1 & 0 \\ 0 & 0 \end{pmatrix}$$
+
+          <p><strong>1. Query Matrix $Q = X W_1^Q$:</strong></p>
+          $$q_{1,1} = 1(1) + 0(0) + 1(1) + 0(0) = 2.0, \quad q_{1,2} = 1(0) + 0(1) + 1(0) + 0(1) = 0.0$$
+          $$q_{2,1} = 0(1) + 2(0) + 0(1) + 1(0) = 0.0, \quad q_{2,2} = 0(0) + 2(1) + 0(0) + 1(1) = 3.0$$
+          $$Q = \begin{pmatrix} 2.0 & 0.0 \\ 0.0 & 3.0 \end{pmatrix}$$
+
+          <p><strong>2. Key Matrix $K = X W_1^K$:</strong></p>
+          $$k_{1,1} = 1(0) + 0(1) + 1(0) + 0(1) = 0.0, \quad k_{1,2} = 1(1) + 0(0) + 1(1) + 0(0) = 2.0$$
+          $$k_{2,1} = 0(0) + 2(1) + 0(0) + 1(1) = 3.0, \quad k_{2,2} = 0(1) + 2(0) + 0(1) + 1(0) = 0.0$$
+          $$K = \begin{pmatrix} 0.0 & 2.0 \\ 3.0 & 0.0 \end{pmatrix}$$
+
+          <p><strong>3. Value Matrix $V = X W_1^V$:</strong></p>
+          $$v_{1,1} = 1(1) + 0(0) + 1(1) + 0(0) = 2.0, \quad v_{1,2} = 1(1) + 0(1) + 1(0) + 0(0) = 1.0$$
+          $$v_{2,1} = 0(1) + 2(0) + 0(1) + 1(0) = 0.0, \quad v_{2,2} = 0(1) + 2(1) + 0(0) + 1(0) = 2.0$$
+          $$V = \begin{pmatrix} 2.0 & 1.0 \\ 0.0 & 2.0 \end{pmatrix}$$
+        </div>
+
+        <h2>Step 2: Compute Raw Dot-Product Scores $Q K^T$</h2>
+        <div class="math-box">
+          $$K^T = \begin{pmatrix} 0.0 & 3.0 \\ 2.0 & 0.0 \end{pmatrix}$$
+          $$S = Q K^T = \begin{pmatrix} 2.0 & 0.0 \\ 0.0 & 3.0 \end{pmatrix} \begin{pmatrix} 0.0 & 3.0 \\ 2.0 & 0.0 \end{pmatrix} = \begin{pmatrix} 2(0)+0(2) & 2(3)+0(0) \\ 0(0)+3(2) & 0(3)+3(0) \end{pmatrix} = \begin{pmatrix} 0.0 & 6.0 \\ 6.0 & 0.0 \end{pmatrix}$$
+        </div>
+
+        <h2>Step 3: Scale by $\sqrt{d_k} = \sqrt{2} \approx 1.4142$</h2>
+        <div class="math-box">
+          $$S_{\text{scaled}} = \frac{S}{\sqrt{2}} = \begin{pmatrix} \frac{0.0}{1.4142} & \frac{6.0}{1.4142} \\ \frac{6.0}{1.4142} & \frac{0.0}{1.4142} \end{pmatrix} = \begin{pmatrix} 0.0 & 4.2426 \\ 4.2426 & 0.0 \end{pmatrix}$$
+        </div>
+
+        <h2>Step 4: Row-Wise Softmax Normalization</h2>
+        <div class="math-box">
+          <p>For Row 1 (Token 1):</p>
+          $$e^{0.0} = 1.0, \quad e^{4.2426} \approx 69.589 \implies \text{Sum} = 70.589$$
+          $$\alpha_{1,1} = \frac{1.0}{70.589} \approx \mathbf{0.0142}, \quad \alpha_{1,2} = \frac{69.589}{70.589} \approx \mathbf{0.9858}$$
+          <p>For Row 2 (Token 2):</p>
+          $$\alpha_{2,1} = \frac{69.589}{70.589} \approx \mathbf{0.9858}, \quad \alpha_{2,2} = \frac{1.0}{70.589} \approx \mathbf{0.0142}$$
+          $$\mathbf{A = \text{softmax}(S_{\text{scaled}}) = \begin{pmatrix} 0.0142 & 0.9858 \\ 0.9858 & 0.0142 \end{pmatrix}}$$
+          <p><em>Notice: Token 1 heavily attends to Token 2 (98.6%), and Token 2 heavily attends to Token 1 (98.6%)!</em></p>
+        </div>
+
+        <h2>Step 5: Multiply by Value Matrix $V$</h2>
+        <div class="math-box">
+          $$\text{Output}_{\text{Head 1}} = A V = \begin{pmatrix} 0.0142 & 0.9858 \\ 0.9858 & 0.0142 \end{pmatrix} \begin{pmatrix} 2.0 & 1.0 \\ 0.0 & 2.0 \end{pmatrix}$$
+          <p>For Row 1:</p>
+          $$o_{1,1} = 0.0142(2.0) + 0.9858(0.0) = \mathbf{0.0284}$$
+          $$o_{1,2} = 0.0142(1.0) + 0.9858(2.0) = 0.0142 + 1.9716 = \mathbf{1.9858}$$
+          <p>For Row 2:</p>
+          $$o_{2,1} = 0.9858(2.0) + 0.0142(0.0) = \mathbf{1.9716}$$
+          $$o_{2,2} = 0.9858(1.0) + 0.0142(2.0) = 0.9858 + 0.0284 = \mathbf{1.0142}$$
+          $$\mathbf{\text{Output}_{\text{Head 1}} = \begin{pmatrix} 0.0284 & 1.9858 \\ 1.9716 & 1.0142 \end{pmatrix} \in \mathbb{R}^{2 \times 2}}$$
+          <p>In a full Multi-Head Attention layer, this $2 \times 2$ block is concatenated horizontally with Head 2's $2 \times 2$ output to form a $2 \times 4$ tensor, and multiplied by $W^O \in \mathbb{R}^{4 \times 4}$ to yield the final representation.</p>
+        </div>
+      </section>
+    
+
+
+      <!-- TAB 11: 28+ HIGH-FREQUENCY FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview-dl5" class="tab-section">
+        <h1>28+ High-Frequency FAANG Interview Questions: Transformers & LLMs</h1>
+        <p class="section-subtitle">Real-world interview questions asked at Meta, Google, OpenAI, Anthropic, and Microsoft for MLE and Research Engineer roles.</p>
+
+        <details open>
+          <summary><span>Q1: Why do we divide by $\sqrt{d_k}$ in Scaled Dot-Product Attention?</span> <span class="badge badge-math">Derivation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> If query and key vector components are independent random variables with zero mean and unit variance, their dot product has mean $0$ and variance $d_k$. For large dimensions (e.g. $d_k = 64$ or $128$), the dot products grow very large in magnitude. When passed to the Softmax function, large logits push Softmax into regions with near-zero gradients ($\frac{\partial S_i}{\partial z_j} \approx 0$), causing catastrophic vanishing gradients during backpropagation. Dividing by $\sqrt{d_k}$ normalizes the variance back to $1.0$, keeping Softmax in its sensitive gradient region.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: What is the computational complexity of Self-Attention with respect to sequence length $L$?</span> <span class="badge badge-math">Complexity</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Self-attention has time complexity $O(L^2 \cdot d)$ and memory complexity $O(L^2)$. The $Q K^T$ matrix multiplication involves computing an $L \times L$ attention matrix, where each of the $L^2$ elements requires a $d$-dimensional dot product. Storing this attention map during training requires $O(L^2)$ memory per head, making naive self-attention prohibitive for very long context lengths (e.g. $100k+$ tokens).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: What is the KV Cache and why is it used during LLM inference?</span> <span class="badge badge-system">Inference</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In autoregressive generation, generating each new token requires computing attention against all past tokens. Because past tokens do not change in causal attention, re-computing their Key and Value projections at every generation step wastes $O(L^2)$ compute. The KV Cache stores the Key and Value tensors for all previous tokens in GPU memory. At each step, the model only computes $Q, K, V$ for the single new token, appends the new $K, V$ to the cache, and computes attention in $O(L)$ time.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: What is the exact formula for KV Cache VRAM memory footprint?</span> <span class="badge badge-math">Formula</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> $\text{Memory (bytes)} = 2 \times n_{\text{layers}} \times n_{\text{kv\_heads}} \times d_{\text{head}} \times L_{\text{context}} \times B_{\text{batch}} \times P_{\text{precision\_bytes}}$. The initial factor of 2 accounts for storing both Keys and Values. For LLaMA-2-70B with FP16 ($P=2$), 80 layers, 64 heads, and $d=128$, a single sequence at 4k context consumes approximately $10$ GB of VRAM.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: How does Grouped-Query Attention (GQA) reduce KV Cache memory compared to Multi-Head Attention (MHA)?</span> <span class="badge badge-system">Architecture</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In standard MHA, every Query head has its own private Key and Value head ($H:H:H$). In GQA, multiple Query heads share a single Key/Value head. For example, in LLaMA-3 with 32 Query heads and 8 KV heads, groups of 4 Query heads share 1 KV head. This reduces the KV Cache memory footprint and memory bandwidth requirement by $4\times$, drastically speeding up autoregressive generation throughput with negligible degradation in quality.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q6: How does FlashAttention achieve $2\times - 4\times$ speedups without approximating the attention matrix?</span> <span class="badge badge-system">Kernel</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> FlashAttention is an exact, non-approximate attention algorithm. Traditional attention is memory-bound, writing the $L \times L$ attention matrix to slow GPU High-Bandwidth Memory (HBM) and reading it back multiple times. FlashAttention uses <strong>GPU SRAM tiling</strong> and the <strong>Online Softmax trick</strong> to compute attention block-by-block entirely within ultra-fast on-chip SRAM ($\approx 19$ TB/s bandwidth), never materializing the $L \times L$ matrix in HBM. This reduces HBM memory access from $O(L^2)$ to $O(L)$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the difference between Pre-LN and Post-LN Transformers?</span> <span class="badge badge-concept">Architecture</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In Post-LN ($x_{l+1} = \text{LN}(x_l + F(x_l))$), LayerNorm is applied after the residual addition. Gradients passing through the layer norm chain decay in variance near early layers, causing vanishing gradients and requiring fragile learning rate warmup. In Pre-LN ($x_{l+1} = x_l + F(\text{LN}(x_l))$), LayerNorm is inside the residual branch. The identity skip connection $x_L = x_0 + \sum F(\text{LN}(x_l))$ provides an unobstructed gradient highway, enabling stable training of 100+ layer models from step 1.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is RMSNorm and why do modern LLMs (LLaMA, Gemma) use it instead of LayerNorm?</span> <span class="badge badge-system">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> LayerNorm normalizes by both mean and variance: $\frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} \gamma + \beta$. RMSNorm hypothesizes that mean-centering is redundant for scaling invariance and computes only the root mean square: $\frac{x}{\text{RMS}(x)} \gamma$, where $\text{RMS}(x) = \sqrt{\frac{1}{d}\sum x_i^2 + \epsilon}$. Dropping mean computation and bias eliminates two GPU memory passes, speeding up normalization kernels by 7%–10%.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: How does Rotary Position Embedding (RoPE) work mathematically?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> RoPE encodes position by rotating 2D coordinate pairs of query and key vectors in the complex plane by an angle proportional to their sequence position $m$: $q_m = R_{\Theta, m} q$. Because the inner product between two complex numbers rotated by $m\theta$ and $n\theta$ is $\text{Re}[(q e^{i m \theta})(k e^{i n \theta})^*] = \text{Re}[q k^* e^{i(m-n)\theta}]$, the attention score $\langle q_m, k_n \rangle$ depends strictly on the relative distance $m-n$. This naturally confers relative position awareness while allowing linear-time computation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: What is SwiGLU and why does it outperform standard GELU in FFN layers?</span> <span class="badge badge-concept">Architecture</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> SwiGLU is a Gated Linear Unit with Swish activation: $\text{SwiGLU}(x) = (\text{Swish}(x W_1) \odot (x W_3)) W_2$. Unlike standard FFNs with fixed non-linearities, the gating branch $x W_3$ acts as a dynamic information filter that dynamically weights feature dimensions. Modern LLMs scale the intermediate dimension to $\frac{8}{3}d_{\text{model}}$ to maintain parameter equivalence, consistently achieving lower validation perplexity.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q11: State the Chinchilla scaling law and explain its practical implications.</span> <span class="badge badge-system">Scaling</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> DeepMind's Chinchilla law states that for compute-optimal training, model parameter count $N$ and token count $D$ should scale in equal 1:1 proportion: $N \propto C^{0.5}, D \propto C^{0.5}$, with total compute $C \approx 6ND$ and an optimal ratio $D \approx 20N$. Prior models like GPT-3 (175B on 300B tokens) were severely undertrained. However, for inference-heavy production serving, open models are deliberately "overtrained" (e.g. LLaMA-3-8B trained on 15T tokens, a $1800:1$ ratio) to minimize downstream inference cost per token.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: How does Byte-Pair Encoding (BPE) differ from Byte-Level BPE?</span> <span class="badge badge-concept">Tokenization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard BPE starts with individual characters as base vocabulary. Any unseen Unicode character or emoji produces an out-of-vocabulary `<unk>` token. Byte-Level BPE (used in GPT-2/3/4 and LLaMA) operates on the 256 fundamental raw byte values of UTF-8. Because every text character, symbol, or binary snippet decomposes into bytes, Byte-Level BPE tokenizes any arbitrary string without ever encountering an unknown token.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why is loss masking necessary during Supervised Fine-Tuning (SFT)?</span> <span class="badge badge-system">Training</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In SFT, training examples consist of a user prompt and target assistant response $[x; y]$. If cross-entropy loss is computed across the entire sequence, the model updates weights to predict the prompt tokens $x$ (which are arbitrary user inputs). Setting prompt token labels to $-100$ (`ignore_index=-100` in PyTorch) masks out the prompt, ensuring gradients update model weights <strong>only on assistant response tokens $y$</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: What is the Bradley-Terry model used in RLHF reward modeling?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The Bradley-Terry model formalizes the probability that output $y_w$ is preferred over $y_l$ given prompt $x$ based on their latent scalar rewards: $P(y_w \succ y_l \mid x) = \sigma(r(x, y_w) - r(x, y_l)) = \frac{1}{1 + e^{-(r_w - r_l)}}$. Reward models are trained by minimizing the negative log-likelihood: $\mathcal{L}_{\text{RM}} = -\mathbb{E}[\log \sigma(r(x, y_w) - r(x, y_l))]$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: Why is a KL divergence penalty included in the PPO objective during RLHF?</span> <span class="badge badge-concept">RLHF</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Without the KL penalty $-\beta \mathbb{D}_{\text{KL}}(\pi_\theta \parallel \pi_{\text{ref}})$, the policy model exploits imperfections in the learned reward model (reward hacking), outputting repetitive gibberish, exaggerated praise, or nonsensical formatting that scores high on the reward proxy but is useless to humans. The KL term anchors the aligned policy close to the initial SFT reference distribution.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: How does Direct Preference Optimization (DPO) eliminate the need for a separate Reward Model?</span> <span class="badge badge-math">Derivation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Under the KL-constrained RL objective, the theoretical optimal policy has a closed-form analytical relationship to ground-truth reward: $r(x, y) = \beta \log \frac{\pi_\theta(y \mid x)}{\pi_{\text{ref}}(y \mid x)} + \beta \log Z(x)$. Substituting this into the Bradley-Terry preference likelihood cancels out the partition function $Z(x)$, yielding an objective that expresses preference probability directly in terms of policy log-ratios. DPO optimizes preference alignment with supervised cross-entropy, eliminating the reward model and PPO loop.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: What is the memory footprint of full fine-tuning a 70B model with AdamW?</span> <span class="badge badge-system">VRAM</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Mixed precision training with AdamW requires 16 bytes per parameter: 2 bytes for FP16 weights, 2 bytes for FP16 gradients, 4 bytes for FP32 first moment $m$, 4 bytes for FP32 second moment $v$, and 4 bytes for FP32 master weights. For 70B parameters: $70 \times 10^9 \times 16 \approx 1,120 \text{ GB}$ VRAM. Adding activation memory brings total VRAM requirement to ~1.3–1.5 TB.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: How does Low-Rank Adaptation (LoRA) work, and how are its adapter matrices initialized?</span> <span class="badge badge-math">PEFT</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> LoRA freezes base weights $W_0 \in \mathbb{R}^{d \times k}$ and injects trainable rank-$r$ decomposition matrices: $W = W_0 + \frac{\alpha}{r} B A$, where $B \in \mathbb{R}^{d \times r}$ and $A \in \mathbb{R}^{r \times k}$ ($r \ll \min(d, k)$). Matrix $A$ is initialized from Gaussian distribution $\mathcal{N}(0, \sigma^2)$ and matrix $B$ is initialized to <strong>all zeros</strong>. Thus, $\Delta W = B A = 0$ at step 0, ensuring training starts identically to the base pretrained model.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: How does QLoRA achieve 4-bit fine-tuning without catastrophic quantization loss?</span> <span class="badge badge-system">Quantization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> QLoRA introduces three techniques: (1) <strong>4-bit NormalFloat (NF4)</strong>, an information-theoretically optimal quantile quantization for normally distributed weights; (2) <strong>Double Quantization (DQ)</strong>, which quantizes the FP32 quantization scale factors to 8-bit, saving 0.37 bits/param; and (3) <strong>Paged Optimizers</strong>, which use CUDA unified memory to page memory spikes to CPU RAM to prevent OOM errors.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: What is the Reparameterization Trick in Variational Autoencoders (VAEs)?</span> <span class="badge badge-math">Generative</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In a VAE, the encoder outputs mean $\mu$ and variance $\sigma^2$ of latent distribution $q(z \mid x)$. Directly sampling $z \sim \mathcal{N}(\mu, \sigma^2)$ is a non-differentiable stochastic operation that blocks backpropagation. The reparameterization trick rewrites the sample as $z = \mu + \sigma \odot \epsilon$, where $\epsilon \sim \mathcal{N}(0, \mathbf{I})$ is independent random noise. Sampling is now an external input, making $z$ a deterministic, differentiable function of $\mu$ and $\sigma$ so gradients flow back into the encoder.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: How do Diffusion Models (DDPM) generate images?</span> <span class="badge badge-concept">Diffusion</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> DDPM consists of two processes: (1) <strong>Forward process</strong>, which systematically adds Gaussian noise to an image over $T$ timesteps according to a variance schedule until it becomes pure isotropic Gaussian noise; (2) <strong>Reverse process</strong>, where a neural network (U-Net or DiT) is trained with mean squared error to predict the noise $\epsilon$ added at each step $t$. Starting from pure noise, iterative subtraction of predicted noise recovers clean photorealistic images.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: Why does Latent Diffusion (Stable Diffusion) run in latent space rather than pixel space?</span> <span class="badge badge-system">Efficiency</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Running diffusion directly in pixel space ($512 \times 512 \times 3 \approx 786\text{k}$ values) requires massive compute per sampling step. Latent Diffusion uses a pre-trained VAE encoder to compress images by an $8\times$ spatial factor into latent vectors of dimension $64 \times 64 \times 4 \approx 16\text{k}$ values—a <strong>$48\times$ reduction in data dimensions</strong>. High-frequency imperceptible details are handled by the VAE, while diffusion focuses compute strictly on semantic generation.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: What is Classifier-Free Guidance (CFG) in text-to-image diffusion?</span> <span class="badge badge-math">Sampling</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> CFG controls prompt adherence by combining conditional noise prediction $\epsilon_\theta(x_t, c)$ and unconditional noise prediction $\epsilon_\theta(x_t, \emptyset)$: $\tilde{\epsilon} = \epsilon_\theta(x_t, \emptyset) + s (\epsilon_\theta(x_t, c) - \epsilon_\theta(x_t, \emptyset))$, where $s > 1$ is the guidance scale. By extrapolating in the direction of the text condition away from empty noise, CFG amplifies semantic features matching the prompt at the expense of sample diversity.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: What are Activation Outliers in LLMs and how does SmoothQuant solve them?</span> <span class="badge badge-system">Quantization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In LLMs with >6.7B parameters, certain activation channels develop extreme outlier magnitudes ($100\times$ larger than typical values). Naive INT8 quantization clips these outliers, destroying perplexity. SmoothQuant observes that weights are uniform while activations have outliers. It applies a per-channel mathematically equivalent scaling factor $s$: $Y = (X \cdot \text{diag}(s)^{-1}) \cdot (\text{diag}(s) \cdot W)$, smoothing activation peaks into the weights so both activations and weights can be quantized to INT8 with tensor core speedups.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: What is Speculative Decoding and how does it speed up LLM inference?</span> <span class="badge badge-system">Serving</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> LLM generation is memory-bandwidth bound: loading 70B parameters takes ~35ms whether generating 1 token or verifying multiple tokens. Speculative decoding uses a small, fast "draft model" (e.g. 1B) to generate $K$ candidate tokens auto-regressively. The large 70B "target model" runs a single parallel forward pass to verify all $K$ tokens at once. Accepted tokens are kept; rejected tokens are resampled. This yields $2\times - 3\times$ speedups without changing the target model's output distribution.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q26: What is PagedAttention in vLLM and how does it eliminate memory fragmentation?</span> <span class="badge badge-system">Systems</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard serving frameworks allocate contiguous memory buffers for the maximum sequence length (e.g. 2048 tokens). Because request lengths are unpredictable, 60%–80% of VRAM was wasted on internal and external memory fragmentation. Inspired by OS virtual memory paging, PagedAttention partitions the KV cache into fixed-size physical blocks (e.g. 16 tokens) mapped via a block table. Memory is allocated on-demand in non-contiguous physical pages, enabling near-zero memory waste and $2\times - 4\times$ larger batch sizes.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q27: How does DeepSeek-R1's Group Relative Policy Optimization (GRPO) differ from PPO?</span> <span class="badge badge-faang">Modern SOTA</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard PPO requires training a separate Critic (Value) model with equivalent parameter scale to estimate the baseline $V(s)$ for generalized advantage estimation (GAE). GRPO eliminates the Critic model entirely. For each prompt $q$, the policy samples a group of $G$ responses $\{o_1, \dots, o_G\}$. The advantage $A_i$ for output $i$ is calculated by normalizing its reward against the group's empirical mean and standard deviation: $A_i = \frac{r_i - \text{mean}(r)}{\text{std}(r)}$. This halves GPU memory requirements for RL training while maintaining robust policy updates.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q28: Explain the difference between AWQ and GPTQ post-training quantization.</span> <span class="badge badge-system">Quantization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Both are 4-bit weight-only quantization algorithms. GPTQ uses second-order Taylor expansion and the inverse Hessian matrix $H^{-1}$ to update remaining unquantized weights layer-by-layer to compensate for quantization errors. AWQ (Activation-aware Weight Quantization) observes that weights corresponding to high-magnitude activation channels are disproportionately critical. Instead of re-optimizing all weights, AWQ protects the top 1% salient weights by finding per-channel scale factors that minimize output error, preserving reasoning benchmarks better than GPTQ without calibration overfitting.</p>
+          </div>
+        </details>
+      </section>
+    
+
+
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz-dl5" class="tab-section">
+        <h1>DL Module 5 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your Transformer, LLM, and Generative Deep Learning mastery with instant feedback.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. In Scaled Dot-Product Attention, why are the dot products divided by $\sqrt{d_k}$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) To ensure the attention weights sum to 1.0.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) To prevent the variance of the dot products from scaling with $d_k$, which would push Softmax into vanishing gradient saturation regions.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) To make the matrix multiplications compatible with INT8 precision.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) Because the backward pass derivative requires a square root factor.</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> For independent zero-mean unit-variance components, $\text{Var}(q \cdot k) = d_k$. Dividing by $\sqrt{d_k}$ scales variance back to 1.0, preserving healthy Softmax gradients.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. How much KV Cache VRAM is required for a model with 32 layers, 8 KV heads, head dim 128, context length 4,096 tokens, batch size 4, in FP16 precision (2 bytes)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) 268.4 MB</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) 2.15 GB ($2 \times 32 \times 8 \times 128 \times 4096 \times 4 \times 2 = 2,147,483,648$ bytes)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) 1.07 GB</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) 8.59 GB</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> Using the formula $2 \times L_{\text{layers}} \times N_{\text{kv}} \times d \times L \times B \times P$: $2 \times 32 \times 8 \times 128 \times 4096 \times 4 \times 2 = 2,147,483,648 \text{ bytes} = 2.0 \text{ GiB} = 2.15 \text{ GB}$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. What is the fundamental mechanism that allows FlashAttention to run 2x-4x faster than standard PyTorch attention?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) It quantizes queries and keys to 4-bit integers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) It tiles attention computation in GPU SRAM using the online softmax trick, avoiding materializing the $L \times L$ matrix in slow HBM.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) It approximates the attention matrix with low-rank SVD.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) It skips attention on even-numbered tokens.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> FlashAttention is an exact algorithm that never materializes the quadratic $L \times L$ attention matrix in GPU global HBM, keeping intermediate math inside fast on-chip SRAM.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. Why did deep Transformers transition from Post-LN (Vaswani 2017) to Pre-LN (GPT-2, LLaMA)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">A) Pre-LN maintains an unobstructed identity skip connection from layer 0 to $L$, enabling stable gradient flow without fragile learning rate warmup.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">B) Pre-LN uses fewer parameters than Post-LN.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) Post-LN cannot be executed on NVIDIA GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) Pre-LN eliminates the need for feed-forward layers.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> In Pre-LN, $x_L = x_0 + \sum F(\text{LN}(x_l))$, creating an unattenuated identity gradient highway that allows deep models to train reliably.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. According to the Chinchilla scaling laws, what is the compute-optimal ratio of training tokens to model parameters?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) 2 tokens per parameter.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) Approximately 20 tokens per parameter ($D \approx 20N$).</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) 1,000 tokens per parameter.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) 0.5 tokens per parameter.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> DeepMind proved that model size $N$ and token count $D$ should scale equally ($N \propto C^{0.5}, D \propto C^{0.5}$), leading to an optimal ratio of $\approx 20$ tokens per parameter.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. In LoRA (Low-Rank Adaptation), how is the adapter matrix $B$ initialized?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) With Gaussian random noise $\mathcal{N}(0, 1)$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">B) To all zeros ($B = 0$), so that $\Delta W = BA = 0$ at the start of training.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) With an identity matrix.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) Using Kaiming He uniform initialization.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> Initializing $B=0$ ensures that $\Delta W = 0$ at step 0, preserving the exact pretrained model representations until gradient updates begin.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. What is the fundamental mathematical breakthrough of Direct Preference Optimization (DPO)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">A) It analytically substitutes the optimal policy into the Bradley-Terry preference loss, eliminating the separate Reward Model and PPO loop.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">B) It proves that reinforcement learning cannot work for language.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) It uses Monte Carlo tree search to generate tokens.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) It replaces backpropagation with evolutionary algorithms.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> DPO establishes a closed-form formula for reward in terms of policy probabilities, enabling alignment training with simple cross-entropy directly on preference pairs.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the Reparameterization Trick in Variational Autoencoders?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) Replacing the encoder with a diffusion model.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">B) Expressing the latent variable as $z = \mu + \sigma \odot \epsilon$ with $\epsilon \sim \mathcal{N}(0, \mathbf{I})$, making sampling a differentiable node.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) Using LoRA adapters in the decoder.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) Quantizing the latent vector to 4 bits.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> Decoupling the stochasticity into independent noise $\epsilon$ allows backpropagation gradients to flow directly into the encoder parameters $\mu$ and $\sigma$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. In Rotary Position Embedding (RoPE), how does the inner product $\langle R_m q, R_n k \rangle$ represent position?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) It scales with the absolute sum $m + n$.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) It depends strictly on the relative distance $m - n$ due to complex angle subtraction.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) It resets to zero every 512 tokens.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) It computes Euclidean distance in 3D space.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> Multiplying complex numbers by $e^{im\theta}$ and $(e^{in\theta})^*$ yields $e^{i(m-n)\theta}$, making the dot product a pure function of relative offset $m-n$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. How does Classifier-Free Guidance (CFG) scale $s > 1.0$ affect text-to-image diffusion generation?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) It increases sample diversity at the cost of prompt adherence.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) It amplifies conditioning features, sharpening prompt alignment and image contrast while reducing sample diversity.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) It doubles generation speed by skipping 50% of denoising steps.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) It converts the diffusion model into a GAN.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> By extrapolating the noise prediction away from the unconditional prediction ($\tilde{\epsilon} = \epsilon_\emptyset + s(\epsilon_c - \epsilon_\emptyset)$), CFG forces the model to adhere strongly to prompt conditioning.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

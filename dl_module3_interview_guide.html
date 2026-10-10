@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DL Module 3: CNNs, Receptive Fields & Vision Architectures — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #fbbf24;
+      --accent-glow: rgba(251, 191, 36, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --cyan: #38bdf8;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--cyan); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">DL<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link">DL1: Foundations</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link">DL2: Optimization</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link active">DL3: CNNs & CV</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link">DL4: RNNs & Attention</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link">DL5: Transformers & LLMs</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">DL Module 3 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-why-cnn')"><span>🖼️</span> 1. Why Dense Layers Fail</li>
+        <li class="nav-item" onclick="switchTab('tab-math-shapes')"><span>📐</span> 2. 2D Conv Math & Shapes</li>
+        <li class="nav-item" onclick="switchTab('tab-receptive-field')"><span>👁️</span> 3. Receptive Field Calculus</li>
+        <li class="nav-item" onclick="switchTab('tab-special-convs')"><span>🔧</span> 4. 1x1, Dilated & Transposed</li>
+        <li class="nav-item" onclick="switchTab('tab-classic-arch')"><span>🏛️</span> 5. AlexNet, VGG & Inception</li>
+        <li class="nav-item" onclick="switchTab('tab-resnet')"><span>🛑</span> 6. ResNet & Gradient Highway</li>
+        <li class="nav-item" onclick="switchTab('tab-mobilenet')"><span>📱</span> 7. MobileNets (8x FLOPs Proof)</li>
+        <li class="nav-item" onclick="switchTab('tab-modern-vision')"><span>🏎️</span> 8. ResNeXt & ConvNeXt</li>
+        <li class="nav-item" onclick="switchTab('tab-detection')"><span>📦</span> 9. Object Detection (YOLO)</li>
+        <li class="nav-item" onclick="switchTab('tab-segmentation')"><span>🎨</span> 10. Segmentation & RoIAlign</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: WHY DENSE LAYERS FAIL ON VISION -->
+      <section id="tab-why-cnn" class="tab-section active">
+        <h1>Why Dense Layers Fail on Vision & Convolutional Physics</h1>
+        <p class="section-subtitle">Spatial locality, translation equivariance, and the catastrophic parameter explosion of fully connected layers.</p>
+
+        <div class="first-principles">
+          <h4>🖼️ The Catastrophic Parameter Explosion of MLP on Images</h4>
+          <p>Suppose you want to process a standard smartphone photograph ($1000 \times 1000$ pixels, RGB channels = $3,000,000$ inputs) using a standard Fully Connected (Dense) hidden layer with just $1,000$ neurons:</p>
+          $$\text{Number of Weights} = 3,000,000 \times 1,000 = \mathbf{3,000,000,000 \text{ parameters!}}$$
+          <p>At 4 bytes per FP32 parameter, this <strong>single layer requires 12 GB of VRAM</strong> just to store its weight matrix! A model with billions of parameters on raw pixels would overfit instantly on any realistic dataset.</p>
+        </div>
+
+        <h2>1. The Two Inductive Biases of Computer Vision</h2>
+        <div class="math-box">
+          <h4>Biological & Physical Principles of Visual Data:</h4>
+          <ol>
+            <li><strong>Spatial Locality (Pixels Near Each Other Are Correlated):</strong>
+              <br>A pixel at $(x, y)$ shares meaningful semantics with adjacent pixels $(x+1, y)$ (forming edges, textures, and patches). It has virtually zero direct correlation with a pixel at the opposite corner of the image.
+              <br><em>CNN Solution:</em> Local receptive field kernels ($3\times 3$ or $5\times 5$) connect neurons only to local neighborhoods.
+            </li>
+            <br>
+            <li><strong>Translation Equivariance (Features Are Universal Across Space):</strong>
+              <br>An edge, eye, or cat's ear is the same visual feature whether it appears in the top-left, center, or bottom-right corner of an image.
+              <br><em>CNN Solution:</em> <strong>Weight Sharing!</strong> The exact same $3\times 3$ filter kernel slides across every spatial location in the image, reducing parameter count from billions to just $3 \times 3 = 9$ numbers!
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Translation Equivariance vs. Translation Invariance</h2>
+        <div class="interview-alert">
+          <h4>🔥 The Classic FAANG Interview Distinction:</h4>
+          <ul>
+            <li><strong>Translation Equivariance (Convolutions):</strong>
+              <br>If the input shifts by $(\Delta x, \Delta y)$, the feature map representation shifts by the exact same $(\Delta x, \Delta y)$:
+              $$f(g(x)) = g(f(x))$$
+              <em>Convolutional layers are equivariant: shifting a cat in the image shifts the activation peak in the feature map.</em>
+            </li>
+            <li><strong>Translation Invariance (Pooling / Global Average Pooling):</strong>
+              <br>If the input shifts, the output prediction <strong>does not change at all</strong>:
+              $$f(g(x)) = f(x)$$
+              <em>Max Pooling and Global Average Pooling provide invariance: the final classifier predicts "Cat" regardless of where the cat sits in the frame.</em>
+            </li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 2: 2D CONVOLUTION MATH & TENSOR SHAPES -->
+      <section id="tab-math-shapes" class="tab-section">
+        <h1>2D Convolution Math, Output Shapes & Parameter Counting</h1>
+        <p class="section-subtitle">Cross-correlation vs. convolution, the universal spatial output formula, and exact layer parameter calculation.</p>
+
+        <div class="first-principles">
+          <h4>📐 Cross-Correlation vs. True Convolution</h4>
+          <p>In pure mathematics, a convolution flips the kernel horizontally and vertically before sliding:</p>
+          $$(I * K)(i, j) = \sum_m \sum_n I(i - m, j - n) K(m, n)$$
+          <p>In deep learning libraries (PyTorch, TensorFlow, CUDA cuDNN), the kernel is <strong>NOT flipped</strong>. We compute the <strong>Cross-Correlation</strong>:</p>
+          $$S(i, j) = (I \star K)(i, j) = \sum_m \sum_n I(i + m, j + n) K(m, n)$$
+          <p>Since the weights $K$ are learned via backpropagation, flipping is mathematically irrelevant &mdash; the network simply learns the mirrored weights directly!</p>
+        </div>
+
+        <h2>1. The Universal Output Shape Formula</h2>
+        <div class="math-box">
+          <h4>The Dimension Equation:</h4>
+          <p>Given input spatial dimension $W_{\text{in}}$, kernel size $K$, padding $P$, and stride $S$:</p>
+          $$\mathbf{W_{\text{out}} = \left\lfloor \frac{W_{\text{in}} - K + 2P}{S} \right\rfloor + 1}$$
+          <ul>
+            <li><strong>Valid Padding ($P = 0$):</strong> No padding. Output shrinks: $W_{\text{out}} = \lfloor \frac{W_{\text{in}} - K}{S} \rfloor + 1$.</li>
+            <li><strong>Same Padding (Preserve Spatial Dimensions when $S = 1$):</strong>
+              <br>To ensure $W_{\text{out}} = W_{\text{in}}$, set padding:
+              $$\mathbf{P = \frac{K - 1}{2}} \quad (\text{requires odd kernel size, e.g. } K=3 \implies P=1, \; K=5 \implies P=2)$$
+            </li>
+          </ul>
+        </div>
+
+        <h2>2. Parameter Counting for a Convolutional Layer</h2>
+        <div class="deep-dive">
+          <h4>Formula for Total Trainable Parameters:</h4>
+          <p>Let a Conv2D layer have $C_{\text{in}}$ input channels, $C_{\text{out}}$ output filters, kernel dimensions $K_h \times K_w$, and bias terms:</p>
+          $$\mathbf{\text{Parameters} = \Big( (K_h \times K_w \times C_{\text{in}}) + 1 \Big) \times C_{\text{out}}}$$
+          <div class="example-box">
+            <h4>Concrete Interview Example:</h4>
+            <p><strong>Question:</strong> <em>How many parameters are in a Conv2D layer with $C_{\text{in}} = 64$, $C_{\text{out}} = 128$, kernel $3\times 3$, with bias enabled?</em></p>
+            <p><strong>Calculation:</strong></p>
+            <ul>
+              <li>Weights per filter = $3 \times 3 \times 64 = 576$</li>
+              <li>Bias per filter = $1$</li>
+              <li>Total per filter = $576 + 1 = 577$</li>
+              <li>Total for 128 filters = $577 \times 128 = \mathbf{73,856 \text{ parameters}}$</li>
+            </ul>
+            <p><em>Notice that parameter count is completely independent of input image size $(H, W)$!</em> A $32 \times 32$ image and a $4000 \times 4000$ image use the exact same 73,856 weights.</p>
+          </div>
+        </div>
+      </section>
+    
+      <!-- TAB 3: RECEPTIVE FIELD CALCULATION -->
+      <section id="tab-receptive-field" class="tab-section">
+        <h1>Receptive Field (RF): Physics & Recursive Math</h1>
+        <p class="section-subtitle">What a deep neuron sees: Jump factors, stride scaling, and worked step-by-step calculations.</p>
+
+        <div class="first-principles">
+          <h4>👁️ What is the Receptive Field?</h4>
+          <p>The <strong>Receptive Field (RF)</strong> of a neuron in layer $l$ is the spatial area in the original input image that influences that neuron's activation. If an object is 100 pixels wide, a neuron whose receptive field is only 15 pixels cannot recognize the object &mdash; it can only see a small patch of fur or metal!</p>
+        </div>
+
+        <h2>1. Recursive Mathematical Equations for Receptive Field</h2>
+        <div class="math-box">
+          <h4>The Universal Recursive Tracking System:</h4>
+          <p>For each layer $l = 1, \dots, L$ with kernel size $k_l$ and stride $s_l$:</p>
+          <ol>
+            <li><strong>Cumulative Stride / Jump ($j_l$):</strong> Distance between consecutive features in the feature map relative to input:
+              $$j_0 = 1, \quad \mathbf{j_l = j_{l-1} \cdot s_l}$$
+            </li>
+            <li><strong>Receptive Field Size ($RF_l$):</strong>
+              $$RF_0 = 1, \quad \mathbf{RF_l = RF_{l-1} + (k_l - 1) \cdot j_{l-1}}$$
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Worked Step-by-Step Receptive Field Walkthrough</h2>
+        <div class="deep-dive">
+          <h4>Tracking Receptive Field Across a 3-Layer Network:</h4>
+          <ul>
+            <li><strong>Input:</strong> $RF_0 = 1, \; j_0 = 1$.</li>
+            <li><strong>Layer 1 (Conv2D: $k_1 = 3, \; s_1 = 1$):</strong>
+              <br>$RF_1 = RF_0 + (k_1 - 1)j_0 = 1 + (3 - 1)(1) = 1 + 2 = \mathbf{3}$
+              <br>$j_1 = j_0 \cdot s_1 = 1 \cdot 1 = \mathbf{1}$
+            </li>
+            <li><strong>Layer 2 (MaxPool: $k_2 = 2, \; s_2 = 2$):</strong>
+              <br>$RF_2 = RF_1 + (k_2 - 1)j_1 = 3 + (2 - 1)(1) = 3 + 1 = \mathbf{4}$
+              <br>$j_2 = j_1 \cdot s_2 = 1 \cdot 2 = \mathbf{2}$
+            </li>
+            <li><strong>Layer 3 (Conv2D: $k_3 = 3, \; s_3 = 1$):</strong>
+              <br>$RF_3 = RF_2 + (k_3 - 1)j_2 = 4 + (3 - 1)(2) = 4 + 4 = \mathbf{8}$
+              <br>$j_3 = j_2 \cdot s_3 = 2 \cdot 1 = \mathbf{2}$
+            </li>
+          </ul>
+          <p><strong>Conclusion:</strong> A single scalar activation in the output of Layer 3 is influenced by an $\mathbf{8 \times 8}$ pixel patch in the original image!</p>
+        </div>
+
+        <h2>3. Effective vs. Theoretical Receptive Field (Luo et al., NeurIPS 2016)</h2>
+        <div class="interview-alert">
+          <h4>💡 The Gaussian Distribution of Attention:</h4>
+          <p>Although the theoretical receptive field grows linearly with depth, Luo et al. proved that the <strong>Effective Receptive Field (ERF)</strong> &mdash; pixels that actually have non-negligible gradient impact &mdash; follows a 2D Gaussian distribution centered at the middle of the theoretical field. Pixels near the boundary have virtually zero impact! Skip connections (ResNets) expand the ERF significantly.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 4: 1X1, DILATED & TRANSPOSED CONVOLUTIONS -->
+      <section id="tab-special-convs" class="tab-section">
+        <h1>Specialized Convolutions: 1x1, Dilated & Transposed</h1>
+        <p class="section-subtitle">Channel projection physics, exponential receptive field expansion, and pixel upsampling mechanics.</p>
+
+        <div class="first-principles">
+          <h4>🔧 Beyond Standard Convolutions</h4>
+          <p>Standard spatial convolutions mix spatial information ($H, W$) and channel information ($C$) simultaneously. Modern computer vision relies on specialized convolutional variants that decouple spatial and channel transformations.</p>
+        </div>
+
+        <h2>1. 1x1 Convolutions: Cross-Channel Pooling (Lin et al., Network-in-Network)</h2>
+        <div class="deep-dive">
+          <h4>How a 1x1 Filter Operates:</h4>
+          <p>A $1\times 1$ convolution has kernel spatial size $1 \times 1$. It operates on a single pixel location $(h, w)$ across all $C_{\text{in}}$ channels simultaneously:</p>
+          $$y(h, w, k) = \sum_{c=1}^{C_{\text{in}}} W_{c, k} \cdot x(h, w, c) + b_k$$
+          <p><strong>Two Core Applications:</strong></p>
+          <ol>
+            <li><strong>Dimensionality Reduction (Bottlenecks):</strong> Projecting $C_{\text{in}} = 256 \to C_{\text{out}} = 64$ drastically reduces compute before expensive $3\times 3$ or $5\times 5$ convolutions (the foundation of GoogLeNet and ResNet bottlenecks).</li>
+            <li><strong>Non-Linear Cross-Channel Interaction:</strong> Applying ReLU after a $1\times 1$ conv adds depth and non-linearity without altering spatial dimensions.</li>
+          </ol>
+        </div>
+
+        <h2>2. Dilated (Atrous) Convolutions: Exponential Receptive Field</h2>
+        <div class="math-box">
+          <h4>Mechanism (Yu & Koltun, 2015 / DeepLab):</h4>
+          <p>A dilated convolution inserts $(d - 1)$ zeros (holes) between kernel elements, where $d$ is the <strong>dilation rate</strong>:</p>
+          $$\mathbf{K_{\text{effective}} = K + (K - 1)(d - 1)}$$
+          <ul>
+            <li>For $K = 3$ with $d = 1$: Effective kernel is $3 \times 3$ ($RF = 3$).</li>
+            <li>For $K = 3$ with $d = 2$: Effective kernel is $5 \times 5$ ($RF = 5$), with only 9 active parameters!</li>
+            <li>For $K = 3$ with $d = 4$: Effective kernel is $9 \times 9$ ($RF = 9$), with only 9 active parameters!</li>
+          </ul>
+          <p><strong>Why It Matters for Segmentation:</strong> Standard pooling downsamples resolution, destroying fine boundaries. Dilated convolutions expand receptive field exponentially <strong>without reducing spatial resolution or adding any extra parameters</strong>!</p>
+        </div>
+
+        <h2>3. Transposed Convolutions (Deconvolution / Fractional Stride)</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Checkerboard Artifact Hazard:</h4>
+          <p>Transposed convolutions are used to upsample feature maps in generative models (GANs, VAEs) and segmentation networks (U-Net). However, when kernel size is not evenly divisible by stride (e.g. $K=3, S=2$), overlapping receptive field regions produce uneven accumulation of pixel intensities &mdash; creating visible <strong>checkerboard artifacts</strong> in generated images!</p>
+          <p><strong>Production Fix (Odena et al., 2016):</strong> Replace transposed convolutions with <strong>Bilinear/Nearest-Neighbor Upsampling followed by a standard Conv2D</strong>.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 5: THE EVOLUTION OF CONVNETS -->
+      <section id="tab-classic-arch" class="tab-section">
+        <h1>ConvNet Evolution: From AlexNet to VGG & Inception</h1>
+        <p class="section-subtitle">The shift from large filters to micro-architectures, VGG's 3x3 parameter proof, and multi-scale Inception.</p>
+
+        <div class="first-principles">
+          <h4>🏛️ The Milestones of Computer Vision</h4>
+          <p>The history of modern deep learning began in 2012 when <strong>AlexNet</strong> crushed the ImageNet competition, reducing top-5 classification error from 26% to 15.3%. Subsequent architectures refined filter sizing, depth, and computational efficiency.</p>
+        </div>
+
+        <h2>1. AlexNet Breakthroughs (Krizhevsky, Sutskever & Hinton, 2012)</h2>
+        <div class="math-box">
+          <h4>Key Innovations that Sparked the Deep Learning Revolution:</h4>
+          <ul>
+            <li><strong>ReLU Activation:</strong> Replaced Sigmoid/Tanh, accelerating training by <strong>6x</strong> and preventing gradient saturation.</li>
+            <li><strong>GPU Acceleration:</strong> Implemented in custom CUDA code on two 3GB NVIDIA GTX 580 GPUs.</li>
+            <li><strong>Dropout ($p=0.5$):</strong> Prevented severe overfitting in the massive 4096-neuron fully connected layers.</li>
+            <li><strong>Heavy Data Augmentation:</strong> Random $224\times 224$ crops, horizontal flips, and PCA color jittering.</li>
+          </ul>
+        </div>
+
+        <h2>2. Mathematical Proof: Why VGG Stacks $3\times 3$ Filters (Simonyan & Zisserman, 2014)</h2>
+        <div class="deep-dive">
+          <h4>Theorem: Two stacked $3\times 3$ convs equal one $5\times 5$ conv in receptive field, but save 28% parameters!</h4>
+          <p><strong>Step 1: Receptive Field Equivalence:</strong></p>
+          <ul>
+            <li>Layer 1 ($3\times 3, s=1$): $RF_1 = 3$.</li>
+            <li>Layer 2 ($3\times 3, s=1$): $RF_2 = RF_1 + (3 - 1) = 3 + 2 = \mathbf{5}$.</li>
+          </ul>
+          <p>Thus, two consecutive $3\times 3$ convolutions cover the exact same $5\times 5$ spatial receptive field as a single $5\times 5$ filter!</p>
+
+          <p><strong>Step 2: Parameter Comparison for $C$ Channels:</strong></p>
+          <ul>
+            <li>Single $5\times 5$ Convolution:
+              $$\text{Params} = 5 \times 5 \times C \times C = \mathbf{25 C^2}$$
+            </li>
+            <li>Two Stacked $3\times 3$ Convolutions:
+              $$\text{Params} = 2 \times (3 \times 3 \times C \times C) = 2 \times 9 C^2 = \mathbf{18 C^2}$$
+            </li>
+          </ul>
+          <p><strong>Ratio:</strong> $\frac{18 C^2}{25 C^2} = \mathbf{0.72}$ &mdash; a <strong>28% reduction in parameters and compute</strong>!</p>
+          <p><em>Furthermore, stacking two layers introduces two non-linear ReLU activations instead of one, giving the network higher representational power!</em> (Three $3\times 3$ convs cover $7\times 7$ while saving 45% compute: $27 C^2$ vs $49 C^2$).</p>
+        </div>
+
+        <h2>3. GoogLeNet / Inception (Szegedy et al., 2014)</h2>
+        <div class="interview-alert">
+          <h4>💡 The Inception Philosophy: "Multi-Scale Processing"</h4>
+          <p>Instead of guessing whether to use a $1\times 1$, $3\times 3$, or $5\times 5$ filter at layer $l$, GoogLeNet runs <strong>all of them in parallel</strong> and concatenates their outputs along the channel dimension!</p>
+          <p><strong>The Bottleneck Trick:</strong> To prevent computational explosion, GoogLeNet places a $1\times 1$ conv <em>before</em> the $3\times 3$ and $5\times 5$ convs to compress channel dimension, allowing a 22-layer network to run with only 5 million parameters (compared to AlexNet's 60M and VGG's 138M)!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 6: RESNET & DEEP RESIDUAL LEARNING -->
+      <section id="tab-resnet" class="tab-section">
+        <h1>ResNet: Deep Residual Learning & The Gradient Highway</h1>
+        <p class="section-subtitle">Kaiming He et al. (2015), the degradation crisis, identity shortcuts, and the mathematical gradient highway proof.</p>
+
+        <div class="first-principles">
+          <h4>🛑 The Degradation Problem: Why Deeper Plain Networks Fail</h4>
+          <p>Before 2015, machine learning researchers believed that adding more layers to a plain network was always beneficial. But experiments revealed a paradox:</p>
+          <p><strong>A 56-layer plain network performed WORSE on both training and test error than a 20-layer network!</strong></p>
+          <p>This was NOT overfitting (because training error was also worse). It was the <strong>optimization degradation problem</strong>: Standard optimization algorithms simply could not push gradients through 50+ stacked non-linear layers without signal attenuation.</p>
+        </div>
+
+        <h2>1. The Residual Formulation</h2>
+        <div class="math-box">
+          <h4>The Core Hypothesis:</h4>
+          <p>Instead of hoping a stack of layers fits an underlying mapping $\mathcal{H}(x)$, we explicitly let the layers fit a <strong>residual mapping</strong> $\mathcal{F}(x) \equiv \mathcal{H}(x) - x$:</p>
+          $$\mathbf{y = \mathcal{F}(x, \{W_i\}) + x}$$
+          <p>Where $x$ is the input fed directly via an <strong>Identity Shortcut Connection</strong>.</p>
+          <p><strong>Why is this easier to learn?</strong> If an identity mapping is optimal, it is much easier for weights to decay toward zero ($\mathcal{F}(x) \to 0$) than to learn an identity transformation $W x \approx x$ through multiple non-linear layers!</p>
+        </div>
+
+        <h2>2. Mathematical Proof of the Uninterrupted Gradient Highway</h2>
+        <div class="deep-dive">
+          <h4>Theorem: Gradients flow directly back from layer $L$ to any earlier layer $l$ without multiplicative decay.</h4>
+          <p>Consider the recursive residual relation for any deep layer $L$ given earlier layer $l$:</p>
+          $$x_L = x_l + \sum_{i=l}^{L-1} \mathcal{F}(x_i, W_i)$$
+          <p>By the chain rule, the gradient of the scalar loss $\mathcal{L}$ with respect to activation $x_l$ is:</p>
+          $$\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_L} \frac{\partial x_L}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_L} \left( \frac{\partial}{\partial x_l} \left[ x_l + \sum_{i=l}^{L-1} \mathcal{F}(x_i, W_i) \right] \right)$$
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_L} \left( \mathbf{I} + \frac{\partial}{\partial x_l} \sum_{i=l}^{L-1} \mathcal{F}(x_i, W_i) \right)}$$
+
+          <h4>The Punchline of the Formula:</h4>
+          <ul>
+            <li>Look at the term $\mathbf{I}$ (the identity matrix): The gradient $\frac{\partial \mathcal{L}}{\partial x_L}$ is multiplied by $\mathbf{I}$ and transferred directly to $\frac{\partial \mathcal{L}}{\partial x_l}$ <strong>without passing through any weight matrices</strong>!</li>
+            <li>Even if the second term $\frac{\partial}{\partial x_l} \sum \mathcal{F}$ vanishes completely to zero, the gradient is guaranteed to flow through the $+ \mathbf{I}$ highway!</li>
+            <li>This mathematically proves why ResNet-152, ResNet-1001, and modern Transformers (which use residual connections) train smoothly without gradient vanishing! $\blacksquare$</li>
+          </ul>
+        </div>
+
+        <h2>3. BasicBlock vs. Bottleneck Block</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Block Type</th><th>Layer Structure</th><th>Where Used</th><th>Design Advantage</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>BasicBlock</strong></td>
+                <td>$3\times 3 \text{ Conv} \to 3\times 3 \text{ Conv}$</td>
+                <td>ResNet-18, ResNet-34</td>
+                <td>Simpler, lower depth.</td>
+              </tr>
+              <tr>
+                <td><strong>Bottleneck Block</strong></td>
+                <td>$1\times 1 \text{ Conv (reduce 4x)} \to 3\times 3 \text{ Conv} \to 1\times 1 \text{ Conv (restore)}$</td>
+                <td>ResNet-50, ResNet-101, ResNet-152</td>
+                <td>$1\times 1$ conv squeezes channels from $256 \to 64$, runs $3\times 3$ on small channel volume, and restores to $256$. Drastically reduces FLOPs while increasing non-linear depth.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 7: MOBILENETS & DEPTHWISE SEPARABLE CONVOLUTIONS -->
+      <section id="tab-mobilenet" class="tab-section">
+        <h1>MobileNets & Depthwise Separable Convolutions</h1>
+        <p class="section-subtitle">Howard et al. (2017), spatial vs. channel decoupling, and the complete 8-9x FLOPs reduction proof.</p>
+
+        <div class="first-principles">
+          <h4>📱 Edge AI & Mobile Computation Constraints</h4>
+          <p>Running ResNet-50 on an iPhone or embedded drone processor drains the battery and exceeds thermal limits. <strong>MobileNet</strong> revolutionized lightweight deep learning by breaking standard convolution into two decoupled steps: spatial filtering and channel projection.</p>
+        </div>
+
+        <h2>1. The Two-Step Factorization</h2>
+        <div class="math-box">
+          <h4>A Standard Convolution mixes space and channels simultaneously:</h4>
+          $$\text{Standard Conv: Computes spatial filtering AND channel combination in a single step.}$$
+          
+          <h4>Depthwise Separable Convolution splits this into:</h4>
+          <ol>
+            <li><strong>Step 1: Depthwise Convolution:</strong>
+              <br>Applies a single $K \times K$ filter per input channel independently (computes spatial patterns without channel mixing). Output has $C_{\text{in}}$ channels.
+            </li>
+            <li><strong>Step 2: Pointwise Convolution ($1\times 1$ Conv):</strong>
+              <br>Applies $C_{\text{out}}$ filters of size $1 \times 1 \times C_{\text{in}}$ to compute linear combinations across channels.
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Mathematical Proof: The 8-9x Compute Reduction</h2>
+        <div class="deep-dive">
+          <h4>Computational Cost (FLOPs) Comparison:</h4>
+          <p>Let input be $D_F \times D_F \times M$ and output be $D_F \times D_F \times N$ with kernel size $D_K \times D_K$ (assuming stride 1 with same padding):</p>
+
+          <p><strong>1. FLOPs of Standard Convolution:</strong></p>
+          $$\text{Cost}_{\text{standard}} = D_K \times D_K \times M \times N \times D_F \times D_F$$
+
+          <p><strong>2. FLOPs of Depthwise Separable Convolution:</strong></p>
+          $$\text{Cost}_{\text{depthwise}} = D_K \times D_K \times M \times D_F \times D_F$$
+          $$\text{Cost}_{\text{pointwise}} = 1 \times 1 \times M \times N \times D_F \times D_F = M \times N \times D_F \times D_F$$
+          $$\text{Cost}_{\text{separable}} = (D_K \times D_K \times M \times D_F^2) + (M \times N \times D_F^2)$$
+
+          <p><strong>3. The Compute Reduction Ratio:</strong></p>
+          $$\mathbf{\frac{\text{Cost}_{\text{separable}}}{\text{Cost}_{\text{standard}}} = \frac{D_K^2 \cdot M \cdot D_F^2 + M \cdot N \cdot D_F^2}{D_K^2 \cdot M \cdot N \cdot D_F^2} = \frac{D_K^2 + N}{D_K^2 \cdot N} = \frac{1}{N} + \frac{1}{D_K^2}}$$
+
+          <h4>Evaluation for Standard $3\times 3$ Filters ($D_K = 3$):</h4>
+          <p>Since output channels $N$ is typically large ($N \ge 64$), $\frac{1}{N} \approx 0$:</p>
+          $$\mathbf{\text{Ratio} \approx \frac{1}{3^2} = \frac{1}{9} \approx \mathbf{0.11}}$$
+          <p><strong>Result:</strong> Depthwise separable convolution achieves <strong>an 8x to 9x reduction in computational cost</strong> with only $\approx 1\%$ loss in ImageNet top-1 accuracy! $\blacksquare$</p>
+        </div>
+      </section>
+    
+      <!-- TAB 8: MODERN VISION ARCHITECTURES -->
+      <section id="tab-modern-vision" class="tab-section">
+        <h1>Modern Vision Architectures: ResNeXt & ConvNeXt</h1>
+        <p class="section-subtitle">Cardinality, split-transform-merge, and modernizing CNNs to match Vision Transformers.</p>
+
+        <div class="first-principles">
+          <h4>🏎️ The Modern Evolution of ConvNets</h4>
+          <p>While Vision Transformers (ViT) captured headlines in 2020-2021, modern ConvNet engineering demonstrated that convolutional architectures can match or exceed Transformer accuracy when modern training recipes are applied.</p>
+        </div>
+
+        <h2>1. ResNeXt & The Power of Cardinality (Xie et al., 2017)</h2>
+        <div class="math-box">
+          <h4>Cardinality (The Number of Paths):</h4>
+          <p>ResNeXt introduces a third dimension beyond depth and width: <strong>Cardinality ($C$)</strong> &mdash; the number of parallel grouped transformation paths in a block.</p>
+          $$\mathbf{y = x + \sum_{i=1}^C \mathcal{T}_i(x)}$$
+          <p><strong>Interview Takeaway:</strong> Increasing cardinality is strictly more effective at boosting classification accuracy than increasing depth or width while maintaining the exact same parameter budget and FLOP count.</p>
+        </div>
+
+        <h2>2. ConvNeXt: Modernizing CNNs for the 2020s (Liu et al., CVPR 2022)</h2>
+        <div class="deep-dive">
+          <h4>How Meta Modernized ResNet-50 into ConvNeXt:</h4>
+          <ol>
+            <li><strong>Macro Design:</strong> Changed stage compute ratio from $(3, 4, 6, 3)$ to $(3, 3, 9, 3)$ (matching Swin Transformer).</li>
+            <li><strong>Inverted Bottleneck:</strong> Widened hidden channels $4x$ in the middle rather than compressing them.</li>
+            <li><strong>Larger Kernel Size ($7\times 7$ Depthwise):</strong> Replaced $3\times 3$ convs with non-overlapping $7\times 7$ depthwise convs, mimicking ViT self-attention receptive field!</li>
+            <li><strong>Micro-Design Tweaks:</strong>
+              <ul>
+                <li>Replaced ReLU with <strong>GELU</strong>.</li>
+                <li>Fewer activation and normalization layers (only 1 per block instead of 3).</li>
+                <li>Replaced BatchNorm with <strong>LayerNorm</strong>.</li>
+                <li>Separate downsampling layers (patches).</li>
+              </ul>
+            </li>
+          </ol>
+          <p><strong>Outcome:</strong> ConvNeXt achieved <strong>87.8% ImageNet top-1 accuracy</strong>, outperforming Swin Transformers while retaining CNN inference efficiency!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 9: OBJECT DETECTION PARADIGMS -->
+      <section id="tab-detection" class="tab-section">
+        <h1>Object Detection: IoU, NMS, Faster R-CNN & YOLO</h1>
+        <p class="section-subtitle">Bounding box regression, anchor boxes, two-stage vs. single-stage detectors, and mAP evaluation.</p>
+
+        <div class="first-principles">
+          <h4>📦 Classification vs. Object Detection</h4>
+          <p>Classification asks: <em>"What is in this image?"</em> (single label output). Object Detection asks: <em>"Where are the objects, and what are their categories?"</em> (predicting coordinates $[x, y, w, h]$ and class labels for multiple overlapping objects).</p>
+        </div>
+
+        <h2>1. Core Metrics & Algorithms: IoU & NMS</h2>
+        <div class="math-box">
+          <h4>A. Intersection over Union (IoU / Jaccard Index):</h4>
+          $$\mathbf{\text{IoU} = \frac{\text{Area}(B_1 \cap B_2)}{\text{Area}(B_1 \cup B_2)} = \frac{\text{Area of Overlap}}{\text{Area of Union}}}$$
+          <p>Measures how closely a predicted bounding box matches ground truth. An IoU $\ge 0.50$ is classically considered a True Positive.</p>
+
+          <br>
+          <h4>B. Non-Maximum Suppression (NMS) Algorithm:</h4>
+          <p>A detection network proposes thousands of overlapping candidate boxes for a single object. NMS prunes duplicates:</p>
+          <ol>
+            <li>Discard all candidate boxes with class confidence score $< \text{threshold}_{\text{conf}}$.</li>
+            <li>Select the box $B^*$ with the highest remaining confidence score and output it.</li>
+            <li>Calculate IoU between $B^*$ and all other remaining boxes. Discard any box where $\text{IoU}(B^*, B_i) > \text{threshold}_{\text{IoU}}$ (typically $0.45$).</li>
+            <li>Repeat until no candidate boxes remain.</li>
+          </ol>
+        </div>
+
+        <h2>2. Two-Stage Detectors (Faster R-CNN) vs. Single-Stage Detectors (YOLO)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Dimension</th><th>Two-Stage Detectors (Faster R-CNN)</th><th>Single-Stage Detectors (YOLO / SSD)</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Architecture Flow</strong></td>
+                <td>Stage 1: Region Proposal Network (RPN) suggests candidate regions.<br>Stage 2: RoI pooling + classification & refinement head.</td>
+                <td>Single forward pass: Divides image into $S \times S$ grid; each grid cell predicts bounding boxes and class probabilities directly.</td>
+              </tr>
+              <tr>
+                <td><strong>Inference Latency</strong></td>
+                <td>Slow ($10 - 20$ FPS)</td>
+                <td><strong>Real-Time</strong> ($60 - 150+$ FPS)</td>
+              </tr>
+              <tr>
+                <td><strong>Accuracy (mAP)</strong></td>
+                <td>Historically higher accuracy on small objects.</td>
+                <td>Modern YOLO (v8, v9, v10) matches or exceeds Faster R-CNN accuracy.</td>
+              </tr>
+              <tr>
+                <td><strong>Primary Industrial Use</strong></td>
+                <td>Medical scans, offline satellite imagery inspection.</td>
+                <td>Autonomous driving, real-time robotics, edge video analytics.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 10: SEMANTIC & INSTANCE SEGMENTATION -->
+      <section id="tab-segmentation" class="tab-section">
+        <h1>Segmentation: FCN, U-Net & RoIAlign in Mask R-CNN</h1>
+        <p class="section-subtitle">Pixel-level classification, encoder-decoder skip connections, and eliminating quantization misalignment.</p>
+
+        <div class="first-principles">
+          <h4>🎨 Semantic vs. Instance vs. Panoptic Segmentation</h4>
+          <ul>
+            <li><strong>Semantic Segmentation:</strong> Assigns every pixel a category label (e.g. all pedestrians are colored red as one blob).</li>
+            <li><strong>Instance Segmentation:</strong> Segments each distinct object individual (Pedestrian 1 is red, Pedestrian 2 is blue).</li>
+            <li><strong>Panoptic Segmentation:</strong> Combines both semantic (stuff: sky, road) and instance (things: cars, people).</li>
+          </ul>
+        </div>
+
+        <h2>1. U-Net Architecture (Ronneberger et al., 2015)</h2>
+        <div class="deep-dive">
+          <h4>Why U-Net Dominates Biomedical Imaging:</h4>
+          <p>U-Net consists of a contracting path (encoder) and an expansive path (decoder), forming a U-shape:</p>
+          <ol>
+            <li><strong>Encoder Path:</strong> Repeated $3\times 3$ convolutions and MaxPool operations to capture high-level semantic context.</li>
+            <li><strong>Decoder Path:</strong> Upsampling layers to restore high-resolution pixel coordinates.</li>
+            <li><strong>Skip Connections (The Core Innovation):</strong> Concatenates high-resolution low-level feature maps directly from the encoder to the corresponding decoder layer!
+              <br><em>Why this is essential:</em> Deep encoders lose precise spatial boundary locations. Skip connections transmit fine-grained edge and texture coordinates directly across the network, enabling pixel-perfect boundary segmentation!
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. RoIPool vs. RoIAlign (He et al., Mask R-CNN 2017)</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Quantization Misalignment Bug in RoIPool:</h4>
+          <p>In Fast R-CNN, <strong>RoIPool</strong> extracts fixed-size feature maps from candidate boxes by applying floor/round quantization ($\lfloor x/16 \rfloor$).</p>
+          <ul>
+            <li>Rounding coordinates creates a spatial quantization error of up to 1-2 pixels on the feature map.</li>
+            <li>Multiplied by a $16x$ downsampling stride, this creates a <strong>16 to 32 pixel misalignment</strong> on the original image &mdash; catastrophic for pixel-level masks!</li>
+          </ul>
+          <h4>The RoIAlign Solution:</h4>
+          <p>RoIAlign completely eliminates rounding! It uses <strong>Bilinear Interpolation</strong> at four sampling locations inside each bin, computing exact continuous fractional coordinates. This single modification boosted mask accuracy significantly.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ High-Frequency FAANG Interview Questions: Computer Vision</h1>
+        <p class="section-subtitle">Technical screening and deep architectural design questions asked at Meta, Apple, Google, and Waymo.</p>
+
+        <h2>Part 1: Convolutional Fundamentals & Shapes</h2>
+        <details open>
+          <summary><span>Q1: How many trainable parameters are in a Conv2D layer with 128 input channels, 256 output channels, and a 3x3 kernel (with bias)?</span> <span class="badge badge-faang">Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Each filter has size $3 \times 3 \times 128$ weights $+ 1$ bias $= 1,152 + 1 = 1,153$ parameters. For 256 output filters: $1,153 \times 256 = \mathbf{295,168 \text{ parameters}}$. Notice that image spatial dimensions $(H, W)$ do not affect parameter count.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: What is the output spatial dimension of an input tensor of size 224x224 passed through a 7x7 conv with stride 2 and padding 3?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Formula: $W_{\text{out}} = \lfloor \frac{W_{\text{in}} - K + 2P}{S} \rfloor + 1$.</p>
+            <p>Substituting: $W_{\text{out}} = \lfloor \frac{224 - 7 + 2(3)}{2} \rfloor + 1 = \lfloor \frac{224 - 7 + 6}{2} \rfloor + 1 = \lfloor \frac{223}{2} \rfloor + 1 = 111 + 1 = \mathbf{112 \times 112}$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: What is the difference between Translation Equivariance and Translation Invariance in CNNs?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong></p>
+            <ul>
+              <li><strong>Translation Equivariance:</strong> Shifting the input image causes the feature map to shift by the exact same amount ($f(g(x)) = g(f(x))$). Standard convolution layers are translation equivariant.</li>
+              <li><strong>Translation Invariance:</strong> Shifting the input image results in no change in the final output ($f(g(x)) = f(x)$). Global Average Pooling and Max Pooling provide translation invariance, ensuring the classified label does not change when an object moves.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Why does stacking two 3x3 convolutions have the same receptive field as one 5x5 convolution while saving parameters?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Receptive field grows as $RF_2 = RF_1 + (k_2 - 1) = 3 + (3 - 1) = 5$. Parameters for one $5\times 5$ conv on $C$ channels is $25 C^2$. Parameters for two $3\times 3$ convs is $2 \times (9 C^2) = 18 C^2$. This saves <strong>28% parameters</strong> while introducing two non-linear ReLU activations instead of one.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: What is a 1x1 convolution used for in CNN architectures?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Cross-channel linear combination and dimensionality reduction. A $1\times 1$ conv compresses or expands channel dimensions (e.g. $256 \to 64$ in ResNet bottleneck blocks) without altering spatial dimensions, reducing computational cost before expensive spatial convolutions.</p>
+          </div>
+        </details>
+
+        <h2>Part 2: ResNets & Modern Architectures</h2>
+        <details>
+          <summary><span>Q6: How does ResNet mathematically solve the vanishing gradient problem?</span> <span class="badge badge-math">Proof</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> By using identity shortcut connections: $x_{l+1} = x_l + \mathcal{F}(x_l)$. The gradient is $\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_{l+1}} \left( \mathbf{I} + \frac{\partial \mathcal{F}}{\partial x_l} \right)$. The identity matrix $\mathbf{I}$ creates an uninterrupted gradient highway, allowing gradient signal to flow backwards directly even if the residual weights derivative $\frac{\partial \mathcal{F}}{\partial x_l}$ vanishes to zero.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the degradation problem in plain deep networks, and why is it NOT overfitting?</span> <span class="badge badge-faang">ResNet</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> When stacking 50+ plain layers without residual connections, the training error is higher than a 20-layer network. If it were overfitting, training error would be lower. It is an optimization degradation problem caused by severe gradient attenuation through repeated non-linearities.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: Derive the computational FLOPs reduction of Depthwise Separable Convolutions in MobileNet.</span> <span class="badge badge-math">Derivation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Standard Conv FLOPs: $K^2 \cdot M \cdot N \cdot D_F^2$. Depthwise Separable FLOPs: $(K^2 \cdot M \cdot D_F^2) + (M \cdot N \cdot D_F^2)$.</p>
+            <p>Ratio: $\frac{K^2 \cdot M \cdot D_F^2 + M \cdot N \cdot D_F^2}{K^2 \cdot M \cdot N \cdot D_F^2} = \frac{1}{N} + \frac{1}{K^2}$. For $K=3$ and large $N$, the ratio is $\approx \frac{1}{9} \approx \mathbf{0.11}$ &mdash; an **8x to 9x reduction in compute**.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: What is Cardinality in ResNeXt and why is it superior to Depth or Width?</span> <span class="badge badge-concept">Architectures</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Cardinality is the number of parallel grouped transformation paths within a block. Xie et al. proved that increasing cardinality yields higher classification accuracy than increasing depth or width while maintaining the exact same FLOPs and parameter budget.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q10: What modern architectural modifications did ConvNeXt introduce to rival Vision Transformers?</span> <span class="badge badge-system">Modern CV</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> $7\times 7$ depthwise convolutions (matching ViT patch self-attention), inverted bottleneck design, replacing ReLU with GELU, fewer normalizations, replacing BatchNorm with LayerNorm, and separate patchify downsampling layers.</p>
+          </div>
+        </details>
+
+        <h2>Part 3: Object Detection & Segmentation</h2>
+        <details>
+          <summary><span>Q11: How does Non-Maximum Suppression (NMS) work in object detection?</span> <span class="badge badge-system">Algorithm</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Discard all boxes below confidence threshold. Pick the highest scoring box $B^*$, save it to final detections, and eliminate all remaining boxes that have $\text{IoU}(B^*, B_i) > \text{threshold}$ (typically 0.45). Repeat until all boxes are processed.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: What is the difference between RoIPool and RoIAlign in Mask R-CNN?</span> <span class="badge badge-faang">Meta CV</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> RoIPool rounds/quantizes continuous bounding box coordinates to integer grid bins ($\lfloor x/16 \rfloor$), creating spatial quantization misalignment of 16-32 pixels in original image space. RoIAlign uses bilinear interpolation at continuous fractional coordinates without rounding, preserving pixel-level alignment mandatory for instance segmentation masks.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why does U-Net use skip connections between the encoder and decoder?</span> <span class="badge badge-concept">Segmentation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Successive pooling/downsampling in the encoder captures high-level semantic context but discards fine-grained spatial localization. Skip connections copy high-resolution spatial feature maps directly across from encoder to decoder, allowing the network to assemble sharp, pixel-accurate segmentation boundaries.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: Explain the difference between 1-stage (YOLO) and 2-stage (Faster R-CNN) object detectors.</span> <span class="badge badge-system">Systems</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Two-stage detectors generate candidate region proposals via an RPN in stage 1, then classify and regress bounding boxes in stage 2 (slower, higher accuracy on small objects). Single-stage detectors treat detection as a single regression problem across a spatial grid in one forward pass (faster, real-time 60+ FPS).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q15: What causes checkerboard artifacts in transposed convolutions and how do you resolve it?</span> <span class="badge badge-system">Generative CV</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> When kernel size is not divisible by stride in transposed convolutions, overlapping receptive field patches accumulate uneven pixel values. Resolved by replacing transposed convolutions with Nearest-Neighbor or Bilinear interpolation upsampling followed by a standard Conv2D layer.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: What is a Dilated (Atrous) Convolution and why is it used in semantic segmentation?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> It inserts $(d-1)$ spaces between kernel elements. For dilation rate $d$, effective kernel size is $K + (K-1)(d-1)$. It expands receptive field exponentially without downsampling spatial resolution or adding any extra parameters, preserving high-resolution boundaries in DeepLab.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: What is mean Average Precision (mAP) in object detection?</span> <span class="badge badge-concept">Metrics</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> mAP computes the Area Under the Precision-Recall curve (AP) for each object class, then averages AP across all classes. mAP@0.5 evaluates at IoU threshold 0.50; mAP@0.5:0.95 averages across 10 IoU thresholds from 0.50 to 0.95 in steps of 0.05 (COCO standard).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: How does Global Average Pooling (GAP) prevent overfitting compared to fully connected layers?</span> <span class="badge badge-concept">Architectures</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Replaces giant dense matrices ($7\times 7\times 512 \to 4096 = 100\text{M params}$) by averaging each feature map spatially down to a single scalar ($1\times 1\times 512$). It has <strong>zero trainable parameters</strong>, preventing overfitting, and enforces direct semantic correspondence between feature maps and category classes.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: What is the Effective Receptive Field (ERF) and why does it matter?</span> <span class="badge badge-math">Theory</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> The theoretical receptive field assumes all pixels inside the window contribute equally. Luo et al. (2016) proved the effective receptive field follows a 2D Gaussian distribution where central pixels have vastly higher influence than boundary pixels.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: Why do Vision Transformers (ViT) require much more training data than CNNs?</span> <span class="badge badge-faang">Transformers vs CNNs</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> CNNs have strong hard-coded <strong>inductive biases</strong>: spatial locality and translation equivariance. Vision Transformers use global self-attention with no innate spatial knowledge &mdash; they must <em>learn</em> spatial locality from data. On small datasets (ImageNet-1k), CNNs outperform ViTs; on massive datasets (JFT-300M), ViTs dominate.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: How do anchor boxes help object detection models detect multiple overlapping objects?</span> <span class="badge badge-concept">Detection</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Predefined bounding box templates of diverse aspect ratios (e.g. 1:1, 1:2, 2:1) assigned to each grid cell. They allow a single spatial grid location to detect multiple overlapping objects of different shapes (e.g. a tall standing pedestrian next to a wide horizontal car).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: What is the purpose of auxiliary classifiers in GoogLeNet?</span> <span class="badge badge-architectures">Google Classic</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> GoogLeNet added intermediate softmax classifier branches at layers 4 and 7 during training. Their losses were scaled by 0.3 and added to the total loss, injecting auxiliary gradients directly into middle layers to combat vanishing gradients before ResNet was invented.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: What is Feature Pyramid Network (FPN) and why is it used?</span> <span class="badge badge-system">CV Systems</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Combines low-resolution semantically strong deep features with high-resolution semantically weak shallow features via top-down pathways and lateral connections. Constructs multi-scale feature representations, allowing detectors to detect small, medium, and large objects at appropriate resolutions.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: Can Max Pooling be replaced with strided convolutions?</span> <span class="badge badge-concept">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Yes. Springenberg et al. (2014, "All Convolutional Net") showed that replacing max pooling with stride-2 convolutions allows the network to learn its own optimal downsampling function rather than hard-coded max operations, with no loss in accuracy.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: What is the difference between Same padding and Valid padding?</span> <span class="badge badge-concept">Basics</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Valid padding applies 0 padding ($P=0$), shrinking the output spatial dimensions. Same padding applies $P = \frac{K-1}{2}$ zero-padding around the border, ensuring output spatial dimensions match input dimensions when stride $S=1$.</p>
+          </div>
+        </details>
+      </section>
+    
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>DL Module 3 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your convolutional neural network and computer vision mastery with instant explanations.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. How many parameters are in a Conv2D layer with 64 input channels, 128 output channels, and a 3x3 kernel (with bias)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) 36,864</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) 73,856 ((3x3x64 + 1) x 128)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) 147,456</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) 8,192</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> Each filter has $3 \times 3 \times 64 = 576$ weights $+ 1$ bias $= 577$ parameters. For 128 filters: $577 \times 128 = 73,856$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. By what factor do Depthwise Separable Convolutions in MobileNet reduce computational FLOPs compared to standard convolutions with 3x3 filters?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) 2x reduction</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) 8x to 9x reduction (Ratio ≈ 1/9)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) 100x reduction</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Zero reduction</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> The cost ratio is $\frac{1}{N} + \frac{1}{K^2}$. For $K=3$ and large $N$, the ratio is approximately $\frac{1}{9}$, yielding an 8x to 9x reduction in compute.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. How does ResNet's identity shortcut connection mathematically guarantee gradient flow?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) By multiplying gradients by 2 at each layer.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) The chain rule gradient contains an identity matrix term $\mathbf{I} + \frac{\partial \mathcal{F}}{\partial x}$, guaranteeing direct gradient propagation even if residual weights vanish.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) By converting activations to float64.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) By eliminating the backward pass.</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> The gradient is $\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_{l+1}}(\mathbf{I} + \frac{\partial \mathcal{F}}{\partial x_l})$. The $+ \mathbf{I}$ term creates an uninterrupted highway.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. Why did VGG choose to stack two 3x3 convolutions instead of using a single 5x5 convolution?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) Because 5x5 filters cannot run on GPUs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">B) Two stacked 3x3 convs cover the exact same 5x5 receptive field while saving 28% parameters and adding an extra non-linearity.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) Because 3x3 filters have no weights.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) Because 5x5 filters always overfit.</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> Two $3\times 3$ filters have parameter cost $18 C^2$ vs $25 C^2$ for one $5\times 5$ filter (a 28% savings), with identical receptive field and two non-linear ReLUs.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. What is the spatial output dimension of a 224x224 input passed through a 7x7 conv with stride 2 and padding 3?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) 224x224</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) 112x112</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) 56x56</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) 108x108</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> $W_{\text{out}} = \lfloor \frac{224 - 7 + 2(3)}{2} \rfloor + 1 = \lfloor \frac{223}{2} \rfloor + 1 = 111 + 1 = 112$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. What is the key advantage of Dilated (Atrous) Convolutions in semantic segmentation?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) They convert images into 1D vectors.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">B) They expand the receptive field exponentially without downsampling spatial resolution or adding parameters.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) They eliminate the need for convolutions.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) They replace bilinear interpolation.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> By inserting spaces between kernel weights, dilated convs expand receptive field exponentially while preserving pixel-level spatial resolution in DeepLab.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. Why did Mask R-CNN replace RoIPool with RoIAlign?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) To reduce floating-point operations.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) RoIPool rounds coordinates, causing large spatial misalignment errors; RoIAlign uses bilinear interpolation without rounding.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) To run on mobile devices.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) Because RoIPool is deprecated in PyTorch.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> RoIPool introduces integer rounding quantization errors. RoIAlign evaluates fractional coordinates via bilinear interpolation, preserving pixel-level boundary masks.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. What is the role of skip connections in the U-Net architecture?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) To skip training epochs.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">B) To transmit fine-grained high-resolution spatial boundary coordinates from encoder layers directly to decoder layers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">C) To reduce channels to 1.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) To convert 2D images to 3D volumes.</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> High-resolution spatial information lost during encoder pooling is restored by concatenating encoder feature maps directly to decoder stages.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. What visual artifact is commonly caused by transposed convolutions when kernel size is not divisible by stride?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) Motion blur</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) Checkerboard artifacts (uneven pixel intensity overlap)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) Color inversion</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) Salt and pepper noise</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> Uneven receptive field overlap creates checkerboard patterns. Solved by using Bilinear/Nearest upsampling followed by standard Conv2D.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. What is Cardinality in the ResNeXt architecture?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) The depth of the network in layers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) The number of parallel grouped transformation paths in a residual block.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) The size of the receptive field in pixels.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) The number of classes in ImageNet.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Cardinality refers to the number of parallel paths ($C$), proven by Xie et al. to be more effective than simply increasing depth or width.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DL Module 1: Neural Foundations, Activations & Backpropagation — Interview Guide</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-tertiary: #1b2640;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --purple: #c084fc;
+      --rose: #fb7185;
+      --border: #223254;
+      --code-bg: #070b14;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #top-nav {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .menu-toggle {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      display: none;
+    }
+    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .mod-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
+    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+
+    .layout-wrapper { display: flex; flex-grow: 1; }
+    #sidebar {
+      width: 320px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: calc(100vh - 49px);
+      position: sticky;
+      top: 49px;
+    }
+    .sidebar-title { 
+      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 1px; 
+      color: var(--text-muted); 
+      font-weight: 700; 
+    }
+    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-item {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
+    .nav-item.active { 
+      background: var(--accent-glow); 
+      color: var(--accent); 
+      border-left-color: var(--accent); 
+      font-weight: 600; 
+    }
+
+    #main-content { 
+      flex-grow: 1; 
+      padding: 2.2rem 3.5rem; 
+      max-width: 1080px; 
+      min-width: 0;
+    }
+    .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
+    .tab-section.active { display: block; }
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(4px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
+    .section-subtitle { 
+      font-size: 1.02rem; 
+      color: var(--text-muted); 
+      margin-bottom: 1.8rem; 
+      border-bottom: 1px solid var(--border); 
+      padding-bottom: 0.8rem; 
+    }
+    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
+    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
+    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
+    p { margin-bottom: 1rem; color: #cbd5e1; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; }
+
+    .first-principles {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .first-principles h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .math-box { 
+      background: rgba(192, 132, 252, 0.08); 
+      border-left: 4px solid var(--purple); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+      overflow-x: auto; 
+    }
+    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
+
+    .interview-alert { 
+      background: rgba(251, 191, 36, 0.08); 
+      border-left: 4px solid var(--warning); 
+      border-radius: 8px; 
+      padding: 1.25rem; 
+      margin: 1.4rem 0; 
+    }
+    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
+
+    .deep-dive {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
+
+    .example-box {
+      background: rgba(52, 211, 153, 0.08);
+      border-left: 4px solid var(--success);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.4rem 0;
+    }
+    .example-box h4 { color: var(--success); font-size: 1.05rem; }
+
+    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
+    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #162238; color: var(--accent); font-weight: 600; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    pre { 
+      background: var(--code-bg); 
+      border: 1px solid #1a273f; 
+      border-radius: 6px; 
+      padding: 1.25rem; 
+      overflow-x: auto; 
+      margin: 1rem 0 1.5rem 0; 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      font-size: 0.88rem; 
+      color: #e2e8f0; 
+      line-height: 1.5; 
+    }
+    code { 
+      font-family: 'Consolas', 'Fira Code', monospace; 
+      background: rgba(255, 255, 255, 0.08); 
+      padding: 0.15rem 0.35rem; 
+      border-radius: 4px; 
+      font-size: 0.88em; 
+      color: var(--accent); 
+    }
+    pre code { background: transparent; padding: 0; color: inherit; }
+
+    details { 
+      background: var(--bg-secondary); 
+      border: 1px solid var(--border); 
+      border-radius: 8px; 
+      margin-bottom: 0.95rem; 
+      transition: border-color 0.2s;
+    }
+    details[open] { border-color: var(--accent); }
+    summary { 
+      padding: 0.95rem 1.25rem; 
+      cursor: pointer; 
+      font-weight: 600; 
+      list-style: none; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    details[open] summary::after { content: '−'; }
+    .qa-content { 
+      padding: 0 1.25rem 1.25rem 1.25rem; 
+      border-top: 1px solid var(--border); 
+      padding-top: 0.95rem; 
+      font-size: 0.94rem; 
+    }
+
+    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
+    .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+    .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
+    .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
+
+    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .quiz-option { 
+      background: var(--bg-primary); 
+      border: 1px solid var(--border); 
+      padding: 0.75rem 1rem; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-size: 0.9rem; 
+      transition: all 0.2s; 
+    }
+    .quiz-option:hover { border-color: var(--accent); }
+    .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
+    .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
+    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
+
+    @media (max-width: 820px) {
+      .menu-toggle { display: block; }
+      #sidebar { 
+        position: fixed; 
+        left: -330px; 
+        top: 49px; 
+        bottom: 0; 
+        z-index: 150; 
+        transition: left 0.25s ease; 
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
+      }
+      #sidebar.open { left: 0; }
+      #main-content { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.7rem; }
+      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header id="top-nav">
+    <div class="top-left">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <a href="index.html" class="logo">DL<span>Mastery</span></a>
+    </div>
+    <nav class="module-nav">
+      <a href="index.html" class="mod-link">🏠 Hub</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link active">DL1: Foundations</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link">DL2: Optimization</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link">DL3: CNNs & CV</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link">DL4: RNNs & Attention</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link">DL5: Transformers & LLMs</a>
+    </nav>
+  </header>
+
+  <div class="layout-wrapper">
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-title">DL Module 1 Deep Dive</div>
+      <ul class="nav-links">
+        <li class="nav-item active" onclick="switchTab('tab-perceptron')"><span>🧠</span> 1. Perceptrons & XOR Crisis</li>
+        <li class="nav-item" onclick="switchTab('tab-activations')"><span>⚡</span> 2. Activation Functions Zoo</li>
+        <li class="nav-item" onclick="switchTab('tab-calculus')"><span>📐</span> 3. Matrix Calculus & Tensors</li>
+        <li class="nav-item" onclick="switchTab('tab-backprop')"><span>🔄</span> 4. Backprop Derivation Proof</li>
+        <li class="nav-item" onclick="switchTab('tab-numerical')"><span>🧮</span> 5. Toy MLP Walkthrough</li>
+        <li class="nav-item" onclick="switchTab('tab-init')"><span>🎲</span> 6. Weight Init (Xavier/He)</li>
+        <li class="nav-item" onclick="switchTab('tab-loss')"><span>🎯</span> 7. Loss Functions & Softmax</li>
+        <li class="nav-item" onclick="switchTab('tab-grad-issues')"><span>💥</span> 8. Vanishing/Exploding Grads</li>
+        <li class="nav-item" onclick="switchTab('tab-expressivity')"><span>🏛️</span> 9. Universal Approx & Depth</li>
+        <li class="nav-item" onclick="switchTab('tab-production')"><span>🛡️</span> 10. Karpathy's Debug Recipe</li>
+        <li class="nav-item" onclick="switchTab('tab-interview')"><span>💼</span> 11. 25+ FAANG Interview Questions</li>
+        <li class="nav-item" onclick="switchTab('tab-quiz')"><span>📝</span> 12. Interactive Self-Quiz</li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+      <!-- TAB 1: PERCEPTRONS & FOUNDATIONS -->
+      <section id="tab-perceptron" class="tab-section active">
+        <h1>Neural Foundations: From Biological Analogy to Deep Networks</h1>
+        <p class="section-subtitle">The artificial neuron, linear separation limits, and the historical XOR crisis that birthed deep learning.</p>
+
+        <div class="first-principles">
+          <h4>🧠 Biological Neuron vs. Artificial Perceptron</h4>
+          <p>The human brain contains approximately $86$ billion neurons, each connected to thousands of others via synapses. When electrical signals arriving at the dendrites exceed a chemical threshold, the neuron "fires" an action potential down its axon to downstream neurons.</p>
+          <p>In 1957, Frank Rosenblatt modeled this biological mechanism as the <strong>Perceptron</strong>:</p>
+          <ol>
+            <li><strong>Inputs ($x_1, x_2, \dots, x_D$):</strong> Electrical signals arriving from incoming synapses.</li>
+            <li><strong>Synaptic Weights ($w_1, w_2, \dots, w_D$):</strong> Synaptic strength/conductance. Positive weights are excitatory; negative weights are inhibitory.</li>
+            <li><strong>Bias ($b$):</strong> Threshold firing potential needed to trigger an action potential.</li>
+            <li><strong>Net Input (Pre-activation $z$):</strong> Weighted sum $z = \sum_{j=1}^D w_j x_j + b = \mathbf{w}^T \mathbf{x} + b$.</li>
+            <li><strong>Activation Function ($\sigma$):</strong> Non-linear threshold governing whether the neuron fires: $y = \sigma(z)$.</li>
+          </ol>
+        </div>
+
+        <h2>1. The Linear Decision Boundary of a Single Perceptron</h2>
+        <div class="math-box">
+          <h4>Mathematical Geometry:</h4>
+          <p>For a binary step activation $\sigma(z) = \mathbb{I}(z \ge 0)$, the decision boundary between classes is the hyperplane:</p>
+          $$\mathbf{w}^T \mathbf{x} + b = 0$$
+          <ul>
+            <li>The weight vector $\mathbf{w}$ is <strong>orthogonal (normal)</strong> to the decision boundary hyperplane.</li>
+            <li>The bias $b$ determines the perpendicular distance of the hyperplane from the origin: $\text{distance} = \frac{-b}{\|\mathbf{w}\|_2}$.</li>
+            <li>The perceptron partitions the input space $\mathbb{R}^D$ into two half-spaces. It can <strong>only solve linearly separable problems</strong>.</li>
+          </ul>
+        </div>
+
+        <h2>2. The Historical XOR Crisis (Minsky & Papert, 1969)</h2>
+        <p>In their famous 1969 book <em>Perceptrons</em>, Marvin Minsky and Seymour Papert proved that a single-layer perceptron cannot compute the basic binary <strong>XOR (Exclusive OR)</strong> function, causing the first "AI Winter".</p>
+
+        <div class="deep-dive">
+          <h4>Mathematical Proof of XOR Non-Separability:</h4>
+          <p>The XOR truth table has 4 points in $\mathbb{R}^2$:</p>
+          <ul>
+            <li>$(0, 0) \implies 0$</li>
+            <li>$(0, 1) \implies 1$</li>
+            <li>$(1, 0) \implies 1$</li>
+            <li>$(1, 1) \implies 0$</li>
+          </ul>
+          <p>If a single perceptron could classify XOR, there must exist weights $w_1, w_2$ and bias $b$ satisfying:</p>
+          <ol>
+            <li>$w_1(0) + w_2(0) + b < 0 \implies b < 0$</li>
+            <li>$w_1(0) + w_2(1) + b \ge 0 \implies w_2 + b \ge 0$</li>
+            <li>$w_1(1) + w_2(0) + b \ge 0 \implies w_1 + b \ge 0$</li>
+            <li>$w_1(1) + w_2(1) + b < 0 \implies w_1 + w_2 + b < 0$</li>
+          </ol>
+          <p>Adding inequalities (2) and (3) yields:</p>
+          $$(w_1 + b) + (w_2 + b) \ge 0 \implies w_1 + w_2 + 2b \ge 0$$
+          <p>From inequality (4), $w_1 + w_2 + b < 0$. Subtracting this gives:</p>
+          $$b > 0$$
+          <p><strong>Contradiction!</strong> Inequality (1) requires $b < 0$, but algebraic combination requires $b > 0$. No line in $\mathbb{R}^2$ can separate $(0,1)$ and $(1,0)$ from $(0,0)$ and $(1,1)$! $\blacksquare$</p>
+        </div>
+
+        <div class="interview-alert">
+          <h4>💡 How Deep Learning Solved XOR: Representation Learning</h4>
+          <p>Adding a single <strong>hidden layer</strong> with 2 non-linear neurons bends and warps the input coordinate space. The hidden layer maps the 4 points into a new representation space $\mathbb{R}^2$ where the classes <em>become linearly separable</em>!</p>
+          <p><strong>Fundamental Insight:</strong> A deep neural network is a sequence of non-linear coordinate transformations that progressively untangle complicated, twisted data manifolds until the final layer can separate them with a simple linear hyperplane.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 2: ACTIVATION FUNCTIONS ZOO -->
+      <section id="tab-activations" class="tab-section">
+        <h1>Activation Functions: Math, Gradients & Modern Architectures</h1>
+        <p class="section-subtitle">Why linearity collapses networks, the saturation tragedy of Sigmoid, and modern smooth non-linearities (GELU, Swish).</p>
+
+        <div class="first-principles">
+          <h4>❓ Why Do Neural Networks Need Activation Functions?</h4>
+          <p>Suppose you build a 100-layer neural network with <strong>no activation functions</strong> (or linear activations $g(z) = z$):</p>
+          $$a^{[1]} = W^{[1]} x + b^{[1]}$$
+          $$a^{[2]} = W^{[2]} a^{[1]} + b^{[2]} = W^{[2]}(W^{[1]} x + b^{[1]}) + b^{[2]} = (W^{[2]}W^{[1]})x + (W^{[2]}b^{[1]} + b^{[2]})$$
+          $$a^{[L]} = W_{\text{combined}} x + b_{\text{combined}}$$
+          <p>The product of 100 linear transformations is <strong>just another single linear transformation</strong>! A 100-layer linear network has the exact same representational power as a single-layer linear model. <strong>Non-linear activation functions are what allow neural networks to bend space and approximate arbitrary functions.</strong></p>
+        </div>
+
+        <h2>1. Comprehensive Taxonomy of Activation Functions</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Function</th>
+                <th>Formula $g(z)$</th>
+                <th>Derivative $g'(z)$</th>
+                <th>Output Range</th>
+                <th>Pros & Cons</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Sigmoid</strong></td>
+                <td>$$\sigma(z) = \frac{1}{1 + e^{-z}}$$</td>
+                <td>$$\sigma(z)(1 - \sigma(z))$$</td>
+                <td>$(0, 1)$</td>
+                <td><strong>Pros:</strong> Interpretable as probability.<br><strong>Cons:</strong> Vanishing gradient ($\max g' = 0.25$), not zero-centered, computationally expensive $e^{-z}$.</td>
+              </tr>
+              <tr>
+                <td><strong>Tanh</strong></td>
+                <td>$$\tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}$$</td>
+                <td>$$1 - \tanh^2(z)$$</td>
+                <td>$(-1, 1)$</td>
+                <td><strong>Pros:</strong> Zero-centered outputs (faster gradient convergence than Sigmoid).<br><strong>Cons:</strong> Satures for $|z| > 3$ ($\max g' = 1.0$), still vanishes gradients.</td>
+              </tr>
+              <tr>
+                <td><strong>ReLU</strong></td>
+                <td>$$\max(0, z)$$</td>
+                <td>$$\begin{cases} 1 & z > 0 \\ 0 & z < 0 \end{cases}$$</td>
+                <td>$[0, \infty)$</td>
+                <td><strong>Pros:</strong> Constant gradient $1$, no vanishing gradient for $z > 0$, 6x faster to compute.<br><strong>Cons:</strong> "Dying ReLU" (gradient is strictly 0 for $z < 0$), not zero-centered.</td>
+              </tr>
+              <tr>
+                <td><strong>Leaky ReLU</strong></td>
+                <td>$$\max(\alpha z, z) \quad (\alpha \approx 0.01)$$</td>
+                <td>$$\begin{cases} 1 & z > 0 \\ \alpha & z < 0 \end{cases}$$</td>
+                <td>$(-\infty, \infty)$</td>
+                <td><strong>Pros:</strong> Prevents dead neurons by maintaining small gradient slope $\alpha$ for negative values.<br><strong>Cons:</strong> Extra hyperparameter $\alpha$.</td>
+              </tr>
+              <tr>
+                <td><strong>ELU</strong></td>
+                <td>$$\begin{cases} z & z > 0 \\ \alpha(e^z - 1) & z \le 0 \end{cases}$$</td>
+                <td>$$\begin{cases} 1 & z > 0 \\ g(z) + \alpha & z \le 0 \end{cases}$$</td>
+                <td>$(-\alpha, \infty)$</td>
+                <td><strong>Pros:</strong> Smooth saturation for negative inputs, drives mean activations toward zero.<br><strong>Cons:</strong> Involves exponential function $e^z$.</td>
+              </tr>
+              <tr>
+                <td><strong>GELU</strong> (Transformers)</td>
+                <td>$$x \cdot \Phi(x) = x \cdot P(X \le x)$$</td>
+                <td>$$\Phi(x) + x \phi(x)$$</td>
+                <td>$(-0.17, \infty)$</td>
+                <td><strong>Pros:</strong> Probabilistic gating, smooth everywhere, standard in BERT, GPT-2/3/4, ViT, LLaMA.<br><strong>Cons:</strong> Requires erf or tanh approximation.</td>
+              </tr>
+              <tr>
+                <td><strong>Swish / SiLU</strong></td>
+                <td>$$x \cdot \sigma(\beta x) \quad (\beta=1 \implies \text{SiLU})$$</td>
+                <td>$$\beta g(x) + \sigma(\beta x)(1 - \beta g(x))$$</td>
+                <td>$(-0.28, \infty)$</td>
+                <td><strong>Pros:</strong> Discovered by Google via AutoML, non-monotonic, smoother gradient landscape, standard in EfficientNet, LLaMA-2/3.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>2. Mathematical Proof: The Sigmoid Gradient Collapse</h2>
+        <div class="deep-dive">
+          <h4>Why Deep Sigmoid Networks Cannot Train:</h4>
+          <p>Let's find the maximum possible derivative of the Sigmoid function $\sigma(z) = \frac{1}{1 + e^{-z}}$:</p>
+          $$\sigma'(z) = \sigma(z)(1 - \sigma(z))$$
+          <p>Let $u = \sigma(z) \in (0, 1)$. The derivative is a downward parabola: $f(u) = u(1 - u) = u - u^2$.</p>
+          <p>Differentiating with respect to $u$ and setting to 0:</p>
+          $$\frac{df}{du} = 1 - 2u = 0 \implies u = \frac{1}{2} \implies \sigma(z) = 0.5 \implies z = 0$$
+          $$\mathbf{\max_{z} \sigma'(z) = 0.5 \times (1 - 0.5) = 0.25}$$
+          <p>In a 6-layer network using Sigmoid activations, backpropagating gradients through the layers multiplies the local derivatives via the chain rule:</p>
+          $$\text{Gradient scale} \le (0.25)^6 = \frac{1}{4096} \approx \mathbf{0.000244}$$
+          <p><strong>Result:</strong> By the time the gradient reaches the first layer, it has shrunk by more than <strong>4,000-fold</strong>! The earliest layers learn virtually nothing. This is the primary reason deep learning was stuck before ReLU!</p>
+        </div>
+
+        <h2>3. The "Dying ReLU" Problem & Dead Neuron Necrosis</h2>
+        <div class="interview-alert">
+          <h4>🚨 How a Neuron Permanently Dies:</h4>
+          <p>If a large negative gradient update pushes a neuron's weights such that $w^T x + b < 0$ for <strong>all</strong> data points in the training set:</p>
+          <ul>
+            <li>For every sample, pre-activation $z < 0$, so $\text{ReLU}(z) = 0$.</li>
+            <li>The local gradient is strictly $\text{ReLU}'(z) = 0$.</li>
+            <li>Because the gradient is 0, backpropagation never updates the weights: $\Delta w = -\eta \times 0 = 0$.</li>
+            <li>The neuron remains permanently stuck at output 0 for the rest of training &mdash; effectively dead!</li>
+          </ul>
+          <p><strong>Production Fixes:</strong> Use smaller learning rates, He initialization, or Leaky ReLU / GELU / Swish.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 3: MATRIX CALCULUS & TENSOR CONTRACTIONS -->
+      <section id="tab-calculus" class="tab-section">
+        <h1>Matrix Calculus & Vectorized Neural Computation</h1>
+        <p class="section-subtitle">Rigorous index notation, Jacobian matrix anatomy, and dimensional checks for batch execution.</p>
+
+        <div class="first-principles">
+          <h4>📐 Why Vectorization Is Mandatory in Deep Learning</h4>
+          <p>Modern GPUs (NVIDIA H100/A100) are massive parallel SIMD (Single Instruction, Multiple Data) tensor processors. Evaluating a neural network using Python loops over individual neurons takes minutes; evaluating the exact same computation as a single matrix multiplication runs in microseconds on Tensor Cores.</p>
+          <p>To write correct neural code and debug custom layers in PyTorch, you must be fluent in <strong>Matrix Calculus</strong>.</p>
+        </div>
+
+        <h2>1. Dimensional Conventions for a Dense Layer</h2>
+        <p>Let layer $l$ take inputs from layer $l-1$:</p>
+        <div class="math-box">
+          <h4>Shape Definitions (Single Sample vs. Mini-Batch):</h4>
+          <ul>
+            <li>$n^{[l]}$: Number of neurons in layer $l$.</li>
+            <li>$n^{[l-1]}$: Number of neurons in previous layer $l-1$.</li>
+            <li>$B$: Mini-batch size (number of parallel samples).</li>
+          </ul>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Variable</th><th>Mathematical Meaning</th><th>Single Sample Shape</th><th>Mini-Batch Shape (PyTorch)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>$W^{[l]}$</td><td>Weight matrix of layer $l$</td><td>$(n^{[l]}, n^{[l-1]})$</td><td>$(n^{[l]}, n^{[l-1]})$</td></tr>
+                <tr><td>$b^{[l]}$</td><td>Bias vector of layer $l$</td><td>$(n^{[l]}, 1)$</td><td>$(n^{[l]}, 1)$ (broadcasted)</td></tr>
+                <tr><td>$a^{[l-1]}$</td><td>Activations from previous layer</td><td>$(n^{[l-1]}, 1)$</td><td>$(n^{[l-1]}, B)$ or $(B, n^{[l-1]})$</td></tr>
+                <tr><td>$z^{[l]}$</td><td>Linear pre-activations</td><td>$(n^{[l]}, 1)$</td><td>$(n^{[l]}, B)$ or $(B, n^{[l]})$</td></tr>
+                <tr><td>$a^{[l]}$</td><td>Post-activation outputs</td><td>$(n^{[l]}, 1)$</td><td>$(n^{[l]}, B)$ or $(B, n^{[l]})$</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h2>2. Forward Pass: Matrix Formulation</h2>
+        <div class="deep-dive">
+          <h4>Single Sample Forward Pass:</h4>
+          $$z^{[l]} = W^{[l]} a^{[l-1]} + b^{[l]}$$
+          $$a^{[l]} = g^{[l]}(z^{[l]})$$
+          <p><strong>Dimensional Verification:</strong></p>
+          $$\underbrace{z^{[l]}}_{(n^{[l]} \times 1)} = \underbrace{W^{[l]}}_{(n^{[l]} \times n^{[l-1]})} \times \underbrace{a^{[l-1]}}_{(n^{[l-1]} \times 1)} + \underbrace{b^{[l]}}_{(n^{[l]} \times 1)}$$
+
+          <h4>Mini-Batch Forward Pass ($B$ samples stacked as columns):</h4>
+          $$Z^{[l]} = W^{[l]} A^{[l-1]} + \mathbf{b}^{[l]} \mathbf{1}_B^T$$
+          $$A^{[l]} = g^{[l]}(Z^{[l]})$$
+          <p>Where $\mathbf{1}_B$ is a column vector of ones of length $B$ used to represent row-broadcasting the bias vector across all $B$ columns.</p>
+        </div>
+
+        <h2>3. The Jacobian Matrix: Derivative of a Vector with Respect to a Vector</h2>
+        <div class="math-box">
+          <h4>Formal Definition:</h4>
+          <p>If $\mathbf{y} = f(\mathbf{x})$ maps $\mathbb{R}^N \to \mathbb{R}^M$, its Jacobian matrix $\mathbf{J} = \frac{\partial \mathbf{y}}{\partial \mathbf{x}}$ is an $M \times N$ matrix whose $(i, j)$-th entry is $\frac{\partial y_i}{\partial x_j}$:</p>
+          $$\mathbf{J} = \frac{\partial \mathbf{y}}{\partial \mathbf{x}} = \begin{bmatrix}
+            \frac{\partial y_1}{\partial x_1} & \frac{\partial y_1}{\partial x_2} & \cdots & \frac{\partial y_1}{\partial x_N} \\
+            \frac{\partial y_2}{\partial x_1} & \frac{\partial y_2}{\partial x_2} & \cdots & \frac{\partial y_2}{\partial x_N} \\
+            \vdots & \vdots & \ddots & \vdots \\
+            \frac{\partial y_M}{\partial x_1} & \frac{\partial y_M}{\partial x_2} & \cdots & \frac{\partial y_M}{\partial x_N}
+          \end{bmatrix}$$
+          <p><strong>Crucial Special Case (Element-wise Activations):</strong></p>
+          <p>When activation $a^{[l]} = g(z^{[l]})$ is applied element-wise, each $a_i$ depends <em>only</em> on $z_i$ (cross-derivatives $\frac{\partial a_i}{\partial z_j} = 0$ for $i \ne j$).</p>
+          <p>The Jacobian $\frac{\partial a^{[l]}}{\partial z^{[l]}}$ is a <strong>pure diagonal matrix</strong>: $\text{diag}(g'(z_1), g'(z_2), \dots, g'(z_n))$! In practice, we never instantiate this sparse diagonal matrix; we simply perform element-wise multiplication (Hadamard product $\odot$) with the gradient vector!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 4: COMPLETE BACKPROP MATHEMATICAL DERIVATION -->
+      <section id="tab-backprop" class="tab-section">
+        <h1>Vectorized Backpropagation: The Complete Mathematical Proof</h1>
+        <p class="section-subtitle">Deriving the 4 fundamental equations of backpropagation using the multivariate chain rule.</p>
+
+        <div class="first-principles">
+          <h4>🔄 What Is Backpropagation? (From First Principles)</h4>
+          <p>Given a scalar loss $\mathcal{L}(y, \hat{y})$, gradient descent requires the partial derivative of $\mathcal{L}$ with respect to every weight $W_{ij}^{[l]}$ and bias $b_i^{[l]}$ in every layer $l$.</p>
+          <p>Computing each derivative independently by perturbation would require millions of forward passes. <strong>Backpropagation</strong> is dynamic programming applied to the chain rule of calculus: it computes all gradients in a single backward pass by caching intermediate error vectors $\delta^{[l]}$ and propagating them from output to input.</p>
+        </div>
+
+        <h2>1. Definition of the Layer Error Vector $\delta^{[l]}$</h2>
+        <div class="math-box">
+          <h4>The Core Definition:</h4>
+          <p>We define the error (sensitivity) of layer $l$ as the partial derivative of loss $\mathcal{L}$ with respect to its pre-activation vector $z^{[l]}$:</p>
+          $$\mathbf{\delta^{[l]} \equiv \frac{\partial \mathcal{L}}{\partial z^{[l]}} \in \mathbb{R}^{n^{[l]} \times 1}}$$
+        </div>
+
+        <h2>2. The Four Fundamental Equations of Backpropagation</h2>
+        <div class="deep-dive">
+          <h4>Equation BP1: Error in the Output Layer ($l = L$)</h4>
+          <p>By the chain rule:</p>
+          $$\delta_i^{[L]} = \frac{\partial \mathcal{L}}{\partial z_i^{[L]}} = \frac{\partial \mathcal{L}}{\partial a_i^{[L]}} \frac{\partial a_i^{[L]}}{\partial z_i^{[L]}} = \frac{\partial \mathcal{L}}{\partial a_i^{[L]}} g'(z_i^{[L]})$$
+          $$\mathbf{\delta^{[L]} = \nabla_{a^{[L]}} \mathcal{L} \odot g'(z^{[L]})}$$
+          <p><em>(Special case: When using Softmax with Cross-Entropy Loss, or Linear with MSE Loss, this simplifies remarkably to $\delta^{[L]} = \hat{y} - y$!)</em></p>
+
+          <br>
+          <h4>Equation BP2: Error Propagation to Hidden Layer ($l \to l-1$)</h4>
+          <p>Pre-activation $z_j^{[l-1]}$ affects loss $\mathcal{L}$ through its influence on all pre-activations $z_i^{[l]}$ in the next layer:</p>
+          $$\delta_j^{[l-1]} = \frac{\partial \mathcal{L}}{\partial z_j^{[l-1]}} = \sum_{i=1}^{n^{[l]}} \frac{\partial \mathcal{L}}{\partial z_i^{[l]}} \frac{\partial z_i^{[l]}}{\partial a_j^{[l-1]}} \frac{\partial a_j^{[l-1]}}{\partial z_j^{[l-1]}}$$
+          <p>Since $z_i^{[l]} = \sum_{k} W_{ik}^{[l]} a_k^{[l-1]} + b_i^{[l]}$, we have $\frac{\partial z_i^{[l]}}{\partial a_j^{[l-1]}} = W_{ij}^{[l]}$. Also $\frac{\partial a_j^{[l-1]}}{\partial z_j^{[l-1]}} = g'(z_j^{[l-1]})$.</p>
+          $$\delta_j^{[l-1]} = \left( \sum_{i=1}^{n^{[l]}} \delta_i^{[l]} W_{ij}^{[l]} \right) g'(z_j^{[l-1]})$$
+          <p>In compact matrix notation:</p>
+          $$\mathbf{\delta^{[l-1]} = \left( (W^{[l]})^T \delta^{[l]} \right) \odot g'(z^{[l-1]})}$$
+
+          <br>
+          <h4>Equation BP3: Gradient with Respect to Weights $W^{[l]}$</h4>
+          <p>By the chain rule:</p>
+          $$\frac{\partial \mathcal{L}}{\partial W_{ij}^{[l]}} = \frac{\partial \mathcal{L}}{\partial z_i^{[l]}} \frac{\partial z_i^{[l]}}{\partial W_{ij}^{[l]}} = \delta_i^{[l]} a_j^{[l-1]}$$
+          <p>Expressed as an outer product of vectors:</p>
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial W^{[l]}} = \delta^{[l]} (a^{[l-1]})^T \in \mathbb{R}^{n^{[l]} \times n^{[l-1]}}}$$
+
+          <br>
+          <h4>Equation BP4: Gradient with Respect to Biases $b^{[l]}$</h4>
+          <p>Since $\frac{\partial z_i^{[l]}}{\partial b_i^{[l]}} = 1$:</p>
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial b^{[l]}} = \delta^{[l]} \in \mathbb{R}^{n^{[l]} \times 1}}$$
+        </div>
+
+        <h2>3. Vectorized Mini-Batch Equations (Batch Size $B$)</h2>
+        <div class="math-box">
+          <h4>Matrix Form Across All $B$ Samples in a Batch:</h4>
+          $$\mathbf{\Delta^{[L]} = \nabla_{A^{[L]}} \mathcal{L} \odot g'(Z^{[L]}) \quad (n^{[L]} \times B)}$$
+          $$\mathbf{\Delta^{[l-1]} = \left( (W^{[l]})^T \Delta^{[l]} \right) \odot g'(Z^{[l-1]}) \quad (n^{[l-1]} \times B)}$$
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial W^{[l]}} = \frac{1}{B} \Delta^{[l]} (A^{[l-1]})^T \quad (n^{[l]} \times n^{[l-1]})}$$
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial b^{[l]}} = \frac{1}{B} \sum_{\text{cols}} \Delta^{[l]} \quad (n^{[l]} \times 1)}$$
+          <p>Notice the transpose $(A^{[l-1]})^T$: This matrix multiplication automatically computes the outer product of each sample's error and previous activation, summing them across the batch in parallel!</p>
+        </div>
+      </section>
+    
+      <!-- TAB 5: WORKED TOY MLP NUMERICAL WALKTHROUGH -->
+      <section id="tab-numerical" class="tab-section">
+        <h1>Toy MLP Walkthrough: Exact Forward & Backward Math</h1>
+        <p class="section-subtitle">A complete 2-input, 2-hidden, 1-output neural network worked out step-by-step with real numbers.</p>
+
+        <div class="first-principles">
+          <h4>🧮 Why Work Out Backprop by Hand?</h4>
+          <p>Every ML engineer relies on PyTorch's <code>loss.backward()</code>. But in top-tier interviews (Google, OpenAI, Meta), candidates are routinely asked to trace gradient flow through concrete numbers to test whether they truly understand intermediate caching, matrix shapes, and local derivatives.</p>
+        </div>
+
+        <h2>1. Network Architecture & Initial Parameters</h2>
+        <div class="example-box">
+          <h4>Network Architecture:</h4>
+          <ul>
+            <li><strong>Input Layer:</strong> 2 features $x_1 = 0.05, \; x_2 = 0.10$.</li>
+            <li><strong>Hidden Layer:</strong> 2 neurons $h_1, h_2$ with Sigmoid activation $\sigma(z) = \frac{1}{1 + e^{-z}}$.</li>
+            <li><strong>Output Layer:</strong> 1 neuron $o_1$ with Sigmoid activation. Target label $y = 0.01$.</li>
+            <li><strong>Loss Function:</strong> Mean Squared Error $\mathcal{L} = \frac{1}{2}(\hat{y} - y)^2$.</li>
+            <li><strong>Learning Rate:</strong> $\eta = 0.5$.</li>
+          </ul>
+
+          <p><strong>Initial Weights & Biases:</strong></p>
+          <ul>
+            <li>Hidden layer weights: $W^{[1]} = \begin{bmatrix} w_{11} & w_{12} \\ w_{21} & w_{22} \end{bmatrix} = \begin{bmatrix} 0.15 & 0.20 \\ 0.25 & 0.30 \end{bmatrix}$, Biases $b^{[1]} = \begin{bmatrix} 0.35 \\ 0.35 \end{bmatrix}$</li>
+            <li>Output layer weights: $W^{[2]} = \begin{bmatrix} w_{31} & w_{32} \end{bmatrix} = \begin{bmatrix} 0.40 & 0.45 \end{bmatrix}$, Bias $b^{[2]} = 0.60$</li>
+          </ul>
+        </div>
+
+        <h2>2. Step-by-Step Forward Pass</h2>
+        <div class="deep-dive">
+          <h4>A. Compute Hidden Layer Pre-activations & Activations:</h4>
+          $$z_1^{[1]} = w_{11} x_1 + w_{12} x_2 + b_1^{[1]} = (0.15 \times 0.05) + (0.20 \times 0.10) + 0.35 = 0.0075 + 0.020 + 0.35 = \mathbf{0.3775}$$
+          $$a_1^{[1]} = \sigma(z_1^{[1]}) = \frac{1}{1 + e^{-0.3775}} \approx \mathbf{0.5932699}$$
+          <br>
+          $$z_2^{[1]} = w_{21} x_1 + w_{22} x_2 + b_2^{[1]} = (0.25 \times 0.05) + (0.30 \times 0.10) + 0.35 = 0.0125 + 0.030 + 0.35 = \mathbf{0.3925}$$
+          $$a_2^{[1]} = \sigma(z_2^{[1]}) = \frac{1}{1 + e^{-0.3925}} \approx \mathbf{0.5968844}$$
+
+          <br>
+          <h4>B. Compute Output Layer Pre-activation & Final Prediction:</h4>
+          $$z^{[2]} = w_{31} a_1^{[1]} + w_{32} a_2^{[1]} + b^{[2]} = (0.40 \times 0.5932699) + (0.45 \times 0.5968844) + 0.60$$
+          $$z^{[2]} = 0.237308 + 0.268598 + 0.60 = \mathbf{1.105906}$$
+          $$\hat{y} = a^{[2]} = \sigma(z^{[2]}) = \frac{1}{1 + e^{-1.105906}} \approx \mathbf{0.7513651}$$
+
+          <br>
+          <h4>C. Compute Total Loss:</h4>
+          $$\mathcal{L} = \frac{1}{2}(\hat{y} - y)^2 = \frac{1}{2}(0.7513651 - 0.01)^2 = \frac{1}{2}(0.7413651)^2 \approx \mathbf{0.274811}$$
+        </div>
+
+        <h2>3. Step-by-Step Backward Pass</h2>
+        <div class="deep-dive">
+          <h4>A. Output Layer Gradient:</h4>
+          <p>Compute error term $\delta^{[2]} = \frac{\partial \mathcal{L}}{\partial z^{[2]}}$:</p>
+          $$\delta^{[2]} = \frac{\partial \mathcal{L}}{\partial \hat{y}} \cdot \frac{\partial \hat{y}}{\partial z^{[2]}} = (\hat{y} - y) \cdot \hat{y}(1 - \hat{y})$$
+          $$\delta^{[2]} = (0.7513651 - 0.01) \times 0.7513651 \times (1 - 0.7513651) = 0.7413651 \times 0.7513651 \times 0.2486349 \approx \mathbf{0.1384985}$$
+
+          <p><strong>Gradients for Output Weights $w_{31}$ and $w_{32}$:</strong></p>
+          $$\frac{\partial \mathcal{L}}{\partial w_{31}} = \delta^{[2]} \cdot a_1^{[1]} = 0.1384985 \times 0.5932699 \approx \mathbf{0.082167}$$
+          $$\frac{\partial \mathcal{L}}{\partial w_{32}} = \delta^{[2]} \cdot a_2^{[1]} = 0.1384985 \times 0.5968844 \approx \mathbf{0.082668}$$
+          $$\frac{\partial \mathcal{L}}{\partial b^{[2]}} = \delta^{[2]} \approx \mathbf{0.138499}$$
+
+          <br>
+          <h4>B. Hidden Layer Gradients:</h4>
+          <p>Propagate error backwards to hidden neuron $h_1$:</p>
+          $$\delta_1^{[1]} = (\delta^{[2]} \cdot w_{31}) \cdot a_1^{[1]}(1 - a_1^{[1]}) = (0.1384985 \times 0.40) \times 0.5932699 \times (1 - 0.5932699)$$
+          $$\delta_1^{[1]} = 0.0553994 \times 0.2413007 \approx \mathbf{0.013368}$$
+
+          <p>Propagate error backwards to hidden neuron $h_2$:</p>
+          $$\delta_2^{[1]} = (\delta^{[2]} \cdot w_{32}) \cdot a_2^{[1]}(1 - a_2^{[1]}) = (0.1384985 \times 0.45) \times 0.5968844 \times (1 - 0.5968844)$$
+          $$\delta_2^{[1]} = 0.0623243 \times 0.2406132 \approx \mathbf{0.014996}$$
+
+          <p><strong>Gradients for Input-to-Hidden Weights:</strong></p>
+          $$\frac{\partial \mathcal{L}}{\partial w_{11}} = \delta_1^{[1]} \cdot x_1 = 0.013368 \times 0.05 = \mathbf{0.0006684}$$
+          $$\frac{\partial \mathcal{L}}{\partial w_{12}} = \delta_1^{[1]} \cdot x_2 = 0.013368 \times 0.10 = \mathbf{0.0013368}$$
+          $$\frac{\partial \mathcal{L}}{\partial w_{21}} = \delta_2^{[1]} \cdot x_1 = 0.014996 \times 0.05 = \mathbf{0.0007498}$$
+          $$\frac{\partial \mathcal{L}}{\partial w_{22}} = \delta_2^{[1]} \cdot x_2 = 0.014996 \times 0.10 = \mathbf{0.0014996}$$
+        </div>
+
+        <h2>4. Parameter Updates (SGD with $\eta = 0.5$)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Parameter</th><th>Old Value</th><th>Gradient $\frac{\partial \mathcal{L}}{\partial \theta}$</th><th>Update Formula $w \leftarrow w - \eta \nabla$</th><th>New Value</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>$w_{31}$</td><td>0.4000</td><td>+0.082167</td><td>$0.40 - (0.5 \times 0.082167)$</td><td><strong>0.3589</strong></td></tr>
+              <tr><td>$w_{32}$</td><td>0.4500</td><td>+0.082668</td><td>$0.45 - (0.5 \times 0.082668)$</td><td><strong>0.4087</strong></td></tr>
+              <tr><td>$b^{[2]}$</td><td>0.6000</td><td>+0.138499</td><td>$0.60 - (0.5 \times 0.138499)$</td><td><strong>0.5308</strong></td></tr>
+              <tr><td>$w_{11}$</td><td>0.1500</td><td>+0.000668</td><td>$0.15 - (0.5 \times 0.000668)$</td><td><strong>0.1497</strong></td></tr>
+              <tr><td>$w_{12}$</td><td>0.2000</td><td>+0.001337</td><td>$0.20 - (0.5 \times 0.001337)$</td><td><strong>0.1993</strong></td></tr>
+              <tr><td>$w_{21}$</td><td>0.2500</td><td>+0.000750</td><td>$0.25 - (0.5 \times 0.000750)$</td><td><strong>0.2496</strong></td></tr>
+              <tr><td>$w_{22}$</td><td>0.3000</td><td>+0.001500</td><td>$0.30 - (0.5 \times 0.001500)$</td><td><strong>0.2993</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 6: WEIGHT INITIALIZATION THEORY -->
+      <section id="tab-init" class="tab-section">
+        <h1>Weight Initialization: Xavier/Glorot & He/Kaiming Proofs</h1>
+        <p class="section-subtitle">Why zero initialization fails, variance preservation physics, and math derivations for Sigmoid vs. ReLU.</p>
+
+        <div class="first-principles">
+          <h4>🎲 The Goldilocks Dilemma of Initialization</h4>
+          <p>When training a 50-layer network, what happens if initial weights are chosen incorrectly?</p>
+          <ul>
+            <li><strong>Weights too small ($\text{Var}(W) \ll 1$):</strong> Activations shrink exponentially with depth ($a^{[l]} \to 0$), and gradients vanish ($g^{[l]} \to 0$). The network refuses to learn.</li>
+            <li><strong>Weights too large ($\text{Var}(W) \gg 1$):</strong> Activations explode exponentially ($a^{[l]} \to \pm\infty$), gradients explode to <code>NaN</code>, or activations saturate Sigmoid/Tanh neurons immediately.</li>
+          </ul>
+          <p><strong>Goal:</strong> We want the <strong>variance of activations and gradients to remain constant</strong> across all layers from input to output: $\text{Var}(a^{[l]}) = \text{Var}(a^{[l-1]})$.</p>
+        </div>
+
+        <h2>1. Why Zero Initialization Completely Breaks Neural Networks</h2>
+        <div class="interview-alert">
+          <h4>🚨 The Symmetry Breaking Catastrophe:</h4>
+          <p>If you initialize all weights to zero ($W_{ij}^{[l]} = 0$):</p>
+          <ol>
+            <li>In the forward pass, for every neuron $k$ in layer $l$: $z_k^{[l]} = \sum_j 0 \cdot a_j + 0 = 0 \implies a_k^{[l]} = g(0)$. Every single neuron in the layer outputs the exact same value.</li>
+            <li>In the backward pass: $\frac{\partial \mathcal{L}}{\partial W_{ik}^{[l]}} = \delta_i^{[l]} a_k^{[l-1]}$. Because all neurons have identical errors and identical activations, <strong>all weights receive the exact same gradient update</strong>.</li>
+            <li>After training for 100 epochs, all neurons remain 100% identical! The entire layer acts as a single neuron.</li>
+          </ol>
+          <p><em>Conclusion:</em> Initial weights must be random numbers to <strong>break symmetry</strong>!</p>
+        </div>
+
+        <h2>2. Mathematical Derivation: Xavier / Glorot Initialization (2010)</h2>
+        <div class="deep-dive">
+          <h4>Derivation for Linear / Tanh Activations (Xavier Glorot & Yoshua Bengio):</h4>
+          <p>Consider linear pre-activation for neuron $i$ with $n_{\text{in}}$ inputs:</p>
+          $$z_i = \sum_{j=1}^{n_{\text{in}}} W_{ij} x_j$$
+          <p>Assume $W_{ij}$ and $x_j$ are independent random variables with zero mean ($\mathbb{E}[W] = 0, \mathbb{E}[x] = 0$).</p>
+          <p>The variance of the product of two independent zero-mean variables is $\text{Var}(W x) = \text{Var}(W)\text{Var}(x)$. Since the $n_{\text{in}}$ terms are independent:</p>
+          $$\text{Var}(z_i) = \sum_{j=1}^{n_{\text{in}}} \text{Var}(W_{ij} x_j) = n_{\text{in}} \text{Var}(W) \text{Var}(x)$$
+          <p>To preserve signal scale forward through the layer ($\text{Var}(z_i) = \text{Var}(x)$), we must set:</p>
+          $$\mathbf{\text{Var}(W) = \frac{1}{n_{\text{in}}}}$$
+          
+          <p>Now consider the backward pass propagating gradient $\Delta_j^{[l-1]} = \sum_{i=1}^{n_{\text{out}}} W_{ij} \Delta_i^{[l]}$:</p>
+          $$\text{Var}(\Delta^{[l-1]}) = n_{\text{out}} \text{Var}(W) \text{Var}(\Delta^{[l]})$$
+          <p>To preserve gradient scale backward through the layer ($\text{Var}(\Delta^{[l-1]}) = \text{Var}(\Delta^{[l]})$), we must set:</p>
+          $$\mathbf{\text{Var}(W) = \frac{1}{n_{\text{out}}}}$$
+
+          <p>Since $n_{\text{in}} \ne n_{\text{out}}$ in general, Glorot and Bengio took the harmonic mean of both constraints:</p>
+          $$\mathbf{\text{Var}(W) = \frac{2}{n_{\text{in}} + n_{\text{out}}}}$$
+          <ul>
+            <li><strong>Glorot Normal:</strong> $W \sim \mathcal{N}\left(0, \sqrt{\frac{2}{n_{\text{in}} + n_{\text{out}}}}\right)$</li>
+            <li><strong>Glorot Uniform:</strong> For $U(-a, a)$, variance is $\frac{a^2}{3} \implies a = \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}$. $W \sim U\left(-\sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}, \sqrt{\frac{6}{n_{\text{in}} + n_{\text{out}}}}\right)$.</li>
+          </ul>
+        </div>
+
+        <h2>3. Mathematical Derivation: He / Kaiming Initialization (2015) for ReLU</h2>
+        <div class="deep-dive">
+          <h4>Why Xavier Fails with ReLU (Kaiming He et al.):</h4>
+          <p>Xavier initialization assumes activations are symmetric around zero with $\mathbb{E}[g(z)] = 0$. But $\text{ReLU}(z) = \max(0, z)$ zeroes out the entire negative half-plane!</p>
+          <p>If $z_j \sim \mathcal{N}(0, \sigma^2)$ is symmetric around 0, then $\text{ReLU}(z)$ has probability $0.5$ of being 0 and probability $0.5$ of being $z > 0$:</p>
+          $$\mathbb{E}[a_j^2] = \frac{1}{2} \mathbb{E}[z_j^2] = \frac{1}{2} \text{Var}(z_j)$$
+          <p>Substituting into the variance equation for the next layer:</p>
+          $$\text{Var}(z_i) = n_{\text{in}} \text{Var}(W) \mathbb{E}[a_j^2] = n_{\text{in}} \text{Var}(W) \left( \frac{1}{2} \text{Var}(z) \right) = \mathbf{\frac{1}{2} n_{\text{in}} \text{Var}(W) \text{Var}(z)}$$
+          <p>If you use Xavier ($\text{Var}(W) = \frac{1}{n_{\text{in}}}$), the variance drops by half in every single layer: $\text{Var}(a^{[l]}) = \left(\frac{1}{2}\right)^l \text{Var}(x)$. In a 30-layer ResNet, activation variance shrinks by $2^{-30} \approx 10^{-9}$!</p>
+          <p>To cancel the factor of $\frac{1}{2}$, we must double the variance:</p>
+          $$\mathbf{\text{Var}(W) = \frac{2}{n_{\text{in}}}}$$
+          <ul>
+            <li><strong>He Normal (Kaiming):</strong> $W \sim \mathcal{N}\left(0, \sqrt{\frac{2}{n_{\text{in}}}}\right)$ (Default for all modern ReLU, LeakyReLU, and ConvNet layers).</li>
+            <li><strong>He Uniform:</strong> $W \sim U\left(-\sqrt{\frac{6}{n_{\text{in}}}}, \sqrt{\frac{6}{n_{\text{in}}}}\right)$.</li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 7: LOSS FUNCTIONS FOR DEEP LEARNING -->
+      <section id="tab-loss" class="tab-section">
+        <h1>Loss Functions: Softmax Gradient Proof & Modern Losses</h1>
+        <p class="section-subtitle">Categorical cross-entropy calculus, focal loss for extreme imbalance, and metric learning loss formulations.</p>
+
+        <div class="first-principles">
+          <h4>🎯 The Objective of Deep Learning</h4>
+          <p>A loss function measures the discrepancy between predicted probability distribution $\hat{y}$ and true ground truth distribution $y$. The choice of loss dictates the gradient landscape over which backpropagation navigates.</p>
+        </div>
+
+        <h2>1. The Elegant Gradient Proof: Softmax + Cross-Entropy Loss</h2>
+        <div class="deep-dive">
+          <h4>Theorem: The derivative of Cross-Entropy loss with Softmax output simplifies to $(\hat{y}_i - y_i)$.</h4>
+          <p>Let pre-activations (logits) be $z = [z_1, z_2, \dots, z_C]^T$. The Softmax probability for class $i$ is:</p>
+          $$\hat{y}_i = \frac{e^{z_i}}{\sum_{k=1}^C e^{z_k}}$$
+          <p>The Categorical Cross-Entropy loss for one-hot label $y$ ($y_c = 1$ for true class $c$, $0$ otherwise) is:</p>
+          $$\mathcal{L} = -\sum_{k=1}^C y_k \ln \hat{y}_k = -\ln \hat{y}_c$$
+
+          <p><strong>Step 1: Compute the Jacobian of Softmax $\frac{\partial \hat{y}_i}{\partial z_j}$ using the quotient rule:</strong></p>
+          <p><strong>Case 1 ($i = j$):</strong></p>
+          $$\frac{\partial \hat{y}_i}{\partial z_i} = \frac{e^{z_i} \sum e^{z_k} - e^{z_i} e^{z_i}}{(\sum e^{z_k})^2} = \frac{e^{z_i}}{\sum e^{z_k}} - \left(\frac{e^{z_i}}{\sum e^{z_k}}\right)^2 = \mathbf{\hat{y}_i(1 - \hat{y}_i)}$$
+
+          <p><strong>Case 2 ($i \ne j$):</strong></p>
+          $$\frac{\partial \hat{y}_i}{\partial z_j} = \frac{0 - e^{z_i} e^{z_j}}{(\sum e^{z_k})^2} = -\frac{e^{z_i}}{\sum e^{z_k}} \frac{e^{z_j}}{\sum e^{z_k}} = \mathbf{-\hat{y}_i \hat{y}_j}$$
+
+          <p><strong>Step 2: Apply the Chain Rule to Loss $\mathcal{L}$:</strong></p>
+          $$\frac{\partial \mathcal{L}}{\partial z_j} = \sum_{i=1}^C \frac{\partial \mathcal{L}}{\partial \hat{y}_i} \frac{\partial \hat{y}_i}{\partial z_j} = \sum_{i=1}^C \left(-\frac{y_i}{\hat{y}_i}\right) \frac{\partial \hat{y}_i}{\partial z_j}$$
+          $$\frac{\partial \mathcal{L}}{\partial z_j} = -\frac{y_j}{\hat{y}_j}\hat{y}_j(1 - \hat{y}_j) - \sum_{i \ne j} \left(-\frac{y_i}{\hat{y}_i}\right) (-\hat{y}_i \hat{y}_j)$$
+          $$\frac{\partial \mathcal{L}}{\partial z_j} = -y_j(1 - \hat{y}_j) + \sum_{i \ne j} y_i \hat{y}_j = -y_j + y_j \hat{y}_j + \hat{y}_j \sum_{i \ne j} y_i$$
+          $$\frac{\partial \mathcal{L}}{\partial z_j} = -y_j + \hat{y}_j \left( y_j + \sum_{i \ne j} y_i \right) = -y_j + \hat{y}_j \left( \sum_{i=1}^C y_i \right)$$
+          <p>Since one-hot vector probabilities sum to 1 ($\sum_{i=1}^C y_i = 1$):</p>
+          $$\mathbf{\frac{\partial \mathcal{L}}{\partial z_j} = \hat{y}_j - y_j} \quad \blacksquare$$
+          <p><em>The entire complex quotient and logarithm algebra collapses into simple residual error $(\hat{y}_j - y_j)$!</em></p>
+        </div>
+
+        <h2>2. Focal Loss for Extreme Class Imbalance (Lin et al., RetinaNet)</h2>
+        <div class="math-box">
+          <h4>The Problem with Standard Cross-Entropy:</h4>
+          <p>In dense object detection (e.g. YOLO, RetinaNet), background candidate boxes outnumber foreground target objects $100,000 : 1$. Even if the model assigns a small loss $0.05$ to each easy background box, the sum of 100,000 easy background losses completely drowns the gradient signal from rare objects.</p>
+          
+          <h4>The Focal Loss Formula:</h4>
+          $$\mathbf{\text{FL}(p_t) = -\alpha_t (1 - p_t)^\gamma \ln(p_t)}$$
+          <ul>
+            <li>$p_t$: Predicted probability of the correct class.</li>
+            <li>$(1 - p_t)^\gamma$: <strong>Modulating factor</strong> ($\gamma \ge 0$, typically $\gamma = 2.0$).</li>
+            <li>$\alpha_t$: Class weighting factor.</li>
+          </ul>
+          <p><strong>How It Works:</strong> If a sample is well-classified ($p_t = 0.99$), the modulating factor is $(1 - 0.99)^2 = 0.0001$, scaling the loss down by <strong>10,000-fold</strong>! The model spends 99.9% of its gradient energy learning hard, ambiguous edge cases.</p>
+        </div>
+
+        <h2>3. Regression Loss: MSE vs. MAE vs. Smooth L1 / Huber Loss</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Loss Function</th><th>Formula</th><th>Gradient Behavior</th><th>Outlier Robustness</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>MSE ($L_2$)</strong></td><td>$\frac{1}{2}(y - \hat{y})^2$</td><td>Linear with error ($y - \hat{y}$). Huge gradient for large errors.</td><td>Very Sensitive (squaring magnifies outliers).</td></tr>
+              <tr><td><strong>MAE ($L_1$)</strong></td><td>$|y - \hat{y}|$</td><td>Constant gradient $\pm 1$. Non-differentiable at 0.</td><td>Robust (linear penalty).</td></tr>
+              <tr><td><strong>Smooth L1 (Huber)</strong></td><td>$$\begin{cases} 0.5(y - \hat{y})^2 & \text{if } |y - \hat{y}| < 1 \\ |y - \hat{y}| - 0.5 & \text{otherwise} \end{cases}$$</td><td>Quadratic and smooth near 0; linear for large errors.</td><td><strong>Best of Both Worlds</strong> (standard in bounding box regression).</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 8: VANISHING & EXPLODING GRADIENTS -->
+      <section id="tab-grad-issues" class="tab-section">
+        <h1>Vanishing & Exploding Gradients: Dynamics & Remedies</h1>
+        <p class="section-subtitle">Jacobian product decay, spectral radius conditions, and gradient clipping mathematics.</p>
+
+        <div class="first-principles">
+          <h4>💥 The Physics of Deep Gradient Propagation</h4>
+          <p>Recall backpropagation equation BP2 for propagating error $\delta$ across $L$ layers:</p>
+          $$\delta^{[1]} = \left( \prod_{l=2}^L (W^{[l]})^T \text{diag}(g'(z^{[l-1]})) \right) \delta^{[L]}$$
+          <p>The gradient at the first layer is the product of $L-1$ weight matrices and activation derivative matrices. By linear algebra:</p>
+          <ul>
+            <li>If the largest eigenvalue (spectral radius) of the transition operator is <strong>less than 1.0</strong>: The product decays exponentially to zero ($O(\lambda^L) \to 0$) &rarr; <strong>Vanishing Gradient</strong>.</li>
+            <li>If the largest eigenvalue is <strong>greater than 1.0</strong>: The product grows exponentially to infinity ($O(\lambda^L) \to \infty$) &rarr; <strong>Exploding Gradient</strong> (produces <code>NaN</code> weights).</li>
+          </ul>
+        </div>
+
+        <h2>1. Gradient Clipping: By Value vs. By Norm</h2>
+        <div class="deep-dive">
+          <h4>A. Gradient Clipping by Value:</h4>
+          $$g_i \leftarrow \max(-c, \min(c, g_i))$$
+          <p><strong>The Flaw:</strong> Clipping each coordinate independently alters the <strong>direction</strong> of the gradient vector, turning a steep descent direction into a distorted diagonal vector!</p>
+
+          <br>
+          <h4>B. Gradient Clipping by Global Norm (Mikolov et al., 2012):</h4>
+          $$\mathbf{g \leftarrow g \cdot \frac{c}{\max(c, \|g\|_2)} = \begin{cases} g & \text{if } \|g\|_2 \le c \\ g \cdot \frac{c}{\|g\|_2} & \text{if } \|g\|_2 > c \end{cases}}$$
+          <p><strong>Why Norm Clipping is Superior:</strong> It scales the length of vector $g$ down to maximum threshold $c$ while <strong>strictly preserving the original direction</strong> in parameter space ($\frac{g}{\|g\|}$ is unchanged)! Standard in PyTorch via <code>torch.nn.utils.clip_grad_norm_</code>.</p>
+        </div>
+
+        <h2>2. Architectural Breakthroughs That Tamed Gradient Instability</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Technique</th><th>Mechanism</th><th>Mathematical Effect</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>ReLU / GELU Activations</strong></td><td>Replaces saturating sigmoids with piece-wise linear functions.</td><td>$g'(z) = 1$ for positive activations; eliminates derivative saturation factor $0.25^L$.</td></tr>
+              <tr><td><strong>He / Xavier Initialization</strong></td><td>Scales initial weight variances with layer fan-in.</td><td>Maintains spectral norm of weight matrices near 1.0 at initialization.</td></tr>
+              <tr><td><strong>Residual Connections (ResNet)</strong></td><td>Adds identity skip connection: $x^{[l]} = F(x^{[l-1]}) + x^{[l-1]}$.</td><td>Provides an uninterrupted "gradient highway": $\frac{\partial \mathcal{L}}{\partial x^{[l-1]}} = \frac{\partial \mathcal{L}}{\partial x^{[l]}}\left(1 + \frac{\partial F}{\partial x^{[l-1]}}\right)$. The "$+1$" term guarantees gradients flow back even if $\frac{\partial F}{\partial x} \approx 0$.</td></tr>
+              <tr><td><strong>Batch / Layer Normalization</strong></td><td>Normalizes intermediate channel activations to zero mean, unit variance.</td><td>Bounds pre-activations, preventing neurons from drifting into saturation regions.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    
+      <!-- TAB 9: UNIVERSAL APPROXIMATION & DEPTH VS WIDTH -->
+      <section id="tab-expressivity" class="tab-section">
+        <h1>Expressivity: Universal Approximation & Depth vs. Width</h1>
+        <p class="section-subtitle">Cybenko's theorem, exponential space-folding geometry, and why deep networks out-compute shallow ones.</p>
+
+        <div class="first-principles">
+          <h4>🏛️ The Universal Approximation Theorem (Cybenko 1989, Hornik 1991)</h4>
+          <p><strong>The Theorem:</strong> Any continuous function $f: [0, 1]^D \to \mathbb{R}$ on a compact subset of $\mathbb{R}^D$ can be approximated to arbitrary accuracy $\epsilon > 0$ by a standard feedforward neural network with <strong>a single hidden layer</strong> and a non-linear activation function $\sigma$:</p>
+          $$|F(x) - f(x)| < \epsilon \quad \text{where } F(x) = \sum_{i=1}^M \alpha_i \sigma(w_i^T x + b_i)$$
+          
+          <h4>The Giant Catch:</h4>
+          <p>The theorem is an <em>existence proof</em>, not a practical engineering recipe:</p>
+          <ul>
+            <li>It does <strong>not</strong> say how to learn the weights (gradient descent is not guaranteed to find them).</li>
+            <li>It does <strong>not</strong> guarantee efficiency: Approximating even simple functions with a single hidden layer may require an <strong>exponentially large number of hidden neurons</strong> ($M = O(2^D)$), requiring infinite memory!</li>
+          </ul>
+        </div>
+
+        <h2>1. Why Deep Networks Beat Shallow Networks: Space Folding Geometry</h2>
+        <div class="deep-dive">
+          <h4>Mont&uacute;far et al. (2014) & Telgarsky (2016) Theorems on Depth:</h4>
+          <p>Consider a neural network using piece-wise linear ReLU activations. Every hidden layer with $n$ neurons folds the input space along hyperplanes:</p>
+          <ul>
+            <li>A <strong>shallow network</strong> with 1 hidden layer of $M$ neurons can divide the input space into at most:
+              $$\text{Max Linear Regions (Shallow)} = \sum_{j=0}^D \binom{M}{j} = O(M^D)$$
+            </li>
+            <li>A <strong>deep network</strong> with $L$ hidden layers, each of width $W$, can fold the space repeatedly like origami:
+              $$\text{Max Linear Regions (Deep)} = O\left( \left(\frac{W}{D}\right)^{(L-1)D} W^D \right) = \mathbf{O(W^{L \cdot D})}$$
+            </li>
+          </ul>
+          <p><strong>The Exponential Advantage:</strong> Depth creates an <strong>exponential number of piecewise linear regions</strong> using a polynomial number of parameters! A 100-layer network with 100 neurons per layer can create vastly more complex functional surfaces than a single-layer network with 10,000 neurons.</p>
+        </div>
+
+        <h2>2. Compositional Hierarchy: Why Nature Is Deep</h2>
+        <div class="interview-alert">
+          <h4>💡 The Physics of the Real World:</h4>
+          <p>The physical universe is hierarchical: Quarks assemble into atoms, atoms into molecules, molecules into cells, cells into organs, and organs into organisms. Human language and vision follow the exact same compositional structure:</p>
+          <ul>
+            <li><strong>Layer 1:</strong> Gabor-like directional edge detectors and color blobs.</li>
+            <li><strong>Layer 2:</strong> Textures, corners, and contours.</li>
+            <li><strong>Layer 3:</strong> Object motifs (wheels, eyes, noses).</li>
+            <li><strong>Final Layers:</strong> Semantic entities (dogs, cars, humans).</li>
+          </ul>
+          <p>A deep network mirrors the natural compositional structure of reality, enabling massive feature reuse across concepts.</p>
+        </div>
+      </section>
+    
+      <!-- TAB 10: PRODUCTION ENGINEERING & DEBUGGING -->
+      <section id="tab-production" class="tab-section">
+        <h1>Production Engineering: Debugging & Training Neural Nets</h1>
+        <p class="section-subtitle">Andrej Karpathy's battle-tested training recipe, numerical gradient checking, and dead neuron diagnosis.</p>
+
+        <div class="first-principles">
+          <h4>🛡️ The "Silent Failure" Nature of Neural Networks</h4>
+          <p>In traditional software engineering, a syntax error or logic flaw throws an exception and crashes immediately. In deep learning, <strong>broken models run without errors</strong>: they iterate for 24 hours, consume thousands of dollars in cloud compute, and output mediocre loss curves without ever crashing.</p>
+          <p>To succeed as a Deep Learning Engineer, you must know how to systematically isolate and debug neural networks.</p>
+        </div>
+
+        <h2>1. Andrej Karpathy's 5-Step Recipe for Training Neural Nets</h2>
+        <div class="deep-dive">
+          <ol>
+            <li><strong>Step 1: Inspect the Raw Data Thoroughly:</strong>
+              <br>Scan hundreds of raw examples before writing model code. Identify label noise, class imbalance, corrupt bounding boxes, data leakage between train/test splits, and verify preprocessing scalers.
+            </li>
+            <br>
+            <li><strong>Step 2: Set Up a Leak-Free Skeleton & Verify Initial Loss:</strong>
+              <br>Before training, check that initial loss matches theoretical expectation:
+              <ul>
+                <li>For a $C$-class classification problem with random weights, initial loss should be <strong>exactly</strong> $-\ln(1/C) = \ln(C)$. (e.g. for ImageNet $C=1000$, $\mathcal{L}_{\text{init}} \approx \ln(1000) \approx 6.91$). If initial loss is 25.0, your initialization is broken!</li>
+              </ul>
+            </li>
+            <br>
+            <li><strong>Step 3: Overfit a Tiny Batch (The Mandatory Sanity Test):</strong>
+              <br>Train your model on just <strong>10 to 20 samples</strong> without regularization.
+              <br><strong>Requirement:</strong> The model must drive loss to near zero ($\mathcal{L} < 0.001$) and reach $100\%$ accuracy within 50 epochs.
+              <br><em>If a model cannot memorize 10 examples, do not proceed!</em> You have a fundamental bug in the loss function, tensor shapes, gradient zeroing, or forward graph.
+            </li>
+            <br>
+            <li><strong>Step 4: Regularize & Prevent Overfitting:</strong>
+              <br>Once the model trains on the full dataset, add regularization: weight decay (AdamW), Dropout, data augmentation, and early stopping.
+            </li>
+            <br>
+            <li><strong>Step 5: Systematically Tune Hyperparameters:</strong>
+              <br>Learning rate is the single most sensitive hyperparameter. Use a learning rate range test (Smith 2017) to find the steepest descent point before instability.
+            </li>
+          </ol>
+        </div>
+
+        <h2>2. Numerical Gradient Checking (Finite Differences)</h2>
+        <div class="math-box">
+          <h4>Verifying Autograd Implementation:</h4>
+          <p>To mathematically verify custom CUDA kernels or autograd functions, compare analytical gradient $\nabla_{\theta} \mathcal{L}$ against the two-sided numerical difference approximation:</p>
+          $$\frac{\partial \mathcal{L}}{\partial \theta_i} \approx \frac{\mathcal{L}(\theta_i + \epsilon) - \mathcal{L}(\theta_i - \epsilon)}{2\epsilon} \quad (\text{typically } \epsilon = 10^{-7})$$
+          <p>Compute the relative error ratio:</p>
+          $$\text{Relative Difference} = \frac{\|\nabla_{\text{analytical}} - \nabla_{\text{numerical}}\|_2}{\|\nabla_{\text{analytical}}\|_2 + \|\nabla_{\text{numerical}}\|_2}$$
+          <ul>
+            <li>$\le 10^{-7}$: Excellent implementation &mdash; mathematically correct.</li>
+            <li>$\approx 10^{-4}$: Suspicious &mdash; check if using float32 instead of double precision float64.</li>
+            <li>$> 10^{-2}$: <strong>Bug in backpropagation logic!</strong></li>
+          </ul>
+        </div>
+      </section>
+    
+      <!-- TAB 11: 25+ FAANG INTERVIEW QUESTIONS -->
+      <section id="tab-interview" class="tab-section">
+        <h1>25+ High-Frequency FAANG Interview Questions: Foundations</h1>
+        <p class="section-subtitle">Real screening and deep architectural questions asked at Google DeepMind, Meta FAIR, OpenAI, and Apple.</p>
+
+        <h2>Part 1: Perceptrons, Activations & Expressivity</h2>
+        <details open>
+          <summary><span>Q1: Why can't a single-layer perceptron solve the XOR problem? How does a multi-layer perceptron fix it?</span> <span class="badge badge-faang">FAANG Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> A single-layer perceptron computes a single linear hyperplane $\mathbf{w}^T \mathbf{x} + b = 0$, which can only separate linearly separable sets. In $\mathbb{R}^2$, the XOR points $(0,1)$ and $(1,0)$ cannot be separated from $(0,0)$ and $(1,1)$ by any straight line.</p>
+            <p>A multi-layer perceptron introduces a non-linear hidden layer that performs a coordinate transformation, projecting the 4 points into a feature space where they become linearly separable by the final layer.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q2: What is the "Dying ReLU" problem, and how do you diagnose and fix it in production?</span> <span class="badge badge-system">Production</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> If a large gradient update shifts a neuron's weights such that pre-activation $z < 0$ for all training samples, $\text{ReLU}(z) = 0$ and $\text{ReLU}'(z) = 0$. The neuron never receives gradient updates and permanently outputs zero.</p>
+            <p><strong>Diagnosis:</strong> Monitor the percentage of zero activations across layers using TensorBoard or Weights & Biases. If $>30\%$ of a layer's activations are permanently 0, neurons are dying.</p>
+            <p><strong>Fixes:</strong> Use smaller learning rates, He (Kaiming) weight initialization, or switch to Leaky ReLU ($\alpha=0.01$), ELU, or GELU.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q3: Why is GELU preferred over ReLU in modern Transformer models (BERT, GPT, ViT)?</span> <span class="badge badge-faang">Transformers</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> GELU (Gaussian Error Linear Unit: $x \Phi(x)$) gates activations based on their value probabilistically: inputs have higher probability of passing through as they increase. Unlike ReLU (which has a hard non-differentiable kink at 0 and zero gradient for all negative values), GELU is smooth everywhere, non-monotonic, and retains small non-zero gradients for slightly negative inputs, creating a smoother loss surface that stabilizes deep Transformer optimization.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q4: Why does a network with only linear activation functions collapse into a single-layer model?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Because matrix multiplication is associative and closed under composition. The composition of $L$ linear transformations $W^{[L]}(W^{[L-1]} \cdots (W^{[1]}x)) = (W^{[L]}W^{[L-1]} \cdots W^{[1]})x = W_{\text{net}}x$ is mathematically identical to a single linear layer with weight matrix $W_{\text{net}}$. Non-linear activations are required to break this linearity.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q5: Explain the Universal Approximation Theorem and its practical limitations.</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Cybenko (1989) and Hornik (1991) proved that a feedforward network with a single hidden layer and non-linear activation can approximate any continuous function on a compact set to arbitrary precision $\epsilon > 0$.</p>
+            <p><strong>Limitations:</strong> It is an existence proof, not a constructibility guarantee. The number of hidden neurons required may scale exponentially with input dimension ($O(2^D)$), making shallow networks computationally intractable compared to deep hierarchical networks.</p>
+          </div>
+        </details>
+
+        <h2>Part 2: Backpropagation & Matrix Calculus</h2>
+        <details>
+          <summary><span>Q6: Derive the gradient of Softmax combined with Categorical Cross-Entropy loss.</span> <span class="badge badge-math">Derivation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Let $\hat{y}_i = \frac{e^{z_i}}{\sum e^{z_k}}$ and $\mathcal{L} = -\sum y_k \ln \hat{y}_k$. The Jacobian of Softmax is $\frac{\partial \hat{y}_i}{\partial z_j} = \hat{y}_i(\mathbb{I}(i=j) - \hat{y}_j)$.</p>
+            <p>By the chain rule: $\frac{\partial \mathcal{L}}{\partial z_j} = \sum_i \left(-\frac{y_i}{\hat{y}_i}\right) \frac{\partial \hat{y}_i}{\partial z_j} = -y_j + \hat{y}_j \sum_i y_i$. Since one-hot probabilities sum to 1 ($\sum y_i = 1$), the gradient simplifies cleanly to: $\mathbf{\frac{\partial \mathcal{L}}{\partial z_j} = \hat{y}_j - y_j}$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q7: What is the memory footprint of backpropagation compared to inference? Why does backprop require so much VRAM?</span> <span class="badge badge-system">Systems / VRAM</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> During inference, activations from layer $l-1$ can be discarded as soon as layer $l$ finishes executing (memory is $O(1)$ with respect to depth).</p>
+            <p>During training, the backward pass requires previous layer activations $a^{[l-1]}$ to compute weight gradients: $\frac{\partial \mathcal{L}}{\partial W^{[l]}} = \delta^{[l]} (a^{[l-1]})^T$. Therefore, <strong>every intermediate activation tensor across all $L$ layers must be cached in GPU VRAM during the forward pass</strong> ($O(L \cdot B)$ memory), which accounts for the vast majority of GPU memory consumption.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q8: What is Activation Checkpointing (Gradient Checkpointing), and what trade-off does it make?</span> <span class="badge badge-system">LLM Training</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Activation Checkpointing drops intermediate activations during the forward pass, keeping only a few checkpoints (e.g. 1 per Transformer block). During the backward pass, it <strong>recomputes the missing activations on-the-fly</strong> from the nearest checkpoint.</p>
+            <p><strong>Trade-off:</strong> Saves $\approx 70-80\%$ of GPU activation memory (enabling 4x larger batch sizes or context lengths), at the cost of $\approx 25-30\%$ extra forward compute time.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q9: Why does element-wise activation derivative multiplication use Hadamard product $\odot$ rather than matrix multiplication?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Because element-wise functions $a_i = g(z_i)$ have a diagonal Jacobian: $\frac{\partial a_i}{\partial z_j} = 0$ for $i \ne j$. Multiplying by a diagonal matrix is computationally identical to element-wise multiplication ($\odot$) with its diagonal vector, running in $O(N)$ time instead of $O(N^2)$.</p>
+          </div>
+        </details>
+
+        <h2>Part 3: Weight Initialization & Gradient Dynamics</h2>
+        <details>
+          <summary><span>Q10: Why does initializing all weights to zero completely prevent a network from learning?</span> <span class="badge badge-faang">Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Symmetry problem. If all weights are 0, every neuron in a given hidden layer computes identical pre-activation $z = 0$, outputs identical activation $a = g(0)$, and receives identical error gradients $\delta$. All weights in that layer update by the exact same amount, meaning all neurons remain identical forever, reducing the layer to a single effective neuron.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q11: Derive why He (Kaiming) initialization uses $\text{Var}(W) = \frac{2}{n_{\text{in}}}$ while Xavier uses $\frac{1}{n_{\text{in}}}$.</span> <span class="badge badge-math">Derivation</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Xavier assumes activations are zero-mean and symmetric, so $\mathbb{E}[a^2] = \text{Var}(z)$, leading to $\text{Var}(W) = \frac{1}{n_{\text{in}}}$.</p>
+            <p>ReLU sets all negative inputs to zero, cutting the active variance in half: $\mathbb{E}[a^2] = \frac{1}{2}\text{Var}(z)$. Therefore, the output variance is $\text{Var}(z_{\text{out}}) = \frac{1}{2} n_{\text{in}} \text{Var}(W) \text{Var}(z_{\text{in}})$. To keep $\text{Var}(z_{\text{out}}) = \text{Var}(z_{\text{in}})$, $\text{Var}(W)$ must be scaled up by 2: $\mathbf{\text{Var}(W) = \frac{2}{n_{\text{in}}}}$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q12: What causes gradients to vanish or explode in deep architectures?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In an $L$-layer network, the gradient at layer 1 involves a product of $L$ Jacobian matrices: $\delta^{[1]} \propto \prod_{l=1}^L W^{[l]} g'(z^{[l]})$. If the singular values of these transition matrices are predominantly $<1$, the product vanishes exponentially ($O(\lambda^L) \to 0$). If they are predominantly $>1$, the product explodes exponentially ($O(\lambda^L) \to \infty$).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q13: Why is gradient clipping by norm preferred over gradient clipping by value?</span> <span class="badge badge-system">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Clipping by value ($g_i \leftarrow \text{clip}(g_i, -c, c)$) truncates each component independently, which changes the <em>direction</em> of the gradient vector in parameter space. Clipping by global norm ($g \leftarrow g \frac{c}{\max(c, \|g\|)}$) rescales the vector magnitude while <strong>preserving its exact original direction</strong>.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q14: How does a residual connection in ResNet solve the vanishing gradient problem?</span> <span class="badge badge-faang">ResNet</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> A residual block computes $x^{[l+1]} = x^{[l]} + F(x^{[l]})$. By the chain rule: $\frac{\partial \mathcal{L}}{\partial x^{[l]}} = \frac{\partial \mathcal{L}}{\partial x^{[l+1]}} \left( \mathbf{I} + \frac{\partial F}{\partial x^{[l]}} \right)$. The identity matrix term $\mathbf{I}$ guarantees that gradient flows directly back to earlier layers even if the residual sub-network derivative $\frac{\partial F}{\partial x}$ vanishes to 0.</p>
+          </div>
+        </details>
+
+        <h2>Part 4: Production Debugging & Loss Functions</h2>
+        <details>
+          <summary><span>Q15: When would you choose Focal Loss over Cross-Entropy Loss?</span> <span class="badge badge-system">Imbalance</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> In tasks with extreme class imbalance (e.g. 1 foreground object vs 100,000 background candidate boxes in object detection, or 0.01% click-through rate prediction). Focal Loss down-weights well-classified easy examples by $(1-p_t)^\gamma$, forcing the gradient to focus on hard, ambiguous examples.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q16: Why is Smooth L1 (Huber) loss preferred over MSE for bounding box regression?</span> <span class="badge badge-faang">CV Core</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> MSE squares the error, producing massive gradients for large prediction mistakes (outliers) that destabilize early training. MAE has constant gradients $\pm 1$, causing jitter near the minimum. Smooth L1 is quadratic near 0 (smooth, stable convergence) and linear for large errors (robust to outliers).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q17: Describe Andrej Karpathy's sanity check for training a new neural network architecture.</span> <span class="badge badge-system">Debugging</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Take a tiny batch of 10-20 training samples, disable all regularization (dropout, weight decay, data augmentation), and train the model. It must be able to overfit that batch to near-zero loss ($100\%$ accuracy). If it cannot, there is a guaranteed structural bug in your code (e.g. forgot <code>optimizer.zero_grad()</code>, wrong loss reduction, flipped label tensors).</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q18: What is the expected initial loss of a classification model with 10 classes and random weights?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> With random weights, the model assigns equal probability $p = 1/10 = 0.1$ to each class. Cross-Entropy loss is $-\ln(0.1) = \ln(10) \approx \mathbf{2.302}$. If the initial loss is 15.0 or 0.1, the initialization is corrupted.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q19: What is numerical gradient checking and why is central difference used over forward difference?</span> <span class="badge badge-math">Math</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Numerical gradient checking compares analytical autograd gradients to finite differences. Central difference $\frac{f(\theta+\epsilon) - f(\theta-\epsilon)}{2\epsilon}$ has error $O(\epsilon^2)$ (via Taylor series cancellation of first-order terms), whereas forward difference $\frac{f(\theta+\epsilon) - f(\theta)}{\epsilon}$ has much higher error $O(\epsilon)$.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q20: Why do we zero out gradients (<code>optimizer.zero_grad()</code>) in PyTorch before each backward pass?</span> <span class="badge badge-system">PyTorch</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> PyTorch accumulates gradients by default (<code>param.grad += grad</code>) to facilitate distributed training across multiple devices and gradient accumulation across multiple sub-batches. If not zeroed, gradients from the current batch add to previous batches, compounding into exploded updates.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q21: What is the computational complexity of backpropagation for a network with $W$ weights and $B$ batch size?</span> <span class="badge badge-math">Complexity</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Both the forward pass and backward pass are $O(B \cdot W)$ FLOPs. The backward pass takes approximately $2\times$ the compute of the forward pass (computing error sensitivity $\delta$ and computing weight gradient $\frac{\partial \mathcal{L}}{\partial W}$). Total training step is $\approx 3\times$ forward compute.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q22: Can a neural network with linear activations learn an XOR function if we increase hidden layers to 1,000?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> <strong>NO.</strong> A composition of 1,000 linear layers is strictly a single linear transformation. Since XOR is non-linearly separable, no linear model can solve it, regardless of depth.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q23: How does mixed precision training (FP16/BF16) affect gradient backpropagation?</span> <span class="badge badge-system">Hardware</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> FP16 has a narrow exponent range ($2^{-14} \approx 6 \times 10^{-5}$ min normal value). Small backprop gradients underflow to zero. <strong>Loss Scaling</strong> multiplies loss by a scale factor (e.g. 1024) before backprop to shift gradients into FP16 range, and unscales them before weight updates. BF16 has the same dynamic range as FP32 (8-bit exponent) and eliminates the need for loss scaling.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q24: What happens if you initialize biases with large positive values in a ReLU network?</span> <span class="badge badge-system">Optimization</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> Setting initial biases to small positive values (e.g. $b=0.01$ or $0.1$) ensures that initial pre-activations $z = w^T x + b > 0$, preventing neurons from dying immediately on epoch 1. However, setting biases too large can slow initial convergence.</p>
+          </div>
+        </details>
+
+        <details>
+          <summary><span>Q25: Why does Leaky ReLU use a small slope $\alpha = 0.01$ for negative inputs instead of $\alpha = 1.0$?</span> <span class="badge badge-concept">Concept</span></summary>
+          <div class="qa-content">
+            <p><strong>Answer:</strong> If $\alpha = 1.0$, Leaky ReLU becomes $g(z) = z$ (a linear function), collapsing the network into a linear model. A small slope $\alpha = 0.01$ maintains non-linearity while preventing the gradient from collapsing to zero.</p>
+          </div>
+        </details>
+      </section>
+    
+      <!-- TAB 12: INTERACTIVE SELF-QUIZ -->
+      <section id="tab-quiz" class="tab-section">
+        <h1>DL Module 1 Interactive Self-Assessment Quiz</h1>
+        <p class="section-subtitle">Test your foundational deep learning knowledge with instant feedback.</p>
+
+        <div class="quiz-card" id="q1">
+          <div class="quiz-question">1. What is the maximum value of the derivative of the standard Sigmoid function $\sigma'(z)$?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">A) 1.0</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q1-exp')">B) 0.25 (at $z = 0$)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">C) 0.50</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q1-exp')">D) 0.10</div>
+          </div>
+          <div class="quiz-explanation" id="q1-exp">
+            <strong>Correct!</strong> Since $\sigma'(z) = \sigma(z)(1 - \sigma(z))$, the maximum occurs at $\sigma(z) = 0.5$ ($z=0$), yielding $0.5 \times (1 - 0.5) = 0.25$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+          <div class="quiz-question">2. Why does initializing all weights in a neural network to zero prevent learning?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">A) Because loss becomes infinity immediately.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q2-exp')">B) Because of symmetry: all neurons in a layer compute identical outputs and receive identical gradients.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">C) Because PyTorch throws a runtime division by zero exception.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q2-exp')">D) Because learning rate drops to zero.</div>
+          </div>
+          <div class="quiz-explanation" id="q2-exp">
+            <strong>Correct!</strong> With zero initialization, all neurons compute identical forward activations and receive identical backward gradients, failing to break symmetry.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+          <div class="quiz-question">3. For a layer with $n_{\text{in}}$ inputs and ReLU activations, what is the recommended weight variance under He (Kaiming) initialization?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">A) $\text{Var}(W) = \frac{1}{n_{\text{in}}}$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q3-exp')">B) $\text{Var}(W) = \frac{2}{n_{\text{in}}}$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">C) $\text{Var}(W) = \frac{1}{\sqrt{n_{\text{in}}}}$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q3-exp')">D) $\text{Var}(W) = 1.0$</div>
+          </div>
+          <div class="quiz-explanation" id="q3-exp">
+            <strong>Correct!</strong> Because ReLU zeros out the negative half of the distribution (halving activation variance), He initialization uses $\frac{2}{n_{\text{in}}}$ to preserve signal scale.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q4">
+          <div class="quiz-question">4. What is the gradient of Categorical Cross-Entropy loss with respect to pre-activation logits $z_i$ when using Softmax?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">A) $\frac{\hat{y}_i - y_i}{\hat{y}_i}$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q4-exp')">B) $\hat{y}_i - y_i$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">C) $(\hat{y}_i - y_i)^2$</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q4-exp')">D) $-\ln(\hat{y}_i)$</div>
+          </div>
+          <div class="quiz-explanation" id="q4-exp">
+            <strong>Correct!</strong> The quotient rule derivatives of Softmax elegantly cancel out when multiplied by the derivative of cross-entropy, yielding residual error $\hat{y}_i - y_i$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q5">
+          <div class="quiz-question">5. Why is gradient clipping by global norm superior to gradient clipping by value?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">A) It runs faster on CPU.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q5-exp')">B) It preserves the original direction of the gradient vector while scaling down its magnitude.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">C) It sets all negative gradients to zero.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q5-exp')">D) It eliminates the need for a learning rate.</div>
+          </div>
+          <div class="quiz-explanation" id="q5-exp">
+            <strong>Correct!</strong> Clipping by value alters the vector's orientation. Norm clipping scales the vector down uniformly: $g \frac{c}{\|g\|}$, preserving descent direction.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q6">
+          <div class="quiz-question">6. What happens if you build a 50-layer neural network using only linear activations ($g(z) = z$)?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">A) It achieves universal function approximation.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q6-exp')">B) It is mathematically equivalent to a single linear layer.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">C) It cannot be trained with gradient descent.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q6-exp')">D) It overfits immediately.</div>
+          </div>
+          <div class="quiz-explanation" id="q6-exp">
+            <strong>Correct!</strong> The composition of linear functions is another linear function: $W_L W_{L-1} \cdots W_1 x = W_{\text{net}} x$.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q7">
+          <div class="quiz-question">7. In Andrej Karpathy's training recipe, what is the first test you must run on a newly implemented neural network?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">A) Run full training on 1,000,000 images with AdamW.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q7-exp')">B) Overfit a tiny batch of 10-20 samples to near-zero loss.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">C) Apply heavy data augmentation and dropout.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q7-exp')">D) Quantize the model to INT8.</div>
+          </div>
+          <div class="quiz-explanation" id="q7-exp">
+            <strong>Correct!</strong> If a model cannot memorize 10-20 samples to 100% accuracy without regularization, there is a fundamental bug in the code.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q8">
+          <div class="quiz-question">8. Which activation function is the standard default in modern Transformer architectures like BERT and GPT-4?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">A) Sigmoid</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">B) Tanh</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q8-exp')">C) GELU (Gaussian Error Linear Unit)</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q8-exp')">D) Step function</div>
+          </div>
+          <div class="quiz-explanation" id="q8-exp">
+            <strong>Correct!</strong> GELU ($x \Phi(x)$) provides smooth probabilistic gating and is standard across Transformers.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q9">
+          <div class="quiz-question">9. What primary issue does Focal Loss solve in dense object detection models?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">A) Vanishing gradients in deep ResNets.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q9-exp')">B) Extreme foreground-background class imbalance where easy background samples overwhelm training gradients.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">C) Floating point underflow during backprop.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q9-exp')">D) Symmetry breaking in weight matrices.</div>
+          </div>
+          <div class="quiz-explanation" id="q9-exp">
+            <strong>Correct!</strong> Focal Loss down-weights easy examples with $(1-p_t)^\gamma$, allowing rare foreground objects to drive parameter learning.
+          </div>
+        </div>
+
+        <div class="quiz-card" id="q10">
+          <div class="quiz-question">10. Why does Activation Checkpointing (Gradient Checkpointing) save significant GPU VRAM during training?</div>
+          <div class="quiz-options">
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">A) It converts all model weights to 4-bit integers.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, true, 'q10-exp')">B) It avoids storing all intermediate activations during the forward pass, recomputing them on-the-fly during the backward pass.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">C) It eliminates the backward pass entirely.</div>
+            <div class="quiz-option" onclick="checkAnswer(this, false, 'q10-exp')">D) It offloads weights to CPU RAM permanently.</div>
+          </div>
+          <div class="quiz-explanation" id="q10-exp">
+            <strong>Correct!</strong> Forward activations consume $O(L \cdot B)$ memory. Checkpointing drops intermediate activations and recalculates them as needed, trading 25% compute for 80% VRAM savings.
+          </div>
+        </div>
+      </section>
+    
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar() { 
+      document.getElementById('sidebar').classList.toggle('open'); 
+    }
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById(tabId);
+      if (target) { 
+        target.classList.add('active'); 
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+      }
+      const activeNavItem = Array.from(document.querySelectorAll('.nav-item')).find(item => {
+        const attr = item.getAttribute('onclick');
+        return attr && attr.includes(tabId);
+      });
+      if (activeNavItem) activeNavItem.classList.add('active');
+      if (window.innerWidth <= 820) { 
+        document.getElementById('sidebar').classList.remove('open'); 
+      }
+    }
+    function checkAnswer(btn, isCorrect, expId) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.quiz-option').forEach(opt => opt.onclick = null);
+      if (isCorrect) { 
+        btn.classList.add('correct'); 
+      } else {
+        btn.classList.add('incorrect');
+        parent.querySelectorAll('.quiz-option').forEach(opt => {
+          if (opt.getAttribute('onclick') && opt.getAttribute('onclick').includes('true')) {
+            opt.classList.add('correct');
+          }
+        });
+      }
+      const exp = document.getElementById(expId);
+      if (exp) exp.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

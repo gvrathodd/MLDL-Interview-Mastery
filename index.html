@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ML & Deep Learning Interview Mastery Portal — Complete Curriculum (10 Modules)</title>
+  <style>
+    :root {
+      --bg-primary: #0a0e17;
+      --bg-secondary: #121a2d;
+      --bg-card: #18233c;
+      --border: #223254;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --purple: #c084fc;
+      --rose: #fb7185;
+      --amber: #f59e0b;
+      --indigo: #818cf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 1rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.5rem 0.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.2rem;
+    }
+
+    .badge-hub {
+      display: inline-block;
+      background: var(--accent-glow);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.28rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.85rem;
+    }
+
+    h1 {
+      font-size: 2.35rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.5px;
+    }
+    h1 span.gradient-text {
+      background: linear-gradient(135deg, #38bdf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .stat-number.purple { color: var(--purple); }
+    .stat-number.green { color: var(--success); }
+    .stat-number.amber { color: var(--warning); }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    /* Track Filter Controls */
+    .track-nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-bottom: 2.2rem;
+      flex-wrap: wrap;
+    }
+
+    .track-btn {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.65rem 1.4rem;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .track-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .track-btn.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .track-btn.active.dl-btn {
+      background: rgba(192, 132, 252, 0.15);
+      color: var(--purple);
+      border-color: var(--purple);
+    }
+
+    /* Section Separators */
+    .track-heading {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 2.2rem 0 1.2rem 0;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .track-heading h2 {
+      font-size: 1.55rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .track-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .track-badge-ml { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .track-badge-dl { background: rgba(192, 132, 252, 0.15); color: var(--purple); border: 1px solid var(--purple); }
+
+    /* Module Grid */
+    .modules-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .module-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .module-card.dl-card:hover {
+      border-color: var(--purple);
+    }
+
+    .module-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .module-tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .tag-ml1 { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .tag-ml2 { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+    .tag-ml3 { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+    .tag-ml4 { background: rgba(192, 132, 252, 0.15); color: var(--purple); }
+    .tag-ml5 { background: rgba(251, 113, 133, 0.15); color: var(--rose); }
+
+    .tag-dl1 { background: rgba(248, 113, 113, 0.15); color: #f87171; }
+    .tag-dl2 { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+    .tag-dl3 { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+    .tag-dl4 { background: rgba(56, 189, 248, 0.15); color: var(--accent); }
+    .tag-dl5 { background: rgba(192, 132, 252, 0.15); color: var(--purple); }
+
+    .module-card h3 {
+      font-size: 1.35rem;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    .module-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 1rem;
+    }
+
+    .topic-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.1rem;
+    }
+
+    .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      color: #cbd5e1;
+    }
+
+    .pill.highlight {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pill.highlight-purple {
+      border-color: var(--purple);
+      color: var(--purple);
+    }
+
+    .pill.highlight-amber {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .btn-action {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: auto;
+    }
+
+    .btn-action.purple-btn {
+      color: var(--purple);
+    }
+
+    .btn-action::after {
+      content: '→';
+      transition: transform 0.2s;
+    }
+    .module-card:hover .btn-action::after {
+      transform: translateX(4px);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Mobile Features */
+    @media (max-width: 650px) {
+      body { padding: 0.5rem; }
+      h1 { font-size: 1.75rem; }
+      .container { padding: 1rem 0.25rem; }
+      .module-card { padding: 1.15rem; }
+      .module-card h3 { font-size: 1.2rem; }
+      .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+      .stat-card { padding: 0.85rem; }
+      .stat-number { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-hub">Mobile-Friendly • Offline • 0 Token Cost</div>
+      <h1><span class="gradient-text">Machine Learning & Deep Learning</span> Interview Mastery Portal</h1>
+      <p>10 Comprehensive modules covering classical ML & modern GenAI: physical analogies, rigorous mathematical proofs, step-by-step numerical calculations, and 250+ FAANG-level interview questions.</p>
+    </header>
+
+    <div class="quick-stats">
+      <div class="stat-card">
+        <div class="stat-number">10</div>
+        <div class="stat-label">Complete Master Modules</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number purple">250+</div>
+        <div class="stat-label">FAANG Interview Q&As</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number green">100</div>
+        <div class="stat-label">Interactive Quiz Questions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number amber">120+</div>
+        <div class="stat-label">Tabs & Worked Numericals</div>
+      </div>
+    </div>
+
+    <!-- Track Filter Nav -->
+    <div class="track-nav">
+      <button class="track-btn active" onclick="filterTrack('all', this)"><span>🌟</span> All 10 Modules</button>
+      <button class="track-btn" onclick="filterTrack('classical-ml', this)"><span>📊</span> Classical ML (Modules 1–5)</button>
+      <button class="track-btn dl-btn" onclick="filterTrack('deep-learning', this)"><span>🧠</span> Deep Learning & GenAI (DL 1–5)</button>
+    </div>
+
+    <div class="modules-grid">
+
+      <!-- ================= TRACK 1: CLASSICAL MACHINE LEARNING ================= -->
+      <div class="track-heading track-ml-header">
+        <h2>Part I: Classical Machine Learning Mastery</h2>
+        <span class="track-badge track-badge-ml">Modules 1 to 5</span>
+      </div>
+
+      <!-- MODULE 1 -->
+      <a href="module1_interview_guide.html" class="module-card track-item-ml">
+        <div class="module-header">
+          <span class="module-tag tag-ml1">Module 1</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Core Theory & Algorithms</span>
+        </div>
+        <h3>Foundations, Concept Learning & Inductive Bias</h3>
+        <p class="module-desc">Definitions ($T, P, E$), Batch vs Online, Find-S algorithm, Version Spaces, Candidate Elimination numericals, and Inductive Bias.</p>
+        <div class="topic-pills">
+          <span class="pill">Find-S Algorithm</span>
+          <span class="pill">Candidate Elimination</span>
+          <span class="pill">Version Space ($S$ & $G$)</span>
+          <span class="pill highlight">No Free Lunch Theorem</span>
+          <span class="pill highlight">PAC Learning</span>
+          <span class="pill highlight">Data Drift (Covariate vs Concept)</span>
+        </div>
+        <div class="btn-action">Open Module 1 Study Guide</div>
+      </a>
+
+      <!-- MODULE 2 -->
+      <a href="module2_interview_guide.html" class="module-card track-item-ml">
+        <div class="module-header">
+          <span class="module-tag tag-ml2">Module 2</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Data Engineering & Evaluation</span>
+        </div>
+        <h3>Data Pipelines, Imputation & Classification Mastery</h3>
+        <p class="module-desc">From raw data to production: Rubin's Missing Data Taxonomy, Outliers & Encodings, Leakage-free Pipelines, Confusion Matrix, PR vs ROC math, Micro/Macro F1 proofs, and Calibration.</p>
+        <div class="topic-pills">
+          <span class="pill">8-Step ML Lifecycle</span>
+          <span class="pill">Rubin's Taxonomy (MCAR/MAR/MNAR)</span>
+          <span class="pill">Tukey 1.5 IQR Proof</span>
+          <span class="pill">Target Encoding Leakage</span>
+          <span class="pill">Data Leakage in CV</span>
+          <span class="pill highlight">PR-AUC for Imbalanced Data</span>
+          <span class="pill highlight">Micro-F1 = Accuracy Proof</span>
+          <span class="pill highlight">SMOTE & Focal Loss</span>
+          <span class="pill highlight">Platt Scaling / Calibration</span>
+          <span class="pill highlight">Bergstra-Bengio Search Proof</span>
+        </div>
+        <div class="btn-action">Open Module 2 Study Guide</div>
+      </a>
+
+      <!-- MODULE 3 -->
+      <a href="module3_interview_guide.html" class="module-card track-item-ml">
+        <div class="module-header">
+          <span class="module-tag tag-ml3">Module 3</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Optimization & Models</span>
+        </div>
+        <h3>Linear Models, Optimization & Regularization Mastery</h3>
+        <p class="module-desc">From slopes to vector spaces: Normal Equation derivation, SVD Moore-Penrose pseudoinverse, Momentum/Adam optimizers, Bias-Variance algebraic proof, Diamond vs Circle Lasso geometry, L.I.N.E. assumptions & VIF, and BCE global convexity.</p>
+        <div class="topic-pills">
+          <span class="pill">Normal Equation Derivation</span>
+          <span class="pill">SVD Pseudoinverse ($X^+$)</span>
+          <span class="pill">Batch / SGD / Mini-batch</span>
+          <span class="pill">Momentum, RMSProp & Adam</span>
+          <span class="pill highlight">Bias-Variance Algebraic Proof</span>
+          <span class="pill highlight">Lasso Diamond vs Circle Geometry</span>
+          <span class="pill highlight">L.I.N.E. Assumptions & VIF</span>
+          <span class="pill highlight">BCE Global Convexity ($\mathbf{H} \succeq 0$)</span>
+          <span class="pill highlight">Softmax Gradients</span>
+          <span class="pill">22+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action">Open Module 3 Study Guide</div>
+      </a>
+
+      <!-- MODULE 4 -->
+      <a href="module4_interview_guide.html" class="module-card track-item-ml">
+        <div class="module-header">
+          <span class="module-tag tag-ml4">Module 4</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Ensembles & SOTA</span>
+        </div>
+        <h3>Decision Trees, Ensembles & SOTA Gradient Boosters Mastery</h3>
+        <p class="module-desc">From emergency room flowcharts to Kaggle-winning gradient boosters: Strict concavity of Gini/Entropy, 14-row PlayTennis numerical calculation, Cost-Complexity Pruning ($CCP_\alpha$), Ensemble variance reduction algebraic proof, OOB $1/e \approx 36.8\%$ proof, AdaBoost, XGBoost 2nd-order Taylor walkthrough with 3-row numerical calculation, LightGBM (GOSS/EFB), CatBoost, and Treelite C deployment.</p>
+        <div class="topic-pills">
+          <span class="pill">PlayTennis 14-Row Walkthrough</span>
+          <span class="pill">Gini Strict Concavity Proof</span>
+          <span class="pill">Cost-Complexity Pruning ($CCP_\alpha$)</span>
+          <span class="pill highlight">Ensemble Variance Proof ($\rho \sigma^2 + \frac{1-\rho}{B}\sigma^2$)</span>
+          <span class="pill highlight">OOB $1/e \approx 36.8\%$ Proof</span>
+          <span class="pill">Random Forest Proximity & Isolation</span>
+          <span class="pill">AdaBoost & Pseudo-Residuals</span>
+          <span class="pill highlight">XGBoost 2nd-Order Taylor ($g_i, h_i$)</span>
+          <span class="pill highlight">3-Row XGBoost Calculation</span>
+          <span class="pill highlight">LightGBM GOSS & EFB</span>
+          <span class="pill highlight">CatBoost Ordered Target Encoding</span>
+          <span class="pill highlight">Tree Extrapolation & Treelite</span>
+          <span class="pill">25+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action">Open Module 4 Study Guide</div>
+      </a>
+
+      <!-- MODULE 5 -->
+      <a href="module5_interview_guide.html" class="module-card track-item-ml">
+        <div class="module-header">
+          <span class="module-tag tag-ml5">Module 5</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Probabilistic Learning</span>
+        </div>
+        <h3>Bayesian Learning, PGMs & EM Algorithm Mastery</h3>
+        <p class="module-desc">From medical diagnostic paradoxes to latent-variable optimization: Base rate fallacy, MLE vs MAP vs Full Bayesian, Gaussian $\implies$ MSE and Bernoulli $\implies$ BCE derivations, Minimum Description Length (MDL), Bayes Optimal Classifier, Naïve Bayes text spam walkthrough with Laplace smoothing, Bayesian Belief Networks with 3 d-separation motifs (Explaining Away), Jensen's inequality ELBO derivation, GMM with 1D numerical walkthrough, mathematical proof that $K$-Means is zero-variance GMM, Thompson Sampling in production A/B testing, and Monte Carlo Dropout.</p>
+        <div class="topic-pills">
+          <span class="pill">Base Rate Fallacy Math</span>
+          <span class="pill">MLE vs MAP vs Full Bayesian</span>
+          <span class="pill highlight">Gaussian $\implies$ MSE Proof</span>
+          <span class="pill highlight">Bernoulli $\implies$ Log-Loss Proof</span>
+          <span class="pill">Minimum Description Length (MDL)</span>
+          <span class="pill highlight">Bayes Optimal & Gibbs $\le 2\times$ Error</span>
+          <span class="pill">Naïve Bayes Text Spam Walkthrough</span>
+          <span class="pill">Laplace Smoothing vs $m$-Estimate</span>
+          <span class="pill highlight">BBN d-Separation & Explaining Away</span>
+          <span class="pill highlight">EM Jensen's Inequality & ELBO</span>
+          <span class="pill highlight">GMM EM 1D Numerical Walkthrough</span>
+          <span class="pill highlight">$K$-Means Limiting Proof ($\sigma^2 \to 0$)</span>
+          <span class="pill highlight">Thompson Sampling & Bandits</span>
+          <span class="pill highlight">MC Dropout & Epistemic Uncertainty</span>
+          <span class="pill">25+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action">Open Module 5 Study Guide</div>
+      </a>
+
+      <!-- ================= TRACK 2: DEEP LEARNING & GENERATIVE AI ================= -->
+      <div class="track-heading track-dl-header">
+        <h2>Part II: Deep Learning & Generative AI Mastery</h2>
+        <span class="track-badge track-badge-dl">Modules DL-1 to DL-5</span>
+      </div>
+
+      <!-- DL MODULE 1 -->
+      <a href="dl_module1_interview_guide.html" class="module-card dl-card track-item-dl">
+        <div class="module-header">
+          <span class="module-tag tag-dl1">DL Module 1</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Neural Foundations & Calculus</span>
+        </div>
+        <h3>Neural Foundations, XOR Crisis, Activations & Backprop Calculus</h3>
+        <p class="module-desc">Biological vs Artificial neurons, Minsky-Papert XOR algebraic impossibility proof, Activation Zoo with Sigmoid saturation proof $\le 0.25$, Vectorized Backpropagation Jacobian chain rule, complete 2-2-1 MLP numerical calculation with real numbers, Xavier & He initialization proofs, and Cybenko Universal Approximation theorem.</p>
+        <div class="topic-pills">
+          <span class="pill">Perceptron Linear Algebra</span>
+          <span class="pill highlight-amber">Minsky XOR Crisis Proof</span>
+          <span class="pill highlight">Sigmoid Saturation Proof ($\sigma' \le 0.25$)</span>
+          <span class="pill">ReLU, GELU & Swish Physics</span>
+          <span class="pill highlight-purple">Vectorized Backprop Matrix Calculus ($\delta^{[l]}$)</span>
+          <span class="pill highlight">2-2-1 MLP Solved Numericals</span>
+          <span class="pill highlight-purple">Xavier $\frac{2}{n_{\text{in}}+n_{\text{out}}}$ Proof</span>
+          <span class="pill highlight-purple">Kaiming He $\frac{2}{n_{\text{in}}}$ Proof</span>
+          <span class="pill">Softmax-CE Gradient ($\hat{y} - y$)</span>
+          <span class="pill">Cybenko Space Folding $O(W^{L \cdot D})$</span>
+          <span class="pill">Karpathy Debugging Recipe</span>
+          <span class="pill">25+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action purple-btn">Open DL Module 1 Study Guide</div>
+      </a>
+
+      <!-- DL MODULE 2 -->
+      <a href="dl_module2_interview_guide.html" class="module-card dl-card track-item-dl">
+        <div class="module-header">
+          <span class="module-tag tag-dl2">DL Module 2</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Optimization & Scaling</span>
+        </div>
+        <h3>Loss Landscapes, Advanced Optimizers & Normalization Zoo</h3>
+        <p class="module-desc">Non-convex loss geometry (saddle points, Hessian condition number $\kappa$, flat vs sharp minima), Momentum & Nesterov look-ahead, complete Adam bias-correction proof ($\frac{m_t}{1-\beta_1^t}$), AdamW decoupled weight decay proof, Cosine Annealing SGDR, BatchNorm Santurkar Lipschitz smoothing proof, LayerNorm/RMSNorm, Inverted Dropout $1/(1-p)$, Deep Double Descent, and DDP Ring-AllReduce $2M$ communication volume proof.</p>
+        <div class="topic-pills">
+          <span class="pill">Loss Landscape Physics</span>
+          <span class="pill">Hessian Condition Number $\kappa$</span>
+          <span class="pill highlight">Momentum & NAG Look-Ahead</span>
+          <span class="pill highlight-purple">Adam Bias-Correction Complete Proof</span>
+          <span class="pill highlight-purple">AdamW Decoupled Weight Decay Proof</span>
+          <span class="pill">Cosine Annealing & Warmup</span>
+          <span class="pill highlight">BatchNorm Lipschitz Smoothing Proof</span>
+          <span class="pill">LayerNorm, InstanceNorm & RMSNorm</span>
+          <span class="pill">Inverted Dropout $1/(1-p)$</span>
+          <span class="pill">Deep Double Descent Threshold</span>
+          <span class="pill highlight-purple">Ring-AllReduce $2M$ Volume Proof</span>
+          <span class="pill">DeepSpeed ZeRO-1/2/3</span>
+          <span class="pill">25+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action purple-btn">Open DL Module 2 Study Guide</div>
+      </a>
+
+      <!-- DL MODULE 3 -->
+      <a href="dl_module3_interview_guide.html" class="module-card dl-card track-item-dl">
+        <div class="module-header">
+          <span class="module-tag tag-dl3">DL Module 3</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Computer Vision & Architectures</span>
+        </div>
+        <h3>CNNs, Receptive Fields & Vision Architectures</h3>
+        <p class="module-desc">Why dense layers fail on vision ($3\times 10^6$ parameters), spatial locality & translation equivariance, 2D convolution output shape formula $\lfloor \frac{W-K+2P}{S} \rfloor + 1$, receptive field recursive tracking with 3-layer worked calculation, $1\times 1$ conv bottlenecks, dilated convs, transposed conv checkerboard artifacts, VGG two $3\times 3$ stacking proof (28% savings), GoogLeNet, ResNet gradient highway proof ($\mathbf{I} + \frac{\partial \mathcal{F}}{\partial x}$), MobileNet depthwise separable 8x FLOPs reduction proof, ResNeXt, ConvNeXt, YOLO, and U-Net.</p>
+        <div class="topic-pills">
+          <span class="pill">Spatial Locality & Equivariance</span>
+          <span class="pill highlight">Output Shape & Param Formulas</span>
+          <span class="pill highlight-purple">Receptive Field Recursive Calculus</span>
+          <span class="pill">1x1 Bottlenecks & Dilated Convs</span>
+          <span class="pill highlight-amber">VGG $3\times 3$ Stacking Proof ($18C^2 < 25C^2$)</span>
+          <span class="pill highlight-purple">ResNet Gradient Highway ($\mathbf{I}$) Proof</span>
+          <span class="pill highlight-purple">MobileNet 8x-9x FLOPs Reduction Proof</span>
+          <span class="pill">ResNeXt Cardinality & ConvNeXt</span>
+          <span class="pill">YOLO Object Detection & NMS</span>
+          <span class="pill">U-Net & Mask R-CNN RoIAlign</span>
+          <span class="pill">25+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action purple-btn">Open DL Module 3 Study Guide</div>
+      </a>
+
+      <!-- DL MODULE 4 -->
+      <a href="dl_module4_interview_guide.html" class="module-card dl-card track-item-dl">
+        <div class="module-header">
+          <span class="module-tag tag-dl4">DL Module 4</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Sequences & Recurrence</span>
+        </div>
+        <h3>Sequence Modeling, RNNs, LSTMs & Attention Mechanics</h3>
+        <p class="module-desc">Temporal physics & Markov limitations, Vanilla RNN forward transitions & BPTT unrolling, mathematical proof of vanishing gradients ($\prod W_{hh}^T \text{diag}(1-h_k^2)$), LSTM Constant Error Carousel additive gradient highway proof, Forget gate bias $+1$ initialization, GRU 2-gate architecture, Bidirectional & stacked RNNs, Seq2Seq information bottleneck crisis, Bahdanau additive vs Luong multiplicative attention, complete step-by-step worked toy attention numerical walkthrough with real numbers, CTC loss, and Beam Search decoding.</p>
+        <div class="topic-pills">
+          <span class="pill">Temporal Markov Limitations</span>
+          <span class="pill">Vanilla RNN & BPTT Unrolling</span>
+          <span class="pill highlight-purple">BPTT Vanishing Gradient Jacobian Proof</span>
+          <span class="pill highlight-purple">LSTM Constant Error Carousel Proof</span>
+          <span class="pill">Forget Gate $+1$ Bias Math</span>
+          <span class="pill">GRU 2-Gate Parameter Efficiency</span>
+          <span class="pill">Bidirectional & Stacked Recurrence</span>
+          <span class="pill highlight-amber">Seq2Seq Information Bottleneck Crisis</span>
+          <span class="pill highlight">Bahdanau Additive vs Luong Multiplicative</span>
+          <span class="pill highlight-purple">Toy Attention Solved Numericals</span>
+          <span class="pill">Beam Search Length Penalty</span>
+          <span class="pill">CTC Loss Forward-Backward</span>
+          <span class="pill">27+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action purple-btn">Open DL Module 4 Study Guide</div>
+      </a>
+
+      <!-- DL MODULE 5 -->
+      <a href="dl_module5_interview_guide.html" class="module-card dl-card track-item-dl">
+        <div class="module-header">
+          <span class="module-tag tag-dl5">DL Module 5</span>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Transformers & Modern GenAI</span>
+        </div>
+        <h3>Transformers, Large Language Models & Generative Deep Learning</h3>
+        <p class="module-desc">Scaled Dot-Product Attention derivation and variance proof $\sqrt{d_k}$, Multi-Head Attention subspace specialization, Rotary Position Embeddings (RoPE) complex plane rotation derivation, Pre-LN vs Post-LN gradient stability proof, SwiGLU & RMSNorm, BERT vs GPT vs T5 archetypes, exact KV cache VRAM memory sizing formula, Grouped-Query Attention (GQA), FlashAttention SRAM tiling & online softmax, Chinchilla scaling laws ($C \approx 6ND$), SFT loss masking, RLHF/PPO Bradley-Terry model, Direct Preference Optimization (DPO) closed-form proof, LoRA low-rank $BA$ parameter efficiency, QLoRA NF4 & Double Quantization, PTQ (AWQ, GPTQ, SmoothQuant), VAE ELBO & reparameterization trick, and DDPM diffusion models.</p>
+        <div class="topic-pills">
+          <span class="pill highlight-purple">Scaled Dot-Product $\sqrt{d_k}$ Variance Proof</span>
+          <span class="pill">Multi-Head Attention Projections</span>
+          <span class="pill highlight-purple">RoPE Complex Rotation Proof</span>
+          <span class="pill highlight">Pre-LN vs Post-LN Identity Highway Proof</span>
+          <span class="pill">SwiGLU & RMSNorm Physics</span>
+          <span class="pill">BERT vs GPT vs T5 Archetypes</span>
+          <span class="pill highlight-amber">Exact KV Cache VRAM Formula ($2 \times L \times H \dots$)</span>
+          <span class="pill highlight">Grouped-Query Attention (GQA)</span>
+          <span class="pill highlight-purple">FlashAttention SRAM Tiling & Online Softmax</span>
+          <span class="pill highlight">Chinchilla Scaling Laws ($C \approx 6ND$)</span>
+          <span class="pill">SFT Prompt Loss Masking</span>
+          <span class="pill highlight-purple">DPO Closed-Form Reward Proof</span>
+          <span class="pill highlight">LoRA Low-Rank ($BA$) Math</span>
+          <span class="pill">QLoRA NF4 & Double Quantization</span>
+          <span class="pill">PTQ (AWQ vs GPTQ vs SmoothQuant)</span>
+          <span class="pill highlight-purple">VAE ELBO & Reparameterization Trick</span>
+          <span class="pill highlight">DDPM Diffusion Forward-Reverse Math</span>
+          <span class="pill">Toy Attention Solved Numericals</span>
+          <span class="pill">28+ FAANG Q&As</span>
+        </div>
+        <div class="btn-action purple-btn">Open DL Module 5 Study Guide</div>
+      </a>
+
+    </div>
+
+    <footer>
+      <p>Machine Learning & Deep Learning Interview Mastery System • Designed for Software Engineers, MLEs, and Research Scientists • Offline & Mobile Optimized</p>
+    </footer>
+  </div>
+
+  <script>
+    function filterTrack(track, btn) {
+      document.querySelectorAll('.track-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const mlHeader = document.querySelector('.track-ml-header');
+      const dlHeader = document.querySelector('.track-dl-header');
+      const mlItems = document.querySelectorAll('.track-item-ml');
+      const dlItems = document.querySelectorAll('.track-item-dl');
+
+      if (track === 'all') {
+        mlHeader.style.display = 'flex';
+        dlHeader.style.display = 'flex';
+        mlItems.forEach(el => el.style.display = 'flex');
+        dlItems.forEach(el => el.style.display = 'flex');
+      } else if (track === 'classical-ml') {
+        mlHeader.style.display = 'flex';
+        dlHeader.style.display = 'none';
+        mlItems.forEach(el => el.style.display = 'flex');
+        dlItems.forEach(el => el.style.display = 'none');
+      } else if (track === 'deep-learning') {
+        mlHeader.style.display = 'none';
+        dlHeader.style.display = 'flex';
+        mlItems.forEach(el => el.style.display = 'none');
+        dlItems.forEach(el => el.style.display = 'flex');
+      }
+    }
+  </script>
+</body>
+</html>
