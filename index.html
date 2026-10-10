@@ -309,16 +309,37 @@
       font-size: 0.85rem;
     }
 
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      position: relative;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
     /* Mobile Features */
     @media (max-width: 650px) {
-      body { padding: 0.5rem; }
-      h1 { font-size: 1.75rem; }
-      .container { padding: 1rem 0.25rem; }
-      .module-card { padding: 1.15rem; }
-      .module-card h3 { font-size: 1.2rem; }
-      .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
-      .stat-card { padding: 0.85rem; }
-      .stat-number { font-size: 1.5rem; }
+      body { padding: 0.25rem; }
+      .container { padding: 0.75rem 0.4rem; }
+      header { margin-bottom: 1.5rem; }
+      .badge-hub { font-size: 0.72rem; padding: 0.22rem 0.65rem; }
+      h1 { font-size: clamp(1.45rem, 5.5vw, 1.85rem); }
+      header p { font-size: 0.9rem; line-height: 1.5; }
+      .quick-stats { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1.6rem; }
+      .stat-card { padding: 0.75rem 0.4rem; }
+      .stat-number { font-size: 1.4rem; }
+      .stat-label { font-size: 0.72rem; }
+      .track-nav { gap: 0.4rem; margin-bottom: 1.5rem; }
+      .track-btn { padding: 0.5rem 0.85rem; font-size: 0.82rem; min-height: 42px; }
+      .track-heading { margin: 1.8rem 0 1rem 0; gap: 0.5rem; }
+      .track-heading h2 { font-size: 1.25rem; }
+      .track-badge { font-size: 0.7rem; }
+      .module-card { padding: 1.1rem 0.9rem; border-radius: 10px; }
+      .module-card h3 { font-size: 1.15rem; }
+      .module-desc { font-size: 0.86rem; margin-bottom: 0.8rem; }
+      .topic-pills { gap: 0.3rem; margin-bottom: 0.85rem; }
+      .pill { font-size: 0.7rem; padding: 0.18rem 0.45rem; }
+      .btn-action { font-size: 0.84rem; min-height: 40px; }
     }
   </style>
 </head>

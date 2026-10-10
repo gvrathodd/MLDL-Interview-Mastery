@@ -9,7 +9,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
           onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
   <style>
-    :root {
+:root {
       --bg-primary: #0a0e17;
       --bg-secondary: #121a2d;
       --bg-tertiary: #1b2640;
@@ -26,75 +26,172 @@
       --code-bg: #070b14;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background-color: var(--bg-primary);
-      color: var(--text);
-      line-height: 1.65;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+    /* ================= MOBILE-FRIENDLY & RESPONSIVE CORE ================= */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
+      position: relative;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* KaTeX Display Formula Overflow Protection */
+    .katex-display {
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      padding: 0.6rem 0.2rem !important;
+      margin: 1rem 0 !important;
+      max-width: 100% !important;
+    }
+    .katex-display > .katex {
+      max-width: 100% !important;
+      text-align: left !important;
+    }
+    .katex {
+      font-size: 1.02em;
+      max-width: 100%;
+    }
+
+    /* Backdrop Blur Overlay for Mobile Drawer */
+    #sidebar-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      z-index: 140;
+      transition: opacity 0.25s ease;
+    }
+    #sidebar-backdrop.active {
+      display: block;
+    }
+
+    /* Sidebar Header & Close Button */
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 1.25rem 0.5rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.5rem;
+    }
+    .sidebar-header .sidebar-title {
+      padding: 0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+    .sidebar-close-btn {
+      display: none;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .sidebar-close-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* Top Navigation Layout */
     #top-nav {
       background: var(--bg-secondary);
       border-bottom: 1px solid var(--border);
-      padding: 0.6rem 1.25rem;
+      padding: 0.55rem 1.25rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: sticky;
       top: 0;
-      z-index: 200;
+      z-index: 130;
+      gap: 0.75rem;
     }
-    .top-left { display: flex; align-items: center; gap: 1rem; }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-shrink: 0;
+    }
     .menu-toggle {
       background: var(--bg-tertiary);
       border: 1px solid var(--border);
       color: var(--accent);
       padding: 0.4rem 0.75rem;
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 0.88rem;
+      font-weight: 600;
       cursor: pointer;
       display: none;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
     }
-    .logo { font-weight: 700; font-size: 1rem; color: #fff; text-decoration: none; }
+    .menu-toggle:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+    }
+    .logo {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      text-decoration: none;
+      white-space: nowrap;
+    }
     .logo span { color: var(--accent); }
-    .module-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding: 0.2rem 0; }
+    .module-nav {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding: 0.2rem 0;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .module-nav::-webkit-scrollbar { display: none; }
     .mod-link {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
-      padding: 0.3rem 0.65rem;
+      padding: 0.3rem 0.6rem;
       border-radius: 6px;
       border: 1px solid transparent;
       white-space: nowrap;
+      transition: all 0.2s;
+      flex-shrink: 0;
     }
     .mod-link:hover { color: #fff; background: var(--bg-tertiary); }
-    .mod-link.active { color: var(--accent); background: var(--accent-glow); border-color: var(--accent); }
+    .mod-link.active {
+      color: var(--accent);
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      font-weight: 700;
+    }
 
+    /* Main Content Layout */
     .layout-wrapper { display: flex; flex-grow: 1; }
     #sidebar {
-      width: 320px;
+      width: 310px;
       background: var(--bg-secondary);
       border-right: 1px solid var(--border);
       flex-shrink: 0;
       overflow-y: auto;
-      height: calc(100vh - 49px);
+      height: calc(100vh - 53px);
       position: sticky;
-      top: 49px;
+      top: 53px;
+      -webkit-overflow-scrolling: touch;
     }
-    .sidebar-title { 
-      padding: 1.2rem 1.25rem 0.5rem 1.25rem; 
-      font-size: 0.75rem; 
-      text-transform: uppercase; 
-      letter-spacing: 1px; 
-      color: var(--text-muted); 
-      font-weight: 700; 
-    }
-    .nav-links { list-style: none; padding-bottom: 2rem; }
+    .nav-links { list-style: none; padding-bottom: 2.5rem; }
     .nav-item {
       padding: 0.75rem 1.25rem;
       font-size: 0.88rem;
@@ -105,207 +202,368 @@
       display: flex;
       align-items: center;
       gap: 0.6rem;
+      word-break: break-word;
     }
     .nav-item:hover { background: var(--bg-tertiary); color: #fff; }
-    .nav-item.active { 
-      background: var(--accent-glow); 
-      color: var(--accent); 
-      border-left-color: var(--accent); 
-      font-weight: 600; 
+    .nav-item.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
     }
 
-    #main-content { 
-      flex-grow: 1; 
-      padding: 2.2rem 3.5rem; 
-      max-width: 1080px; 
+    #main-content {
+      flex-grow: 1;
+      padding: 2.2rem 3.2rem;
+      max-width: 1080px;
       min-width: 0;
+      width: 100%;
+      overflow-x: hidden;
     }
     .tab-section { display: none; animation: fadeIn 0.2s ease-in-out; }
     .tab-section.active { display: block; }
-    @keyframes fadeIn { 
-      from { opacity: 0; transform: translateY(4px); } 
-      to { opacity: 1; transform: translateY(0); } 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    h1 { font-size: 2.15rem; color: #fff; margin-bottom: 0.5rem; }
-    .section-subtitle { 
-      font-size: 1.02rem; 
-      color: var(--text-muted); 
-      margin-bottom: 1.8rem; 
-      border-bottom: 1px solid var(--border); 
-      padding-bottom: 0.8rem; 
+    /* Responsive Typography */
+    h1 {
+      font-size: clamp(1.45rem, 5vw, 2.15rem);
+      line-height: 1.25;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      word-break: break-word;
     }
-    h2 { font-size: 1.45rem; margin: 2.2rem 0 0.9rem 0; color: var(--accent); border-bottom: 1px dashed var(--border); padding-bottom: 0.35rem; }
-    h3 { font-size: 1.15rem; margin: 1.4rem 0 0.6rem 0; color: #e2e8f0; }
-    h4 { font-size: 1.02rem; margin-bottom: 0.4rem; }
-    p { margin-bottom: 1rem; color: #cbd5e1; }
-    ul, ol { margin-bottom: 1.25rem; padding-left: 1.5rem; color: #cbd5e1; }
-    li { margin-bottom: 0.45rem; }
+    .section-subtitle {
+      font-size: clamp(0.88rem, 2.8vw, 1.02rem);
+      color: var(--text-muted);
+      margin-bottom: 1.8rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.8rem;
+      line-height: 1.5;
+    }
+    h2 {
+      font-size: clamp(1.2rem, 4.2vw, 1.45rem);
+      line-height: 1.3;
+      margin: 2.2rem 0 0.9rem 0;
+      color: var(--accent);
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 0.35rem;
+      word-break: break-word;
+    }
+    h3 {
+      font-size: clamp(1.05rem, 3.8vw, 1.2rem);
+      margin: 1.4rem 0 0.6rem 0;
+      color: #e2e8f0;
+      word-break: break-word;
+    }
+    h4 {
+      font-size: clamp(0.96rem, 3.2vw, 1.05rem);
+      margin-bottom: 0.4rem;
+      word-break: break-word;
+    }
+    p { margin-bottom: 1rem; color: #cbd5e1; line-height: 1.65; word-break: break-word; }
+    ul, ol { margin-bottom: 1.25rem; padding-left: 1.4rem; color: #cbd5e1; }
+    li { margin-bottom: 0.45rem; line-height: 1.6; word-break: break-word; }
 
-    .first-principles {
-      background: rgba(56, 189, 248, 0.08);
-      border-left: 4px solid var(--cyan);
+    /* Boxes */
+    .first-principles, .math-box, .interview-alert, .deep-dive, .example-box {
       border-radius: 8px;
       padding: 1.25rem;
       margin: 1.4rem 0;
+      max-width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
-    .first-principles h4 { color: var(--cyan); font-size: 1.05rem; }
-
-    .math-box { 
-      background: rgba(192, 132, 252, 0.08); 
-      border-left: 4px solid var(--purple); 
-      border-radius: 8px; 
-      padding: 1.25rem; 
-      margin: 1.4rem 0; 
-      overflow-x: auto; 
+    .first-principles {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent);
     }
-    .math-box h4 { color: var(--purple); font-size: 1.05rem; }
-
-    .interview-alert { 
-      background: rgba(251, 191, 36, 0.08); 
-      border-left: 4px solid var(--warning); 
-      border-radius: 8px; 
-      padding: 1.25rem; 
-      margin: 1.4rem 0; 
+    .first-principles h4 { color: var(--accent); }
+    .math-box {
+      background: rgba(192, 132, 252, 0.08);
+      border-left: 4px solid var(--purple);
     }
-    .interview-alert h4 { color: var(--warning); font-size: 1.05rem; }
-
+    .math-box h4 { color: var(--purple); }
+    .interview-alert {
+      background: rgba(251, 191, 36, 0.08);
+      border-left: 4px solid var(--warning);
+    }
+    .interview-alert h4 { color: var(--warning); }
     .deep-dive {
       background: var(--bg-secondary);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem;
-      margin: 1.4rem 0;
     }
-    .deep-dive h4 { color: var(--accent); font-size: 1.05rem; }
-
+    .deep-dive h4 { color: var(--accent); }
     .example-box {
-      background: rgba(52, 211, 153, 0.08);
-      border-left: 4px solid var(--success);
-      border-radius: 8px;
-      padding: 1.25rem;
-      margin: 1.4rem 0;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--cyan);
     }
-    .example-box h4 { color: var(--success); font-size: 1.05rem; }
+    .example-box h4 { color: var(--cyan); }
 
-    .table-container { overflow-x: auto; margin: 1.3rem 0; border-radius: 6px; border: 1px solid var(--border); }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; background: var(--bg-secondary); }
-    th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
-    th { background: #162238; color: var(--accent); font-weight: 600; }
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 1.3rem 0;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      max-width: 100%;
+    }
+    table {
+      width: 100%;
+      min-width: 520px;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: var(--bg-secondary);
+    }
+    th, td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    th { background: #162238; color: var(--accent); font-weight: 600; white-space: nowrap; }
     tr:hover td { background: rgba(255, 255, 255, 0.02); }
 
-    pre { 
-      background: var(--code-bg); 
-      border: 1px solid #1a273f; 
-      border-radius: 6px; 
-      padding: 1.25rem; 
-      overflow-x: auto; 
-      margin: 1rem 0 1.5rem 0; 
-      font-family: 'Consolas', 'Fira Code', monospace; 
-      font-size: 0.88rem; 
-      color: #e2e8f0; 
-      line-height: 1.5; 
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid #1a273f;
+      border-radius: 6px;
+      padding: 1.15rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 1rem 0 1.5rem 0;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 0.86rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+      max-width: 100%;
     }
-    code { 
-      font-family: 'Consolas', 'Fira Code', monospace; 
-      background: rgba(255, 255, 255, 0.08); 
-      padding: 0.15rem 0.35rem; 
-      border-radius: 4px; 
-      font-size: 0.88em; 
-      color: var(--accent); 
+    code {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.88em;
+      color: var(--accent);
+      word-break: break-word;
     }
-    pre code { background: transparent; padding: 0; color: inherit; }
+    pre code { background: transparent; padding: 0; color: inherit; word-break: normal; }
 
-    details { 
-      background: var(--bg-secondary); 
-      border: 1px solid var(--border); 
-      border-radius: 8px; 
-      margin-bottom: 0.95rem; 
+    /* Collapsible Q&A Cards */
+    details {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.95rem;
       transition: border-color 0.2s;
+      max-width: 100%;
     }
     details[open] { border-color: var(--accent); }
-    summary { 
-      padding: 0.95rem 1.25rem; 
-      cursor: pointer; 
-      font-weight: 600; 
-      list-style: none; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
+    summary {
+      padding: 0.95rem 1.15rem;
+      cursor: pointer;
+      font-weight: 600;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.6rem;
+      font-size: 0.95rem;
     }
     summary::-webkit-details-marker { display: none; }
-    summary::after { content: '+'; font-size: 1.3rem; color: var(--accent); font-weight: bold; }
+    summary::after {
+      content: '+';
+      font-size: 1.3rem;
+      color: var(--accent);
+      font-weight: bold;
+      flex-shrink: 0;
+      margin-left: 0.5rem;
+    }
     details[open] summary::after { content: '−'; }
-    .qa-content { 
-      padding: 0 1.25rem 1.25rem 1.25rem; 
-      border-top: 1px solid var(--border); 
-      padding-top: 0.95rem; 
-      font-size: 0.94rem; 
+    summary span:first-child { flex: 1; word-break: break-word; }
+    .qa-content {
+      padding: 0 1.15rem 1.15rem 1.15rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.95rem;
+      font-size: 0.93rem;
+      line-height: 1.6;
     }
 
-    .badge { display: inline-block; padding: 0.18rem 0.55rem; border-radius: 4px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; margin-left: 0.5rem; }
+    .badge {
+      display: inline-block;
+      padding: 0.18rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
     .badge-math { background: rgba(192, 132, 252, 0.2); color: var(--purple); }
     .badge-concept { background: rgba(56, 189, 248, 0.2); color: var(--cyan); }
     .badge-faang { background: rgba(248, 113, 113, 0.2); color: var(--danger); }
     .badge-system { background: rgba(52, 211, 153, 0.2); color: var(--success); }
 
-    .quiz-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 1.3rem; margin-bottom: 1.3rem; }
-    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.98rem; }
+    /* Quizzes */
+    .quiz-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin-bottom: 1.3rem;
+      max-width: 100%;
+    }
+    .quiz-question { font-weight: 600; margin-bottom: 0.85rem; color: #fff; font-size: 0.96rem; line-height: 1.5; }
     .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
-    .quiz-option { 
-      background: var(--bg-primary); 
-      border: 1px solid var(--border); 
-      padding: 0.75rem 1rem; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-size: 0.9rem; 
-      transition: all 0.2s; 
+    .quiz-option {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      word-break: break-word;
     }
     .quiz-option:hover { border-color: var(--accent); }
     .quiz-option.correct { background: rgba(52, 211, 153, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
     .quiz-option.incorrect { background: rgba(248, 113, 113, 0.15); border-color: var(--danger); color: var(--danger); }
-    .quiz-explanation { display: none; padding: 0.85rem; border-radius: 6px; background: #18243c; border-left: 3px solid var(--accent); font-size: 0.88rem; margin-top: 0.6rem; }
-
-    @media (max-width: 820px) {
-      .menu-toggle { display: block; }
-      #sidebar { 
-        position: fixed; 
-        left: -330px; 
-        top: 49px; 
-        bottom: 0; 
-        z-index: 150; 
-        transition: left 0.25s ease; 
-        box-shadow: 4px 0 20px rgba(0,0,0,0.5); 
-      }
-      #sidebar.open { left: 0; }
-      #main-content { padding: 1.5rem 1rem; }
-      h1 { font-size: 1.7rem; }
-      .mod-link { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+    .quiz-explanation {
+      display: none;
+      padding: 0.85rem;
+      border-radius: 6px;
+      background: #18243c;
+      border-left: 3px solid var(--accent);
+      font-size: 0.88rem;
+      margin-top: 0.6rem;
+      line-height: 1.5;
     }
+
+    /* ================= MOBILE MEDIA QUERY (PHONES & TABLETS) ================= */
+    @media (max-width: 820px) {
+      #top-nav {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0.5rem 0.75rem;
+        gap: 0.45rem;
+      }
+      .top-left {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .menu-toggle {
+        display: inline-flex;
+      }
+      .module-nav {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 0.25rem;
+        scrollbar-width: none;
+      }
+      .mod-link {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.55rem;
+      }
+
+      #sidebar {
+        position: fixed;
+        left: -320px;
+        top: 0;
+        bottom: 0;
+        width: 290px;
+        height: 100vh;
+        z-index: 150;
+        transition: left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.7);
+      }
+      #sidebar.open {
+        left: 0;
+      }
+      .sidebar-close-btn {
+        display: block;
+      }
+
+      #main-content {
+        padding: 1.25rem 0.85rem;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+      }
+      .first-principles, .math-box, .interview-alert, .deep-dive, .example-box {
+        padding: 0.95rem 0.85rem;
+        margin: 1rem 0;
+        border-radius: 6px;
+      }
+      summary {
+        padding: 0.85rem 0.95rem;
+        font-size: 0.92rem;
+      }
+      .qa-content {
+        padding: 0.85rem 0.95rem;
+        font-size: 0.9rem;
+      }
+      .quiz-card {
+        padding: 1rem 0.85rem;
+      }
+      .quiz-option {
+        padding: 0.7rem 0.85rem;
+        font-size: 0.88rem;
+      }
+      pre {
+        padding: 0.9rem 0.8rem;
+        font-size: 0.82rem;
+      }
+      table {
+        font-size: 0.84rem;
+      }
+      th, td {
+        padding: 0.65rem 0.75rem;
+      }
+    }
+
   </style>
 </head>
 <body>
 
   <!-- Top Navigation Bar -->
+    <!-- Top Navigation Bar -->
   <header id="top-nav">
     <div class="top-left">
-      <button class="menu-toggle" onclick="toggleSidebar()">☰ Topics</button>
+      <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Open Topics Menu">☰ Topics</button>
       <a href="index.html" class="logo">ML<span>Mastery</span></a>
     </div>
-    <nav class="module-nav">
+    <nav class="module-nav" aria-label="Module Navigation">
       <a href="index.html" class="mod-link">🏠 Hub</a>
-      <a href="module1_interview_guide.html" class="mod-link">M1: Foundations</a>
-      <a href="module2_interview_guide.html" class="mod-link">M2: Pipelines</a>
-      <a href="module3_interview_guide.html" class="mod-link">M3: Regression</a>
-      <a href="module4_interview_guide.html" class="mod-link">M4: Trees/Ensembles</a>
-      <a href="module5_interview_guide.html" class="mod-link active">M5: Bayesian</a>
+      <a href="module1_interview_guide.html" class="mod-link">M1</a>
+      <a href="module2_interview_guide.html" class="mod-link">M2</a>
+      <a href="module3_interview_guide.html" class="mod-link">M3</a>
+      <a href="module4_interview_guide.html" class="mod-link">M4</a>
+      <a href="module5_interview_guide.html" class="mod-link active">M5</a>
+      <a href="dl_module1_interview_guide.html" class="mod-link">DL1</a>
+      <a href="dl_module2_interview_guide.html" class="mod-link">DL2</a>
+      <a href="dl_module3_interview_guide.html" class="mod-link">DL3</a>
+      <a href="dl_module4_interview_guide.html" class="mod-link">DL4</a>
+      <a href="dl_module5_interview_guide.html" class="mod-link">DL5</a>
     </nav>
   </header>
 
+  <div id="sidebar-backdrop" onclick="closeSidebar()"></div>
   <div class="layout-wrapper">
     <!-- Sidebar -->
     <nav id="sidebar">
-      <div class="sidebar-title">Module 5 Deep Dive</div>
+      <div class="sidebar-header">
+        <div class="sidebar-title">Module 5 Deep Dive</div>
+        <button class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Close Menu">✕</button>
+      </div>
       <ul class="nav-links">
         <li class="nav-item active" onclick="switchTab('tab-bayes')"><span>🔮</span> 1. Bayes' Theorem & Foundations</li>
         <li class="nav-item" onclick="switchTab('tab-mle-map')"><span>⚖️</span> 2. MLE vs. MAP vs. Bayesian</li>
@@ -1268,7 +1526,8 @@
           <div class="qa-content">
             <p><strong>Answer:</strong> There are two standard approaches:</p>
             <ol>
-              <li><strong>Gaussian Na&iuml;ve Bayes:</strong> Model continuous feature $x_d$ within class $y$ as a normal distribution: $P(x_d \mid y) = rac{1}{\sqrt{2\pi\sigma_{yd}^2}} \exp\left(-rac{(x_d - \mu_{yd})^2}{2\sigma_{yd}^2}ight)$. Compute sample mean $\mu_{yd}$ and variance $\sigma_{yd}^2$ for each class during training.</li>
+              <li><strong>Gaussian Na&iuml;ve Bayes:</strong> Model continuous feature $x_d$ within class $y$ as a normal distribution: $P(x_d \mid y) = rac{1}{\sqrt{2\pi\sigma_{yd}^2}} \exp\left(-rac{(x_d - \mu_{yd})^2}{2\sigma_{yd}^2}
+ight)$. Compute sample mean $\mu_{yd}$ and variance $\sigma_{yd}^2$ for each class during training.</li>
               <li><strong>Discretization (Binning):</strong> Discretize continuous values into $B$ discrete bins (e.g. equal-width or quantile binning) and apply categorical Multinomial Na&iuml;ve Bayes with Laplace smoothing.</li>
             </ol>
           </div>
@@ -1330,7 +1589,8 @@
         <details>
           <summary><span>Q13: Why does standard Maximum Likelihood fail when latent variables are present?</span> <span class="badge badge-concept">Concept</span></summary>
           <div class="qa-content">
-            <p><strong>Answer:</strong> Because the marginal log-likelihood requires summing over unobserved latent states inside the logarithm: $\ln P(X \mid 	heta) = \sum_i \ln \left(\sum_z P(x_i, z \mid 	heta)ight)$. The log of a sum has no closed-form analytical derivative, creating a non-linear coupling between parameters.</p>
+            <p><strong>Answer:</strong> Because the marginal log-likelihood requires summing over unobserved latent states inside the logarithm: $\ln P(X \mid 	heta) = \sum_i \ln \left(\sum_z P(x_i, z \mid 	heta)
+ight)$. The log of a sum has no closed-form analytical derivative, creating a non-linear coupling between parameters.</p>
           </div>
         </details>
 
@@ -1574,9 +1834,18 @@
     </main>
   </div>
 
-  <script>
+    <script>
     function toggleSidebar() { 
-      document.getElementById('sidebar').classList.toggle('open'); 
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      if (sb) sb.classList.toggle('open');
+      if (bd) bd.classList.toggle('active');
+    }
+    function closeSidebar() {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      if (sb) sb.classList.remove('open');
+      if (bd) bd.classList.remove('active');
     }
     function switchTab(tabId) {
       document.querySelectorAll('.tab-section').forEach(el => el.classList.remove('active'));
@@ -1591,9 +1860,7 @@
         return attr && attr.includes(tabId);
       });
       if (activeNavItem) activeNavItem.classList.add('active');
-      if (window.innerWidth <= 820) { 
-        document.getElementById('sidebar').classList.remove('open'); 
-      }
+      closeSidebar();
     }
     function checkAnswer(btn, isCorrect, expId) {
       const parent = btn.parentElement;
@@ -1614,3 +1881,4 @@
   </script>
 </body>
 </html>
+
